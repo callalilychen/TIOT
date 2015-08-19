@@ -34,10 +34,11 @@
 #include <msp430.h>
 
 #include "config.h"
+
 #include "uart.h"
+//#if defined(DEBUG) || defined(INFO) || defined(LOG)
 #include "printString.h"
-//#define INFO
-//#define DEBUG
+//#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

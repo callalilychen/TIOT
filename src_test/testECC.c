@@ -28,6 +28,7 @@ inline void setupECC()
 #ifdef DEBUG
   print("Start ECC, Curve %d\n\r", uECC_curve());
   print("Start ECC, Wordsize %d\n\r", getWordSize());
+  print("Start ECC, UECC Bytes %d\n\r", uECC_BYTES);
 #endif
   uECC_set_rng(&fake_rng);
   int failed = uECC_make_key(public, private);
@@ -49,23 +50,29 @@ inline void setupECC()
   }
   print("\n\r");
 #endif
+  memcpy(hash, public, uECC_BYTES);
 }
 
 inline void updateECC(int newValue)
 {
   sign_state = 0;
   verify_state = 0;
-  hash[16] = getValidASCII((uint8_t)(newValue>>8));
-  hash[17] = getValidASCII((uint8_t)newValue);
+  //hash[16] = getValidASCII((uint8_t)(newValue>>8));
+  //hash[17] = getValidASCII((uint8_t)newValue);
 
 }
 
 inline void printECC(void){
 #ifdef INFO 
-  if(sign_state){
-    print("Sign %s success:\n\r", hash);
     int i=0;
-    for (;i<uECC_BYTES*2; i++){
+  if(sign_state){
+    print("Sign ");
+    for(i=0; i<uECC_BYTES; i++){
+    print("%x",hash[i]);
+  }
+
+    print(" success:\n\r");
+    for (i=0;i<uECC_BYTES*2; i++){
       print("%x", sig[i]);  
     }
     print("\n\r");
@@ -90,18 +97,28 @@ inline int testECC(int newValue)
   sign_state = uECC_sign(private, hash, sig);
 #ifdef SIGNAL
   testSignalLow();
+#ifdef TESTLPM
+  __delay_cycles(1600);
+#else
+  __delay_cycles(8000000ul);
+  __delay_cycles(8000000ul);
+#endif
 #endif
   printECC();
-  __delay_cycles(16000000);
 #ifdef SIGNAL
   testSignalHigh();
 #endif
   verify_state = uECC_verify(public, hash, sig);
 #ifdef SIGNAL
   testSignalLow();
+#ifndef TESTLPM
+  __delay_cycles(8000000ul);
+  __delay_cycles(8000000ul);
+  __delay_cycles(8000000ul);
+  __delay_cycles(8000000ul);
+#endif
 #endif
   printECC();
-  __delay_cycles(32000000);
   return sign_state|verify_state;
 
 }

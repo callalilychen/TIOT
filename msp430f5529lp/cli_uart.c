@@ -175,8 +175,8 @@ CLI_Configure(void)
     UCA1CTL1 |= UCSWRST;                /* Put state machine in reset */
     UCA1CTL0 = 0x00;
     UCA1CTL1 = UCSSEL__SMCLK + UCSWRST; /* Use SMCLK, keep RESET */
-    UCA1BR0 = 0x2C;           /* 25MHz/115200= 217.01 =0xD9 (see User's Guide) */
-    UCA1BR1 = 0x0A;           /* 25MHz/9600= 2604 =0xA2C (see User's Guide) */
+    UCA1BR0 = 0xD9;           /* 25MHz/115200= 217.01 =0xD9 (see User's Guide) */
+    UCA1BR1 = 0x0;           /* 25MHz/9600= 2604 =0xA2C (see User's Guide) */
 
     UCA1MCTL = UCBRS_3 + UCBRF_0;       /* Modulation UCBRSx=3, UCBRFx=0 */
 

@@ -49,3 +49,12 @@ int testLED4(uint16_t _state)
   }
   return 0;
 }
+
+int testleds(uint16_t state){
+  if(testLED1(state) | testLED4(state)){
+    return 0;
+  } else{
+    return ++state;
+  }
+
+}

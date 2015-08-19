@@ -255,16 +255,15 @@ void board_init(void)
     /* disable watchdog timer */
     WDTCTL  =  WDTPW + WDTHOLD;
 
-    /* init MCU pins as adequate for Z1 hardware */
+    /* init MCU pins */
     ports_init();
 
     /* initializes DCO */
     msp430_init_dco();
 
     /* initialize UART/USB module */
- #if defined(DEBUG) || defined(INFO)
     uart_init();
-#endif
-    /* enable interrupts */
-    // TODO IE not work __bis_SR_register(GIE);
+
+    /* enable interrupts
+     *__bis_SR_register(GIE); */
 }

@@ -1,27 +1,32 @@
 #include "testcases.h"
 
 inline void setupSignal(void){
-  P2DIR |= BIT0;					// Set P2.0 to output direction
-  P2DIR |= BIT2;					// Set P2.2 to output direction
+  P2DIR |= BIT3;					// Set P2.3 to output direction
+  P8DIR |= BIT1;					// Set P8.1 to output direction
   P2OUT &= ~(BIT0 + BIT2);
 
 }
 inline void startSignal(void){
-  P2OUT |= (BIT0 + BIT2);
+  testSignalHigh();
   __delay_cycles(1000);
-  P2OUT &= ~(BIT0 + BIT2);
+  testSignalLow();
   __delay_cycles(1000);
-  P2OUT |= (BIT0 + BIT2);
+  testSignalHigh();
   __delay_cycles(1000);
-  P2OUT &= ~(BIT0 + BIT2);
-#ifdef DEBUG
-  print("Start\n\r");
-#endif
+  testSignalLow();
 }
 inline void testSignalHigh(void){
-  P2OUT |= (BIT0 + BIT2);
+  P2OUT |= BIT3;
+  P8OUT |= BIT1;
+#ifdef LED
+  led1on();
+#endif
 }
 
 inline void testSignalLow(void){
-  P2OUT &= ~(BIT0 + BIT2);
+  P2OUT &= ~BIT3;
+  P8OUT &= ~BIT1;
+#ifdef LED
+  led1off();
+#endif
 }

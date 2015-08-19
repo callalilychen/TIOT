@@ -13,21 +13,6 @@ inline int setup3DES(void){
   tripledes_init(&context,THREEDES_BLOCK_SIZE, THREEDES_BLOCK_SIZE, key);
 }
 
-inline void update3DES(int i){
-  enc_state = 0;
-  dec_state = 0;
-  pblock_3des[4] = getValidASCII((uint8_t)(i>>8));
-  pblock_3des[5] = getValidASCII((uint8_t)i);
-}
-
-inline int testEnc3DES(void){
-  enc_state = tripledes_encrypt(&context, pblock_3des, cblock_3des);
-  return enc_state;
-}
-inline int testDec3DES(void){
-  dec_state = tripledes_decrypt(&context, cblock_3des, rpblock_3des);
-  return dec_state;
-}
 inline void print3DES(void){
 #ifdef DEBUG
   if(enc_state){
@@ -55,24 +40,51 @@ inline void print3DES(void){
   }
 #endif
 }
+inline void update3DES(int i){
+  enc_state = 0;
+  dec_state = 0;
+  pblock_3des[4] = getValidASCII((uint8_t)(i>>8));
+  pblock_3des[5] = getValidASCII((uint8_t)i);
+}
+
+inline int testEnc3DES(void){
+#ifdef SIGNAL
+  testSignalHigh();
+#endif
+  enc_state = tripledes_encrypt(&context, pblock_3des, cblock_3des);
+#ifdef SIGNAL
+  testSignalLow();
+#ifdef TESTLPM
+  __delay_cycles(32);
+#else
+  __delay_cycles(1600);
+  __delay_cycles(1600);
+  __delay_cycles(1600);
+#endif
+#endif
+  print3DES();
+  return enc_state;
+}
+inline int testDec3DES(void){
+#ifdef SIGNAL
+  testSignalHigh();
+#endif
+  dec_state = tripledes_decrypt(&context, cblock_3des, rpblock_3des);
+#ifdef SIGNAL
+  testSignalLow();
+#ifndef TESTLPM
+  __delay_cycles(1600);
+  __delay_cycles(1600);
+  __delay_cycles(1600);
+#endif
+#endif
+  print3DES();
+  return dec_state;
+}
 
 void test3DES(int i){
   update3DES(i);
-#ifdef SIGNAL
-  testSignalHigh();
-#endif
   testEnc3DES();
-#ifdef SIGNAL
-  testSignalLow();
-#endif
-  print3DES();
-#ifdef SIGNAL
-  testSignalHigh();
-#endif
   testDec3DES();
-#ifdef SIGNAL
-  testSignalLow();
-#endif
-  print3DES();
 }
 

@@ -6,13 +6,16 @@
 #define BUTTONACTION 1000
 
 #define SIGNAL
-#define SHA256
+//#define SHA256
 //#define AES
-//#define DES
+#define DES
 //#define TESTLED
-#define ECC
+//#define ECC
+#define TESTLPM
 
 void setup(void);
+void tests(void);
+inline void testSingle(void);
 void printError(char * str);
 uint8_t getValidASCII(uint8_t i);
 int equal(uint8_t *, uint8_t *, int size);
@@ -30,6 +33,7 @@ inline void testSignalLow(void);
 #endif
 int testLED1(uint16_t);
 int testLED4(uint16_t);
+int testleds(uint16_t state);
 #endif
 
 #ifdef TESTBUTTOM
@@ -40,7 +44,7 @@ void testButton2(void);
 
 #ifdef TESTLPM
 void setupLPM(void);
-void testLPM(void);
+void testLPM(uint16_t);
 #endif
 
 #ifdef ECC
@@ -57,7 +61,7 @@ int testSHA256(int);
 #endif
 
 #ifdef AES
-void testAES(int);
+inline void testAES(int);
 inline int setupAES(void);
 inline void updateAES(int);
 inline int testEncAES(void);

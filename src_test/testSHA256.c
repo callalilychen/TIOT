@@ -28,6 +28,7 @@ int testSHA256(int newValue){
   sha256(block, SHA256_DIGEST_LENGTH, hash);
 #ifdef SIGNAL
   testSignalLow();
+  __delay_cycles(1600);
 #endif
   printSHA256();
   return 1;

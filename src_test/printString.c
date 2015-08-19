@@ -19,7 +19,11 @@
  ******************************************************************************/
 #include "printString.h" 
 
-int (*handleC)(char);
+int handle(char c)
+{
+  // do nothing
+}
+int (*handleC)(char) = handle;
 void setHandler(int (*handle)(char))
 {
   handleC = handle;
@@ -104,7 +108,18 @@ void print(char *format, ...)
 				break;
 				case 'x':// 8 bit heXadecimal
 					i = va_arg(a, int);
-					puth(i >> 4);
+          if(i>0xfff)
+          {
+            puth(i >> 12);
+          }
+          if(i>0xff)
+          {
+            puth(i >> 8);
+          }
+          if(i>0xf)
+          {
+            puth(i >> 4);
+          }
 					puth(i);
 				break;
 				case 0: return;

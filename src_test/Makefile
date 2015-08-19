@@ -1,10 +1,80 @@
 PROJECT = main
+
+# Project settings
+MCU = msp430f5529
+
+TI_PATH = /home/wenwen/ti
+MSP_PATH = $(TI_PATH)/gcc
+TOOL_PATH = $(MSP_PATH)/bin
+LIBRARY_PATH = $(MSP_PATH)/include
+INCLUDE_PATH = $(LIBRARY_PATH)
+LIBMSP_PATH = $(TI_PATH)/MSPDebugStack_OS_Package
+BUILD_DIR = build
+TARGET = $(BUILD_DIR)/main
+PROGRAMMER = LD_LIBRARY_PATH=$(LIBMSP_PATH) mspdebug tilib
+
 # Project files
 PROJECT_PATH = .
 PROJECT_OBJS = $(PROJECT).o board.o uart.o uECC.o sha256.o aes.o 3des.o printString.o led.o button.o testLPM.o testECC.o testSHA256.o testAES.o test3DES.o testSignal.o testUtils.o
 
-BUILD_DIR = build
+#----------------------------------------------------------
+#----------------------------------------------------------
+#----------------------------------------------------------
+# compiler suite
+CC = $(TOOL_PATH)/msp430-elf-gcc
+CPP = $(TOOL_PATH)/msp430-elf-c++
+OBJCOPY = $(TOOL_PATH)/msp430-elf-objcopy
+SIZE = $(TOOL_PATH)/msp430-elf-size
+#----------------------------------------------------------
+# Linker settings
+LDFLAGS = -Wl,-Map=$(TARGET).map,--cref
+# --gc-sections will allow the linker to remove unused sections
+LDFLAGS += -Wl,--gc-sections
+LDFLAGS += -L$(LIBRARY_PATH)
+#----------------------------------------------------------
+# Compiler settingsf-objdum
+# -mmcu selects the AVR chip type -> specifies instructionset etc.
+# -DF_CPU defines the F_CPU preprocessor makro
+# -ffunction-sections -fdata-sections are needed to place
+#  functions in separate sections, to be able to remove
+#  unneeded functions during linking
+C_FLAGS = -mmcu=$(MCU) -DF_CPU=$(F_CPU) $(INCLUDE_FLAGS) -Os -g
+C_FLAGS += -ffunction-sections -fdata-sections
+C_FLAGS += -I$(INCLUDE_PATH)
+export PREFIX = $(TOOL_PATH)/msp430-elf-
 
-LIBRARY_OBJS_FIN=
+# generate lists of output files (in build dir)
+PROJECT_OBJS_FIN=$(addprefix $(BUILD_DIR)/,$(PROJECT_OBJS))
 
-include ../Makefile.include	
+#--------------------------------------------------------------
+# rules:
+all: directory build size
+
+directory:
+	mkdir -p build
+
+build: elf
+
+# upload the program to the microcontroller flash:
+upload:
+	$(PROGRAMMER) "prog $(TARGET).elf"
+# analyze compiled program size:
+size:
+	$(SIZE) $(TARGET).elf
+
+objdump:
+	$(PREFIX)objdump -S -D -h $(TARGET).elf > $(TARGET).as
+elf: $(TARGET).elf
+# link everything together:
+$(TARGET).elf: project
+	$(CC) $(C_FLAGS) $(PROJECT_OBJS_FIN) -o $(TARGET).elf $(LDFLAGS)
+
+clean:
+	rm -rv $(BUILD_DIR)
+
+project: $(PROJECT_OBJS_FIN)
+
+# build Project files
+$(PROJECT_OBJS_FIN): %.o: $(patsubst %.o,%.c,$(PROJECT_OBJS))
+	$(CC) -c $(C_FLAGS) $(PROJECT_PATH)/$(subst $(BUILD_DIR)/,,$*).c -o $*.o
+	

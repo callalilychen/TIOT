@@ -1,7 +1,7 @@
 #include "uart.h"
 
 int uart_init(void){
-    P4SEL = BIT4 + BIT5;                      // P4.4 = TXD, P4.5 = RXD
+  P4SEL = BIT4 + BIT5;                      // P4.4 = TXD, P4.5 = RXD
   UCA1CTL1 |= UCSWRST;                      // **Put state machine in reset**
   UCA1CTL1 |= UCSSEL_2;                     // SMCLK fBRCLK = fSMCLK 
   UCA1BR0 = BAUD_RATE_MAJOR;                // 1MHz 115200 (see User's Guide)
@@ -13,10 +13,9 @@ int uart_init(void){
   /* configuration done, release reset bit => start UART */
   UCA1CTL1 &= ~UCSWRST;
 
- #if defined(DEBUG) || defined(INFO)
+ #if defined(DEBUG) || defined(INFO) || defined(LOG)
   setHandler(&uart_putByte);
 #endif
- // __bis_SR_register(LPM0_bits + GIE); // Enter LPM0, interrupts enabled
 }
 
 int uart_putByte(char c)
