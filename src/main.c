@@ -2,6 +2,7 @@
 #include "sl_common.h"
 #include "button.h"
 #include "wdt.h"
+#include "printString.h"
 
 #define APPLICATION_VERSION "1.2.0"
 
@@ -263,37 +264,9 @@ int main(int argc, char** argv)
     stopWDT();
     initClk();
     CLI_Configure();
-    CLI_Write("LOS1\n\r");
-    initWDT(WDT_MDLY_8);
-    CLI_Write("LOS2\n\r");
-    turnLedOn(LED1);
-    turnLedOn(LED2);
-    while(1);
-
-    /* Configure command line interface */
-  setupButton();
-  uint16_t pu1 =0;
-  uint16_t pu2 =0;
-  uint16_t pu3 =0;
-  while(1){
-    if(b1pressed(&pu1)){
-      CLI_Write("b1\n\r");
-    }
-    if(b2pressed(&pu2)){
-      CLI_Write("b2\n\r");
-    }
-    if(b3pressed(&pu3)){
-      CLI_Write("b3\n\r");
-    }
-  }
-    _i32 retVal = -1;
-
-    retVal = initializeAppVariables();
-    ASSERT_ON_ERROR(retVal);
-
+    print("LOS1\n\r");
 
     displayBanner();
-
     /*
      * Following function configures the device to default state by cleaning
      * the persistent settings stored in NVMEM (viz. connection profiles &
@@ -305,6 +278,12 @@ int main(int argc, char** argv)
      * Note that all profiles and persistent settings that were done on the
      * device will be lost
      */
+    /* Configure command line interface */
+    _i32 retVal = -1;
+
+    retVal = initializeAppVariables();
+    ASSERT_ON_ERROR(retVal);
+
     retVal = configureSimpleLinkToDefaultState();
     if(retVal < 0)
     {
@@ -325,7 +304,6 @@ int main(int argc, char** argv)
         (ROLE_STA != retVal) )
     {
         CLI_Write((_u8 *)" Failed to start the device \n\r");
-        LOOP_FOREVER();
     }
 
     CLI_Write((_u8 *)" Device started as STATION \n\r");
@@ -335,7 +313,6 @@ int main(int argc, char** argv)
     if(retVal < 0)
     {
         CLI_Write((_u8 *)" Failed to establish connection w/ an AP \n\r");
-        LOOP_FOREVER();
     }
 
     CLI_Write((_u8 *)" Connection established w/ AP and IP is acquired \n\r");
@@ -345,7 +322,6 @@ int main(int argc, char** argv)
     if(retVal < 0)
     {
         CLI_Write((_u8 *)" Device couldn't connect to LAN \n\r");
-        LOOP_FOREVER();
     }
 
     CLI_Write((_u8 *)" Device successfully connected to the LAN\r\n");
@@ -354,10 +330,29 @@ int main(int argc, char** argv)
     if(retVal < 0)
     {
         CLI_Write((_u8 *)" Device couldn't connect to the internet \n\r");
-        LOOP_FOREVER();
     }
 
     CLI_Write((_u8 *)" Device successfully connected to the internet \n\r");
+
+    initWDT(WDT_ADLY_16);
+    setupButton(15, 50);
+
+    while(1){
+      if(!updateState()){
+        continue;
+      }
+      int b1type = b1pressed();
+      int b2type = b2pressed();
+      if( b1type){
+        print("B1 was pressed %d time\n", b1type);
+      }
+      if( b2type){
+        print("B2 was pressed %d time\n", b2type);
+      }
+    }
+
+
+
     return 0;
 }
 

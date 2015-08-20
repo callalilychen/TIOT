@@ -165,6 +165,25 @@ CLI_Write(unsigned char *inBuff)
 #endif
 }
 
+int
+CLI_Put(unsigned char c)
+{
+#ifdef _USE_CLI_
+  if (c == '\n') {
+      CLI_Put('\r');
+  }
+  RTOS_MUTEX_ACQUIRE(&g_printLock);
+  /* wait for a previous transmission to end */
+  while (!(UCA1IFG & UCTXIFG)){
+    __asm__("nop");
+  }
+  UCA1TXBUF = c;
+  RTOS_MUTEX_RELEASE(&g_printLock);
+  return 1;
+#else
+    return 0;
+#endif
+}
 
 void
 CLI_Configure(void)
@@ -186,6 +205,8 @@ CLI_Configure(void)
     UCA1IFG &= ~ (UCRXIFG | UCRXIFG);
     UCA1IE &= ~UCRXIE;
     RTOS_MUTEX_CREATE(&g_printLock);
+
+    setHandler(&CLI_Put);
 #endif
 }
 

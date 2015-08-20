@@ -1,7 +1,8 @@
 #include "stdint.h"
-#include "cli_uart.h"
+#include "printString.h"
 #include "board.h"
+#include "button.h"
 
-extern int wdt_interrupted;
+extern volatile uint16_t wdt_counter;
 
 void initWDT(uint16_t);

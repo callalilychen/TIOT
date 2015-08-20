@@ -1,6 +1,6 @@
 #include "wdt.h"
+volatile uint16_t wdt_counter = 0;
 
-int wdt_interrupted = 0;
 void initWDT(uint16_t init)
 {
   WDTCTL = init;
@@ -17,9 +17,5 @@ __attribute__((interrupt(WDT_VECTOR)))
 #endif
 void WDT_ISR(void)
 {
-  wdt_interrupted = 1;
-//  CLI_Write("WDT\n\r");
-  toggleLed(LED1);
-  turnLedOff(LED2);
-  
+  wdt_counter ++;
 }

@@ -54,6 +54,8 @@
 extern "C" {
 #endif
 
+#include "printString.h"
+
 /*!
     \brief      Read the data on Application UArt channel,
                 User is expected to assign memory and pass
@@ -98,6 +100,18 @@ extern void CLI_Configure(void);
 */
 extern int CLI_Write(unsigned char *inBuff);
 
+/*!
+    \brief      Put a char on Application Uart channel
+
+    \param[in]  c -  char
+
+    \return     int - No of byte sent, -1 in case of error
+
+    \note
+
+    \warning
+*/
+extern int CLI_Put(unsigned char c);
 
 //*****************************************************************************
 //
