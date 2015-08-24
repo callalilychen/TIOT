@@ -166,7 +166,7 @@ CLI_Write(unsigned char *inBuff)
 }
 
 int
-CLI_Put(unsigned char c)
+CLI_Put(char c)
 {
 #ifdef _USE_CLI_
   if (c == '\n') {

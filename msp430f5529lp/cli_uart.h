@@ -38,6 +38,7 @@
 #ifndef __CLI_UART_H__
 #define __CLI_UART_H__
 
+#include "printString.h"
 //****************************************************************************
 //          Define _USE_CLI_ Macro in project's properties to use the
 //          command line interface
@@ -54,7 +55,6 @@
 extern "C" {
 #endif
 
-#include "printString.h"
 
 /*!
     \brief      Read the data on Application UArt channel,
@@ -111,7 +111,7 @@ extern int CLI_Write(unsigned char *inBuff);
 
     \warning
 */
-extern int CLI_Put(unsigned char c);
+extern int CLI_Put(char c);
 
 //*****************************************************************************
 //

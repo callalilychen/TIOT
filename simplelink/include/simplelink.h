@@ -444,8 +444,8 @@ typedef _i16   _SlReturnVal_t;
 
 
 
-#define __CONCAT(x,y)	x ## y
-#define __CONCAT2(x,y)	__CONCAT(x,y)
+//#define __CONCAT(x,y)	x ## y
+#define __CONCAT2(x,y) x ## y
 
 
 /*

@@ -19,12 +19,12 @@
  ******************************************************************************/
 #include "printString.h" 
 
-int handle(unsigned char c)
+static int handle(char c)
 {
   // do nothing
 }
-int (*handleC)(char) = handle;
-void setHandler(int (*handle)(unsigned char))
+static int (*handleC)(char) = handle;
+void setHandler(int (*handle)(char))
 {
   handleC = handle;
 }
@@ -80,19 +80,21 @@ void print(char *format, ...)
 {
 	char c;
 	int i;
-	long n;
+	long l;
+  unsigned short flag = 0;
+
  
 	va_list a;
-  // FIXME not support more than one args
 	va_start(a, format);
 	while(c = *format++) {
+    flag = 0;
 		if(c == '%') {
 			switch(c = *format++) {
 				case 's': // String
 					handleS(va_arg(a, char*));
 					break;
 				case 'c':// Char
-					handleC(va_arg(a, char));
+					handleC((char)va_arg(a, int));
 				break;
 				case 'd':// 16 bit Integer
 				case 'u':// 16 bit Unsigned
@@ -102,12 +104,35 @@ void print(char *format, ...)
 				break;
 				case 'l':// 32 bit Long
 				case 'n':// 32 bit uNsigned loNg
-					n = va_arg(a, long);
-					if(c == 'l' && n < 0) n = -n, handleC('-');
-					xtoa((unsigned long)n, dv);
+					l = va_arg(a, long);
+					if(c == 'l' && l < 0) l = -l, handleC('-');
+					xtoa((unsigned long)l, dv);
 				break;
-				case 'x':// 16 bit heXadecimal
-					i = va_arg(a, int);
+        
+				case 'w':// 32 bit hexadecimal
+					l = va_arg(a, long);
+          flag = 1;
+          if(l>0xfffffff)
+          {
+            puth(l >> 28);
+          }
+          if(l>0xffffff)
+          {
+            puth(l >> 24);
+          }
+          if(l>0xfffff)
+          {
+            puth(l >> 20);
+          }
+          if(l>0xffff)
+          {
+            puth(l >> 16);
+          }
+          i = (int) l;
+        case 'x': // 16 bit hexadecimal
+          if(!flag){
+            i = va_arg(a, int);
+          }
           if(i>0xfff)
           {
             puth(i >> 12);
