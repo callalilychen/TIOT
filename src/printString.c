@@ -19,16 +19,20 @@
  ******************************************************************************/
 #include "printString.h" 
 
-static int handle(char c)
+static int nohandle(char c)
 {
   // do nothing
 }
-static int (*handleC)(char) = handle;
+int (*handleC)(char) = &nohandle;
+int * getHandler(void)
+{
+  return handleC;
+}
 void setHandler(int (*handle)(char))
 {
   handleC = handle;
 }
-int handleS(const char *s)
+static inline int handleS(const char *s)
 {
 	char c;
  

@@ -12,6 +12,11 @@ extern "C" {
 #define BUF_SIZE        20
 #define NO_OF_PACKETS   1
 
+  extern SlSockAddr_t diUdpSockAddr;
+
+  int Buf_Put(char );
+  _i16 updateDAddr(SlSockAddr_t * );
+  _i16 Buf_Flush(_u8);
   _i32 initializeUDPVariables(void);
   _i16 openBsdUdpSocket(SlSockAddr_t *, _u16);
   _i32 closeBsdUdpSocket(_i16);

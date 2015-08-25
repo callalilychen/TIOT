@@ -150,19 +150,25 @@ int main(int argc, char** argv)
     initWDT(WDT_ADLY_16);
     setupButton(15, 50);
     _u16 AddrSize = sizeof(SlSockAddrIn_t);
+    char * buf1 = "B1 was pressed\n";
+    char * buf2 = "B2 was pressed\n";
+    int (*handleFunction)(char);
     while(1){
       Status = sl_RecvFrom(SockID, recvBuf, BUF_SIZE, 0,
                                 (SlSockAddr_t *)&Addr, (SlSocklen_t*)&AddrSize);
       if(Status > 0){
+        updateDAddr((SlSockAddr_t *)&Addr);
         print("Recv: %s\n", recvBuf);
-      }else{
-        print("No DATA!\n");
+        print("Addr: {%nl,%ui,%ui}\n",sl_Htonl(Addr.sin_addr.s_addr),Addr.sin_family,sl_Htons(Addr.sin_port));
+        print("s_addr = %d\n",sl_Htonl(Addr.sin_addr.s_addr));
+        print("family = %d\n",Addr.sin_family);
+        print("port = %d\n",sl_Htons(Addr.sin_port));
+        printIP("Addr", sl_Htonl(Addr.sin_addr.s_addr));
+        if((Status = sl_SendTo(SockID, recvBuf, Status, 0, (SlSockAddr_t *)&Addr, AddrSize))<0){
+          print("Send '%s' failed", recvBuf);
+        }
       }
-      print("Addr: {%nl,%ui,%ui}\n",sl_Htonl(Addr.sin_addr.s_addr),Addr.sin_family,sl_Htons(Addr.sin_port));
-      print("s_addr = %d\n",sl_Htonl(Addr.sin_addr.s_addr));
-      print("family = %d\n",Addr.sin_family);
-      print("port = %d\n",sl_Htons(Addr.sin_port));
-      printIP("Addr", sl_Htonl(Addr.sin_addr.s_addr));
+
       if(!updateState()){
         continue;
       }
@@ -170,9 +176,19 @@ int main(int argc, char** argv)
       int b2type = b2pressed();
       if( b1type){
         print("B1 was pressed %d time\n", b1type);
+        handleFunction = (int (*)(char))getHandler();
+        setHandler(&Buf_Put);
+        print("B1 was pressed %d time\n", b1type);
+        Buf_Flush(1);
+        setHandler(&CLI_Put);
       }
       if( b2type){
         print("B2 was pressed %d time\n", b2type);
+        handleFunction =  (int (*)(char))getHandler();
+        setHandler(&Buf_Put);
+        print("B2 was pressed %d time\n", b2type);
+        Buf_Flush(1);
+        setHandler(handleFunction);
       }
     }
 
