@@ -117,19 +117,12 @@ int main(int argc, char** argv)
     retVal = initializeUDPVariables();
     CLI_Write(" Waiting for data from UDP client \n\r");
 
-    _u8 recvBuf[BUF_SIZE+1] = {0};
     _i16          Status = 0;
-    SlSockAddrIn_t  Addr = {0};
     SlSockAddrIn_t  LocalAddr = {0};
     LocalAddr.sin_family = SL_AF_INET;
     LocalAddr.sin_port = sl_Htons(PORT_NUM);
     LocalAddr.sin_addr.s_addr = 0;
 
-    print("Addr: {%nl,%ui,%ui}\n",sl_Htonl(Addr.sin_addr.s_addr),Addr.sin_family,sl_Htons(Addr.sin_port));
-    print("s_addr = %nl\n",Addr.sin_addr.s_addr);
-    print("family = %d\n",Addr.sin_family);
-    print("port = %d\n",sl_Htons(Addr.sin_port));
-    printIP("Addr", Addr.sin_addr.s_addr);
     print("LocalAddr:\n");
     print("s_addr = %nl\n",LocalAddr.sin_addr.s_addr);
     print("family = %d\n",LocalAddr.sin_family);
@@ -154,20 +147,7 @@ int main(int argc, char** argv)
     char * buf2 = "B2 was pressed\n";
     int (*handleFunction)(char);
     while(1){
-      Status = sl_RecvFrom(SockID, recvBuf, BUF_SIZE, 0,
-                                (SlSockAddr_t *)&Addr, (SlSocklen_t*)&AddrSize);
-      if(Status > 0){
-        updateDAddr((SlSockAddr_t *)&Addr);
-        print("Recv: %s\n", recvBuf);
-        print("Addr: {%nl,%ui,%ui}\n",sl_Htonl(Addr.sin_addr.s_addr),Addr.sin_family,sl_Htons(Addr.sin_port));
-        print("s_addr = %d\n",sl_Htonl(Addr.sin_addr.s_addr));
-        print("family = %d\n",Addr.sin_family);
-        print("port = %d\n",sl_Htons(Addr.sin_port));
-        printIP("Addr", sl_Htonl(Addr.sin_addr.s_addr));
-        if((Status = sl_SendTo(SockID, recvBuf, Status, 0, (SlSockAddr_t *)&Addr, AddrSize))<0){
-          print("Send '%s' failed", recvBuf);
-        }
-      }
+      Buf_Read();
 
       if(!updateState()){
         continue;
@@ -179,7 +159,6 @@ int main(int argc, char** argv)
         handleFunction = (int (*)(char))getHandler();
         setHandler(&Buf_Put);
         print("B1 was pressed %d time\n", b1type);
-        Buf_Flush(1);
         setHandler(&CLI_Put);
       }
       if( b2type){
@@ -187,7 +166,6 @@ int main(int argc, char** argv)
         handleFunction =  (int (*)(char))getHandler();
         setHandler(&Buf_Put);
         print("B2 was pressed %d time\n", b2type);
-        Buf_Flush(1);
         setHandler(handleFunction);
       }
     }

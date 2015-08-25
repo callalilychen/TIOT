@@ -1,8 +1,8 @@
 #include "udp.h"
 
-_i16          SockID = 0;
-_u8 recvBuf[BUF_SIZE+1] = {0};
-_u8 sendBuf[BUF_SIZE+1] = {0};
+static _i16 SockID = 0;
+static _u8 recvBuf[BUF_SIZE+1] = {0};
+static _u8 sendBuf[BUF_SIZE+1] = {0};
 int bufIdx = 0;
 SlSockAddr_t diUdpSockAddr = {0};
 
@@ -18,7 +18,7 @@ int Buf_Put(char c){
   }  
 }
 
- _i16 updateDAddr(SlSockAddr_t * addr){
+_i16 updateDAddr(SlSockAddr_t * addr){
   if(addr == 0 || addr == &diUdpSockAddr){
     return -1;
   }
@@ -35,10 +35,21 @@ _i16 Buf_Flush(_u8 force){
   if(bufIdx > 0 && (sl_SendTo(SockID, sendBuf, bufIdx, 0, &diUdpSockAddr, sizeof(SlSockAddr_t))>=0 || force)){
     bufIdx = 0;
     return 0;
-  }else{
-    CLI_Write("No Success!\r\n");
-    return -1;
   }
+  return -1;
+}
+
+_i16 Buf_Read(void)
+{
+  _u16 AddrSize = sizeof(SlSockAddr_t);
+  Buf_Flush(1);
+  _i16 Status = sl_RecvFrom(SockID, recvBuf, BUF_SIZE, 0, &diUdpSockAddr, (SlSocklen_t*)&AddrSize);
+  if(Status > 0){
+    if((Status = sl_SendTo(SockID, recvBuf, Status, 0, &diUdpSockAddr, AddrSize))<0){
+      print("Send '%s' failed", recvBuf);
+    }
+  }
+  return Status;
 }
 
 /* Application specific status/error codes */

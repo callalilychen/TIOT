@@ -1,6 +1,6 @@
 # Project files
 PROJECT_PATH = .
-PROJECT_SRC  = $(wildcard *.c) $(wildcard ../msp430f5529lp/*.c) $(wildcard ../simplelink/source/*.c) $(wildcard ../example/common/*.c)
+PROJECT_SRC  = $(wildcard *.c) $(wildcard ../crypto/*.c) $(wildcard ../msp430f5529lp/*.c) $(wildcard ../simplelink/source/*.c) $(wildcard ../example/common/*.c)
 PROJECT_OBJS = $(PROJECT_SRC:.c=.o)
 PROJECT_SOBJ = $(PROJECT_SRC:.c=.s)
 C_FLAGS      = --std=c99

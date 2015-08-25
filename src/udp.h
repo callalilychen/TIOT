@@ -14,7 +14,8 @@ extern "C" {
 
   extern SlSockAddr_t diUdpSockAddr;
 
-  int Buf_Put(char );
+  int Buf_Put(char);
+  _i16 Buf_Read();
   _i16 updateDAddr(SlSockAddr_t * );
   _i16 Buf_Flush(_u8);
   _i32 initializeUDPVariables(void);
