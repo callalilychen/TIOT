@@ -22,10 +22,6 @@ int main(int argc, char** argv)
   printBlock("key", key, HASH_BLOCK_LENGTH);
   printBlock("key2", key2, HASH_BLOCK_LENGTH);
 
-  //for(int i = 0; i < HASH_BLOCK_LENGTH; i++){
-  //  key[i] = 0x0b;
-  //}
-  //printBlock("key", key, HASH_BLOCK_LENGTH);
   char* msg = "Hi There haha";
   unsigned int len = HASH_BLOCK_LENGTH;
   unsigned char hm[len]; 
