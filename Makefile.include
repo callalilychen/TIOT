@@ -10,11 +10,6 @@ TOOL_PATH = $(MSP_PATH)/bin
 GCC_LIBRARY_PATH = $(MSP_PATH)/include
 GCC_INCLUDE_PATH = $(GCC_LIBRARY_PATH)
 GCC_LIBMSP_PATH = $(TI_PATH)/MSPDebugStack_OS_Package
-
-# Project files
-LIBRARY_PATH = $(HOME_PATH)/uni/Semester8_MA/msp430/src
-#----------------------------------------------------------
-#----------------------------------------------------------
 #----------------------------------------------------------
 # compiler suite
 CC = $(TOOL_PATH)/msp430-elf-gcc
@@ -27,20 +22,19 @@ DEBUGGER = $(TOOL_PATH)/msp430-elf-gdb
 DEBUGSERVER =  LD_LIBRARY_PATH=$(GCC_LIBMSP_PATH) mspdebug tilib
 #----------------------------------------------------------
 # Compiler settingsf-objdum
-# -mmcu selects the AVR chip type -> specifies instructionset etc.
-# -DF_CPU defines the F_CPU preprocessor makro
+# -mmcu selects the chip type -> specifies instructionset etc.
 # -ffunction-sections -fdata-sections are needed to place
 #  functions in separate sections, to be able to remove
 #  unneeded functions during linking
-C_FLAGS += -mmcu=$(MCU) -DF_CPU=$(F_CPU) $(INCLUDE_FLAGS) -Os -g
+C_FLAGS += -mmcu=$(MCU) $(INCLUDE_FLAGS) -Os -g
 C_FLAGS += -ffunction-sections -fdata-sections
 C_FLAGS += -I$(GCC_INCLUDE_PATH)
 #----------------------------------------------------------
 # Linker settings
 LDFLAGS = -Wl,-Map=$(TARGET).map,--cref
 # --gc-sections will allow the linker to remove unused sections
-LDFLAGS += -Wl,--gc-sections
-LDFLAGS += -L$(GCC_LIBRARY_PATH)
+LDFLAGS += --gc-sections
+LDFLAGS += -Wl,-L$(GCC_LIBRARY_PATH)
 
 PROGRAMMER_FLAGS = "prog $(TARGET).elf"
 TERM_FLAGS += $(PORT) -b 115200

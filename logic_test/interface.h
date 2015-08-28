@@ -1,20 +1,20 @@
 #ifndef __INTERFACE_H__
 #define __INTERFACE_H__
 #include <stdint.h>
-#include "printString.h"
-#include "sl_common.h"
+#include <stdio.h>
+#include "tree.h"
+#include "hmac.h"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#define IPv4 uint32_t
-#define IPv6 uint16_t *
-typedef IPv4 IPaddr;
 
-#define PRINT print
-#ifndef SUCCESS
-#error SUCCESS must be predefined
-#endif
+#define PRINT(...) printf(__VA_ARGS__)
+
+#define HASH_BLOCK_LENGTH SHA256_DIGEST_LENGTH
+//#define HASH_BLOCK_LENGTH SHA256_DIGEST_LENGTH
+#define HASH_FUNC hashfunction
+#define SUCC 0
 
 #ifdef  __cplusplus
 }

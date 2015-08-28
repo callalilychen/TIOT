@@ -44,6 +44,7 @@
 #define _SHA256_H_
 
 #include <inttypes.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,13 +1,13 @@
 #ifndef __HMAC_H__
 #define __HMAC_H__
 
-#include <inttypes.h>
-#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
-int hmac(void *, unsigned char*, size_t, unsigned char*, size_t);
+void hmac(void (*)(unsigned char *, size_t, unsigned char *), size_t, unsigned char*, size_t, unsigned char*, size_t, unsigned char*);
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

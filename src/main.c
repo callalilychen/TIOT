@@ -1,3 +1,6 @@
+#include <stdint.h>
+
+
 #include "simplelink.h"
 #include "sl_common.h"
 #include "button.h"
@@ -18,11 +21,11 @@ static void displayBanner();
  * STATIC FUNCTION DEFINITIONS -- End
  */
 
-static void printIP(char* name, _u32 ip){
+static void printIP(char* name, uint32_t ip){
   print(name);
   print(":0x%w\n", ip);
   for(int i = 24; i >= 0; i-=8){
-    _u8 t = (_u8)(ip >> i);
+    uint8_t t = (uint8_t)(ip >> i);
     print(".%d", t);
   }
   print("\n");
