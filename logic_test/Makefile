@@ -37,7 +37,7 @@ C_FLAGS     +=  --std=c99
 C_FLAGS			+= -I.
 C_FLAGS			+= -I../crypto
 
-TARGET       = build/main
+TARGET       = build/$(PROJECT)
 
 #--------------------------------------------------------------
 # rules:

@@ -3,10 +3,16 @@
 
 #include <string.h>
 #include <strings.h>
+#include "interface.h"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
+#ifndef WORD_SIZE
+#define WORD_SIZE 2
+#define WORD_TYPE (uint16_t *)
+#endif
+
 void hmac(void (*)(unsigned char *, size_t, unsigned char *), size_t, unsigned char*, size_t, unsigned char*, size_t, unsigned char*);
 #ifdef  __cplusplus
 }

@@ -1,6 +1,8 @@
 #include "tree.h"
+#include "utils.h"
 
 static unsigned char root[ITEMLEN] = {0};
+static size_t root_len = 0;
 
 void hashfunction(unsigned char *d, size_t n, unsigned char * md)
 {
@@ -17,6 +19,7 @@ void hashfunction(unsigned char *d, size_t n, unsigned char * md)
 }
 void setRoot(unsigned char * item, size_t len)
 {
+  root_len = len;
   if(item == root){
     return;
   }
@@ -27,13 +30,35 @@ void setRoot(unsigned char * item, size_t len)
   }
 }
   
-unsigned char * getNode(struct position * p, unsigned char * res){
-  memcpy(res, root, ITEMLEN);
-  unsigned char temp[ITEMLEN*2];
-  size_t len;
-  for(int i =1; i<(p->levels); i++){
-    struct descendant d = p ->descendants[i-1];
-    hashfunction(d.function(res, ITEMLEN, d.param, d.param_len, temp, &len), len, res);
+unsigned char * getNode(struct position * p){
+  unsigned char * result = root;
+  size_t len = root_len;
+  
+  for(int i =0; i<(p->levels); i++){
+    descendant * d = p->descendants+i;
+    if(d->child_len > 0){
+      result = d->child;
+      len = d->child_len;
+      continue;
+    }
+    d->func(d, result, len);
+    result = d->child;
+      len = d->child_len;
   }
-  return res;
+  return result;
+}
+
+unsigned char * edge(descendant * d,  unsigned char* parent, size_t parent_len)
+{
+  unsigned char p[parent_len];
+  size_t p_index = 0;
+  while((p_index + d-> param_len) < parent_len){
+    memcpy(p+p_index, d->param, d->param_len);
+    p_index += d->param_len;
+  }
+  memcpy(p+p_index,  d->param, parent_len - p_index);
+  optimizedXOR(parent, p, parent_len, p);
+  hashfunction(p, parent_len, d->child);
+  d->child_len = ITEMLEN; 
+  return d->child;
 }

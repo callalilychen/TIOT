@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "tree.h"
 #include "hmac.h"
+#include "utils.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -12,7 +13,6 @@ extern "C" {
 #define PRINT(...) printf(__VA_ARGS__)
 
 #define HASH_BLOCK_LENGTH SHA256_DIGEST_LENGTH
-//#define HASH_BLOCK_LENGTH SHA256_DIGEST_LENGTH
 #define HASH_FUNC hashfunction
 #define SUCC 0
 

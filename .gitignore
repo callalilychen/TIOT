@@ -5,6 +5,7 @@
 *.hex
 *.map
 /build
+build
 *.as
 
 *~
