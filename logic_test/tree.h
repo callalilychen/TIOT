@@ -5,13 +5,12 @@
 #include <string.h>
 #include "sha256.h"
 
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
 #define ITEMLEN SHA256_DIGEST_LENGTH
   typedef struct descendant{
-    unsigned char * (*func)(struct descendant *, unsigned char *, size_t);
+    unsigned char * (*func)(struct descendant *, unsigned char *, unsigned int *);
     unsigned char * param;
     size_t param_len;
     unsigned char * child;
@@ -25,8 +24,8 @@ extern "C" {
 
   void hashfunction(unsigned char *, size_t, unsigned char *);
   void setRoot(unsigned char *, size_t);
-  unsigned char * getNode(struct position *);
-  unsigned char * edge(descendant *,  unsigned char*, size_t);
+  unsigned char * getNode(struct position *, unsigned int*);
+  unsigned char * edge(descendant *,  unsigned char*, unsigned int);
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

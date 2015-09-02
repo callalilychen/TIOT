@@ -1,5 +1,4 @@
 #include "hmac.h"
-#include <stdint.h>
 
 #define IPAD_SINGLE 0x36
 #define OPAD_SINGLE 0x5c
@@ -19,7 +18,7 @@
 #endif
 
 #define HMAC_BLOCK_LENGTH 64
-void hmac(void (*hash)(unsigned char *, size_t, unsigned char *), size_t hash_block_len, unsigned char* key, size_t key_len, unsigned char* message,  size_t message_len, unsigned char* res){
+unsigned int hmac(void (*hash)(unsigned char *, size_t, unsigned char *), unsigned int hash_block_len, unsigned char* key, unsigned int key_len, unsigned char* message,  unsigned int message_len, unsigned char* res){
     unsigned char tk[hash_block_len];
   if(key_len > HMAC_BLOCK_LENGTH){
     hash(key, key_len, tk);
@@ -56,4 +55,6 @@ void hmac(void (*hash)(unsigned char *, size_t, unsigned char *), size_t hash_bl
   hash(ik, HMAC_BLOCK_LENGTH+message_len, res);
   memcpy(ok+HMAC_BLOCK_LENGTH, res, hash_block_len);
   hash(ok, HMAC_BLOCK_LENGTH + hash_block_len, res);
+
+  return hash_block_len;
 }

@@ -10,7 +10,7 @@ void hashfunction(unsigned char *d, size_t n, unsigned char * md)
   static unsigned char m[ITEMLEN];
 
   if (md == NULL) {
-      md = m;
+    md = m;
   }
 
   sha256_init(&c);
@@ -29,26 +29,26 @@ void setRoot(unsigned char * item, size_t len)
     memcpy(root, item, len);
   }
 }
-  
-unsigned char * getNode(struct position * p){
+
+unsigned char * getNode(struct position * p, unsigned int * size){
   unsigned char * result = root;
-  size_t len = root_len;
-  
+  *size = root_len;
+
   for(int i =0; i<(p->levels); i++){
     descendant * d = p->descendants+i;
     if(d->child_len > 0){
       result = d->child;
-      len = d->child_len;
+      *size = d->child_len;
       continue;
     }
-    d->func(d, result, len);
+    d->func(d, result, *size);
     result = d->child;
-      len = d->child_len;
+    *size = d->child_len;
   }
   return result;
 }
 
-unsigned char * edge(descendant * d,  unsigned char* parent, size_t parent_len)
+unsigned char * edge(descendant * d,  unsigned char* parent, unsigned int parent_len)
 {
   unsigned char p[parent_len];
   size_t p_index = 0;

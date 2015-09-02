@@ -14,7 +14,13 @@ extern "C" {
 
 #define HASH_BLOCK_LENGTH SHA256_DIGEST_LENGTH
 #define HASH_FUNC hashfunction
+#define MAC_FUNC hmac
+#define EDGE_FUNC edge
 #define SUCC 0
+#define FAIL -1
+
+#define H2N(x, y, size) if(size == 2) x = sl_Hons(y);\
+                        else if(size == 4) x = sl_Htonl(y);
 
 #ifdef  __cplusplus
 }
