@@ -51,6 +51,7 @@ extern "C" {
 #endif
 
 #define SHA256_DIGEST_LENGTH 32
+#define SHA256_BLOCK_LENGTH 32
 
 /**
  * @brief Context for ciper operatins based on sha256

@@ -63,7 +63,7 @@ int main(int argc, char** argv)
   unsigned char * payload;
   size_t payload_size = 0;
   uint8_t protocol_version = VERSION_BITS(udp_payload[0]);
-  if(handleSecurityLayer(protocol_version, (unsigned char *)(udp_payload), udp_payload_size, &payload, &payload_size, sendBuf, &sendBufIdx) == SUCC){
+  if(SUCC == handleSecurityLayer(protocol_version, (unsigned char *)(udp_payload), udp_payload_size, &payload, &payload_size)){
     unsigned char * response_payload;
     size_t response_payload_size = 0;
     handleApplicationLayer(payload, payload_size, response_payload, &response_payload_size, sendBuf, &sendBufIdx);

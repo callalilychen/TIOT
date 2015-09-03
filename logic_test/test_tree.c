@@ -1,12 +1,27 @@
+#include "testcase.h"
 #include "interface.h"
-unsigned char *g1(descendant * d,  unsigned char* parent, unsigned int parent_len)
+#include "tree.h"
+#include <openssl/sha.h>
+#include <openssl/hmac.h>
+#include <openssl/evp.h>
+
+#define HASH_FUNC sha256_construction.func
+
+void * g1(tree_node *parent_node, tree_edge *edge, tree_node *node)
 {
-  unsigned char input[parent_len + d->param_len];
-  memcpy(input, parent, parent_len);
-  memcpy(input + parent_len, d->param, d->param_len);
-  HASH_FUNC(input, parent_len + d->param_len, d->child);
-  d->child_len = HASH_BLOCK_LENGTH; 
-  return d->child;
+  unsigned int params_len = 0;
+  for(int i = 0; i< edge->params_counter; i++){
+    params_len += (edge->params_size)[i];
+  }
+  unsigned char input[parent_node->size + params_len];
+  memcpy(input, parent_node -> block, parent_node -> size);
+  unsigned int curr_len = parent_node -> size;
+  for(int i = 0; i< edge->params_counter; i++){
+    memcpy(input + curr_len, (edge -> params)[i], (edge->params_size)[i]);
+    curr_len += (edge->params_size)[i];
+  }
+  sha256_construction.func(input, parent_node->size + params_len, node->block);
+  node->size = sha256_construction.size; 
 }
 
 
@@ -14,110 +29,94 @@ unsigned int key_size = 0;
 
 int tree_test(void){
   char* secret = "test";
-  unsigned char key[HASH_BLOCK_LENGTH] = {0};
-  HASH_FUNC((unsigned char*)secret, 4, key);
-  printBlock("key", key, HASH_BLOCK_LENGTH);
-  setRoot(key, HASH_BLOCK_LENGTH);
+  tree_node nodes[4] ={0};
   
-  descendant branch[3] = {0};
-  position pos = {
-    .levels = 1,
-    .descendants = branch
-  };
+  HASH_FUNC((unsigned char*)secret, 4, nodes[0].block);
+  nodes[0].size = HASH_SIZE;
+  printBlock("Root", nodes[0], HASH_SIZE);
+  
+  tree_edge edges[2] = {0};
   unsigned char * params1= "param"; 
-  unsigned char result[3][HASH_BLOCK_LENGTH] = {0};
-  branch[0].func = &g1;
-  branch[0].param = params1;
-  branch[0].param_len = strlen(params1);
-  branch[0].child = result[0];
-  branch[0].child_len = 0;
+  unsigned int params1_size = (unsigned int) strlen(params1);
+  edges[0].func = g1;
+  edges[0].params = &params1;
+  edges[0].params_size = &params1_size;
+  edges[0].params_counter = 1;
 
-  getNode(&pos, &key_size);
+  fill_nodes(nodes, edges, 1, 1);
 
-  printBlock("tree[1]", result[0], HASH_BLOCK_LENGTH);
-  printBlock("tree[1]", branch[0].child, branch[0].child_len);
+  printBlock("nodes[1]", nodes[0].block, HASH_SIZE);
   
-  unsigned char input[HASH_BLOCK_LENGTH + strlen(params1)];
-  memcpy(input, key, HASH_BLOCK_LENGTH);
-  memcpy(input+HASH_BLOCK_LENGTH, params1, strlen(params1));
-  SHA256(input, HASH_BLOCK_LENGTH + strlen(params1), result[0]);
-  printBlock("tree[1]", result[0], HASH_BLOCK_LENGTH);
-  PRINT("len(params) = %lu\n", strlen(params1));
+  unsigned char input[HASH_SIZE + params1_size];
+  memcpy(input, nodes[0].block, HASH_SIZE);
+  memcpy(input+HASH_SIZE, params1, params1_size);
+  SHA256(input, HASH_SIZE + params1_size,nodes[0].block);
+  printBlock("nodes[1]", nodes[1].block, HASH_SIZE);
+  PRINT("len(params) = %lu\n", params1_size);
 
   unsigned char * params2= "paran"; 
-  branch[1].func = &g1;
-  branch[1].param = params2;
-  branch[1].param_len = strlen(params2);
-  branch[1].child = result[1];
-  branch[1].child_len = 0;
-  pos.levels=2;
-  getNode(&pos, &key_size);
+  unsigned int params2_size =(unsigned int) strlen(params1);
+  edges[1].func = g1;
+  edges[1].params = &params2;
+  edges[1].params_size = &params2_size;
+  edges[1].params_counter = 1;
 
-  printBlock("tree[2]", result[1], HASH_BLOCK_LENGTH);
-  printBlock("tree[1]", branch[1].child, branch[1].child_len);
+  fill_nodes(nodes, edges, 2, 0);
+
+  printBlock("nodes[2]", nodes[2].block, HASH_SIZE);
   
-  memcpy(input, result[0], HASH_BLOCK_LENGTH);
-  memcpy(input+HASH_BLOCK_LENGTH, params2, strlen(params2));
-  SHA256(input, HASH_BLOCK_LENGTH + strlen(params2), result[1]);
-  printBlock("tree[2]", result[1], HASH_BLOCK_LENGTH);
-  PRINT("len(params) = %lu\n", strlen(params2));
+  memcpy(input, nodes[1].block, HASH_SIZE);
+  memcpy(input+HASH_SIZE, params2, params2_size);
+  SHA256(input, HASH_SIZE + params2_size, nodes[2].block);
+  printBlock("nodes[2]", nodes[2].block, HASH_SIZE);
+  PRINT("len(params) = %lu\n", params2_size);
   return 0;
 }
 
-int edge_test(void){
-
+int edge_func_test(void){
   char* secret = "test";
-  setRoot(secret, strlen(secret));
+  tree_node nodes[4] ={0};
   
-  descendant branch[3] = {0};
-  position pos = {
-    .levels = 1,
-    .descendants = branch
-  };
+  HASH_FUNC((unsigned char*)secret, 4, nodes[0].block);
+  nodes[0].size = HASH_SIZE;
+  printBlock("Root", nodes[0], HASH_SIZE);
+  
+  tree_edge edges[2] = {0};
   unsigned char * params1= "param"; 
-  unsigned char result[3][HASH_BLOCK_LENGTH] = {0};
-  branch[0].func = &edge;
-  branch[0].param = params1;
-  branch[0].param_len = strlen(params1);
-  branch[0].child = result[0];
-  branch[0].child_len = 0;
+  unsigned int params1_size = (unsigned int) strlen(params1);
+  edges[0].func = edge_func;
+  edges[0].params = &params1;
+  edges[0].params_size = &params1_size;
+  edges[0].params_counter = 1;
 
-  getNode(&pos, &key_size);
+  fill_nodes(nodes, edges, 1, 1);
 
-  printBlock("tree[1]", result[0], HASH_BLOCK_LENGTH);
-  printBlock("tree[1]", branch[0].child, branch[0].child_len);
+  printBlock("nodes[1]", nodes[0].block, HASH_SIZE);
   
-  unsigned char input[HASH_BLOCK_LENGTH] = {0};
-  for(int i = 0; i < strlen(secret); i++){
-    input[i] = secret[i] ^ params1[i];
-  }
-  SHA256(input, strlen(secret), result[0]);
-  printBlock("tree[1]", result[0], HASH_BLOCK_LENGTH);
-  PRINT("len(params) = %lu\n", strlen(params1));
+  unsigned char input[HASH_SIZE + params1_size];
+  memcpy(input, nodes[0].block, HASH_SIZE);
+  memcpy(input+HASH_SIZE, params1, params1_size);
+  SHA256(input, HASH_SIZE + params1_size,nodes[0].block);
+  printBlock("nodes[1]", nodes[1].block, HASH_SIZE);
+  PRINT("len(params) = %lu\n", params1_size);
 
   unsigned char * params2= "paran"; 
-  branch[1].func = &edge;
-  branch[1].param = params2;
-  branch[1].param_len = strlen(params2);
-  branch[1].child = result[1];
-  branch[1].child_len = 0;
-  pos.levels=2;
-  getNode(&pos, &key_size);
+  unsigned int params2_size =(unsigned int) strlen(params1);
+  edges[1].func = edge_func;
+  edges[1].params = &params2;
+  edges[1].params_size = &params2_size;
+  edges[1].params_counter = 1;
 
-  printBlock("tree[2]", result[1], HASH_BLOCK_LENGTH);
-  printBlock("tree[1]", branch[1].child, branch[1].child_len);
+  fill_nodes(nodes, edges, 2, 0);
+
+  printBlock("nodes[2]", nodes[2].block, HASH_SIZE);
   
-  int p_index = 0;
-  for(int i = 0; i < HASH_BLOCK_LENGTH; i++){
-    input[i] = result[0][i] ^ params2[p_index++];
-    if(p_index >= strlen(params2)){
-      p_index = 0;
-    }
-  }
-  SHA256(input, HASH_BLOCK_LENGTH, result[1]);
-  printBlock("tree[2]", result[1], HASH_BLOCK_LENGTH);
-  PRINT("len(params) = %lu\n", strlen(params2));
-  
+  memcpy(input, nodes[1].block, HASH_SIZE);
+  memcpy(input+HASH_SIZE, params2, params2_size);
+  SHA256(input, HASH_SIZE + params2_size, nodes[2].block);
+  printBlock("nodes[2]", nodes[2].block, HASH_SIZE);
+  PRINT("len(params) = %lu\n", params2_size);
+
   return 0;
 
 }

@@ -87,6 +87,7 @@ int handleSecurityLayer(uint8_t version, unsigned char *msg, size_t msg_size, un
   if(SUCC == setState(secret_index, perm_index, key_index)){
     currKey = getKey(secret_index, perm_index, key_index);
     if(0 == verifyMAC(currKey, currKeySize, *p_payload, *p_payload_size, implementation->MACsize)){
+      if()
     return SUCC;
     }
   }

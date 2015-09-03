@@ -3,29 +3,28 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "sha256.h"
+#include "interface.h"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#define ITEMLEN SHA256_DIGEST_LENGTH
-  typedef struct descendant{
-    unsigned char * (*func)(struct descendant *, unsigned char *, unsigned int *);
-    unsigned char * param;
-    size_t param_len;
-    unsigned char * child;
-    size_t child_len;
-  } descendant;
+#define NODE_SIZE HASH_SIZE
+#define HASH_FUNC sha256_construction.func
 
-  typedef struct position{
-    unsigned int levels;
-    struct descendant * descendants;
-  } position;
+  typedef struct tree_node{
+    unsigned char block[NODE_SIZE];
+    unsigned int size;
+  }tree_node;
 
-  void hashfunction(unsigned char *, size_t, unsigned char *);
-  void setRoot(unsigned char *, size_t);
-  unsigned char * getNode(struct position *, unsigned int*);
-  unsigned char * edge(descendant *,  unsigned char*, unsigned int);
+  typedef struct tree_edge{
+    void (*func)(tree_node *, struct tree_edge *, tree_node *);
+    unsigned char ** params;
+    unsigned int* params_size;
+    unsigned int params_counter;
+  }tree_edge;
+
+  unsigned char * fill_nodes(tree_node *, tree_edge*, unsigned int, unsigned int);
+  void * edge_func(tree_node *, tree_edge *edge, tree_node *);
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

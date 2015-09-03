@@ -1,5 +1,6 @@
 #include "securitylayerV1.h"
 
+#include <string.h>
 
 static uint8_t * dynamicParse(uint8_t * des, uint8_t des_len, uint8_t *msg, uint8_t field_len){
   if(field_len > des_len){

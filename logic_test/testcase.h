@@ -7,6 +7,8 @@ extern "C" {
 #endif
 
 int hmac_test(void);
+int tree_test(void);
+int edge_func_test(void);
 
 #ifdef  __cplusplus
 }
