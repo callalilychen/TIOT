@@ -1,30 +1,30 @@
 #ifndef __TREE_H__
 #define __TREE_H__
 
-#include <stdio.h>
-#include <string.h>
-#include "interface.h"
+#include "treeedges.h"
+#include "treenodes.h"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#define NODE_SIZE HASH_SIZE
-#define HASH_FUNC sha256_construction.func
 
-  typedef struct tree_node{
-    unsigned char block[NODE_SIZE];
-    unsigned int size;
-  }tree_node;
+  inline tree_node *  (__attribute__((always_inline))fillNodes)(tree_node * nodes, tree_edge *edges, unsigned int level, unsigned int flag){
+    if(nodes == NULL || edges == NULL){
+      printf("nodes size %d\n", nodes->size);
+      return NULL;
+    }
+    int i = 0;
+    for(; i<level-1; i++){
+      printf("%d: nodes size %d\n",i, (nodes+i)->size);
+      if(flag || nodes[i+1].size == 0){
+        edges[i].func(nodes+i, edges+i, nodes+i+1);
+      printf("%d: nodes size %d\n",i, (nodes+i)->size);
+      }
+    }
+      printf("2nodes size %d\n", (nodes+i)->size);
+    return nodes+i;
+  }
 
-  typedef struct tree_edge{
-    void (*func)(tree_node *, struct tree_edge *, tree_node *);
-    unsigned char ** params;
-    unsigned int* params_size;
-    unsigned int params_counter;
-  }tree_edge;
-
-  unsigned char * fill_nodes(tree_node *, tree_edge*, unsigned int, unsigned int);
-  void * edge_func(tree_node *, tree_edge *edge, tree_node *);
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

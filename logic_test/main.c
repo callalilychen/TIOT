@@ -3,12 +3,18 @@
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
 #include <openssl/md5.h>
-#include "interface.h"
+#include "treestate.h"
+#include "tree.h" 
+#include "hmac.h"
 #include "securitylayer.h" 
 #include "applicationlayer.h" 
+#include "testcase.h"
 
 
-void printBlock(char* name, unsigned char* block, size_t block_len){
+#include "utils.h"
+
+
+static void printBlock(char* name, unsigned char* block, size_t block_len){
   PRINT("%s:\n", name);
   for (int i=0; i< block_len; i++){
     PRINT("%x|", block[i]);
@@ -25,49 +31,51 @@ int sendC(unsigned char c){
   } else{
     printf("Too long!\n");
   }
+  return 1;
 }
 #define P_SEND &sendC
 int main(int argc, char** argv)
 { 
   resetState();
-  char udp_payload[100] = "testtesttesttestlalalalalalalalalalallalalalalalalalallalalalalalalalalalalalalalalal";
+  unsigned char udp_payload[100] = "testtesttesttestlalalalalalalalalalallalalalalalalalallalalalalalalalalalalalalalalal";
   udp_payload[0] = 0;
-  udp_payload[1] = 0;
 
-  char root[5] = "test";
+  const char root[5] = "test";
 
-  char xoredRoot[4];
-  memcpy(xoredRoot, root, 4);
-  xoredRoot[2] = 0;
-  unsigned char nodes[3][HASH_BLOCK_LENGTH]={0};
+  unsigned char xoredRoot[4] = "eses";
   
-  HASH_FUNC(&xoredRoot, 4, nodes[0]);
-  printBlock("Node 0", nodes[0], HASH_BLOCK_LENGTH);
+  for(int i = 0; i < strlen(root); i++){
+    xoredRoot[i] ^=  root[i];
+  }
+  unsigned char nodes[3][HASH_SIZE]={0};
+  
+  sha_construction.func(xoredRoot, strlen(root), nodes[0]);
+  printBlock("Node 0", nodes[0], HASH_SIZE);
 
-  for(int i = 0; i < HASH_BLOCK_LENGTH; i+=2){
+  for(int i = 0; i < HASH_SIZE; i+=2){
     nodes[0][i] ^=  udp_payload[3];
   }
 
-  printBlock("xored Node 0", nodes[0], HASH_BLOCK_LENGTH);
-  HASH_FUNC(nodes[0], HASH_BLOCK_LENGTH, nodes[1]);
-  printBlock("Node 1", nodes[1], HASH_BLOCK_LENGTH);
+  printBlock("xored Node 0", nodes[0], HASH_SIZE);
+  HASH_FUNC(nodes[0], HASH_SIZE, nodes[1]);
+  printBlock("Node 1", nodes[1], HASH_SIZE);
 
-  MAC_FUNC(HASH_FUNC, HASH_BLOCK_LENGTH, nodes[1], HASH_BLOCK_LENGTH, udp_payload+4, 76, nodes[2]);
-  printBlock("Node 2", nodes[2], HASH_BLOCK_LENGTH);
+  unsigned int hmac_size =0;
+  hmac(&sha_construction, nodes[1], HASH_SIZE,(const unsigned char*)udp_payload+4, 76, nodes[2], &hmac_size);
+  printBlock("Node 2", nodes[2], HASH_SIZE);
   
   memcpy(udp_payload+80, nodes[2], 20);
   
-  setRoot(root, 4);
+  setRoot((unsigned char *)root, 4);
   size_t udp_payload_size = 100;
   printf("len of %s is %lu\n", udp_payload, udp_payload_size);
-  unsigned char * payload;
-  size_t payload_size = 0;
   uint8_t protocol_version = VERSION_BITS(udp_payload[0]);
-  if(SUCC == handleSecurityLayer(protocol_version, (unsigned char *)(udp_payload), udp_payload_size, &payload, &payload_size)){
+  unsigned int header_size = 0;
+  if(SUCC == handleSecurityLayer(protocol_version, (unsigned char *)(udp_payload), udp_payload_size, &header_size)){
     unsigned char * response_payload;
     size_t response_payload_size = 0;
-    handleApplicationLayer(payload, payload_size, response_payload, &response_payload_size, sendBuf, &sendBufIdx);
-    sendBufIdx = 0;
-    handleSecurityLayerAfterPayload(protocol_version, response_payload, response_payload_size, sendBuf+sendBufIdx, &sendBufIdx);
+    //handleApplicationLayer(payload, payload_size, response_payload, &response_payload_size, sendBuf, &sendBufIdx);
+    //sendBufIdx = 0;
+    //handleSecurityLayerAfterPayload(protocol_version, response_payload, response_payload_size, sendBuf+sendBufIdx, &sendBufIdx);
   }
 }

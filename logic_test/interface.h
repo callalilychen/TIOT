@@ -2,7 +2,6 @@
 #define __INTERFACE_H__
 #include <stdint.h>
 #include <stdio.h>
-#include "utils.h"
 #include "sha256.h"
 
 #ifdef  __cplusplus
@@ -18,13 +17,13 @@ extern "C" {
                         else if(size == 4) x = sl_Htonl(y);
 
   typedef struct hash_function_construction{
-    unsigned char (*func) (const unsigned char *d, size_t n, unsigned char *md);
+    unsigned char *(*func) (const unsigned char *d, size_t n, unsigned char *md);
     unsigned int block_size;
     unsigned int size;
   }hash_function_construction;
 
 #define HASH_SIZE SHA256_DIGEST_LENGTH
-extern const hash_function_construction sha256_construction;
+extern const hash_function_construction sha_construction;
 
 #ifdef  __cplusplus
 }

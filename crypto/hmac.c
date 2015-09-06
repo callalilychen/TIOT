@@ -17,12 +17,12 @@
 #define OPAD 0x5c5c5c5c5c5c5c5c
 #endif
 
-unsigned int hmac(hash_function_construction* hash, unsigned char* key, unsigned int key_size, unsigned char* message,  unsigned int message_size, unsigned char* res, unsigned int *res_size){
+unsigned char* hmac(const struct hash_function_construction* hash, const void* key, int key_size, const unsigned char* message, int message_size, unsigned char* res, unsigned int * res_size){
     unsigned char tk[hash->size];
   if(key_size > hash->block_size){
-    hash(key, key_size, tk);
+    hash->func(key, (size_t)key_size, tk);
     key = tk;
-    key_size = hash_block_size;
+    key_size = (int)(hash->size);
   }
   unsigned char ik[hash->block_size+message_size];
   unsigned char ok[hash->block_size+hash->size];
@@ -34,8 +34,8 @@ unsigned int hmac(hash_function_construction* hash, unsigned char* key, unsigned
   }
   if(end*WORD_SIZE < key_size){
     for(int i = end*WORD_SIZE; i< key_size; i++){
-      ik[i] = key[i] ^ IPAD_SINGLE;
-      ok[i] = key[i] ^ OPAD_SINGLE;
+      ik[i] = ((unsigned char*)key)[i] ^ IPAD_SINGLE;
+      ok[i] = ((unsigned char*)key)[i] ^ OPAD_SINGLE;
     }
     start = end+1;
     for(int i = key_size; i< start*WORD_SIZE; i++){
@@ -50,11 +50,11 @@ unsigned int hmac(hash_function_construction* hash, unsigned char* key, unsigned
      (WORD_TYPE ik)[i] = IPAD;
      (WORD_TYPE ok)[i] = OPAD;
   }
-  memcpy(ik+hash->block_size, message, message_size);
-  hash(ik, hash->block_size+message_size, res);
-  memcpy(ok+hash->block_size, res, hash->size);
-  hash(ok, hash->block_size + hash->size, res);
+  memcpy(ik+hash->block_size, message, (size_t)message_size);
+  hash->func(ik, (size_t)(hash->block_size+message_size), res);
+  memcpy(ok+hash->block_size, res, (size_t)(hash->size));
+  hash->func(ok, (size_t)(hash->block_size + hash->size), res);
 
-  *res_size = hash.size;
+  *res_size = hash->size;
   return res;
 }

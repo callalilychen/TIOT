@@ -2,7 +2,9 @@
 #define __SECURITY_LAYER_H__
 
 #include "interface.h"
+#include "hmac.h"
 #include "treestate.h" 
+#include "tree.h" 
 
 #ifdef  __cplusplus
 extern "C" {
@@ -12,21 +14,25 @@ extern "C" {
 #define VERSION_BITS(x) (x>>6) & MAX_VERSION
 
 typedef struct securityLayerImplementation{
-  unsigned char * (*setHeader)(unsigned char* , size_t , uint8_t *);
+  unsigned char * (*parseHeader)(unsigned char* , size_t , unsigned int *);
 
+  void * (*getHeader)(unsigned int*);
+  void * (*getPermCode)(unsigned int*);
   STATE_INDEX_TYPE (*getSecretIndex)(void);
   STATE_INDEX_TYPE (*getPermIndex)(void);
   STATE_INDEX_TYPE (*getKeyIndex)(void);
-
-  uint8_t (*setSecretIndex)(unsigned char* , size_t);
-  uint8_t (*setPermIndex)(unsigned char* , size_t);
-  uint8_t (*setKeyIndex)(unsigned char* , size_t);
+  
+  unsigned int (*setHeader)(unsigned char* , size_t);
+  unsigned int (*setPermCode)(unsigned char* , size_t);
+  unsigned int (*setSecretIndex)(unsigned char* , size_t);
+  unsigned int (*setPermIndex)(unsigned char* , size_t);
+  unsigned int (*setKeyIndex)(unsigned char* , size_t);
  
-  uint8_t MACsize;
+  unsigned int MACsize;
 }securityLayerImplementation;
 
 
-int handleSecurityLayer(uint8_t, unsigned char *, size_t, unsigned char **, size_t *, unsigned char* res, size_t *);
+int handleSecurityLayer(uint8_t, unsigned char *, size_t, unsigned int*);
 int handleSecurityLayerAfterPayload(uint8_t, unsigned char *, size_t, unsigned char* res, size_t *);
 
 

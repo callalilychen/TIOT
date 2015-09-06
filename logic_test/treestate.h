@@ -2,29 +2,41 @@
 #define __TREE_STATE_H__
 
 #include <stdint.h>
+#include <strings.h>
 #include "interface.h"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-#define MAX_CLIENTS 10
+#define MAX_CLIENTS 0xff
+#define STATE_INDEX_SIZE 2
 #define STATE_INDEX_TYPE uint16_t
 #define MAX_INDEX 0xffff
 #define MAX_PERMISSION 0xff
 
-typedef struct state_struct{
+#define STATE_TYPE state_struct
+
+  typedef struct state_struct{
     STATE_INDEX_TYPE perm_index;
     STATE_INDEX_TYPE key_index;
   } state_struct;
-  
-#define STATE_TYPE state_struct
-  
-  void resetState();
-  STATE_TYPE * getState(STATE_INDEX_TYPE);
-  int setState(STATE_INDEX_TYPE, STATE_INDEX_TYPE, STATE_INDEX_TYPE);
-  int incPermIndex(STATE_INDEX_TYPE index);
-  int incKeyIndex(STATE_INDEX_TYPE index);
+
+  extern STATE_TYPE states[MAX_CLIENTS];
+   
+  inline void (__attribute__((always_inline))resetState)(void){
+    bzero(states, sizeof states);  
+  }
+
+  inline STATE_TYPE * (__attribute__((always_inline))getState)(STATE_INDEX_TYPE index){
+    if(index < MAX_CLIENTS)
+      return &states[index];
+    return NULL;
+  }
+
+  int setState(STATE_INDEX_TYPE, STATE_INDEX_TYPE, STATE_INDEX_TYPE, unsigned int*);
+
+
 
 #ifdef  __cplusplus
 }
