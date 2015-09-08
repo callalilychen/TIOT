@@ -15,13 +15,13 @@ extern "C" {
     unsigned int params_size;
   }tree_edge;
   
-  extern tree_edge tmp_edges[MAX_LEVEL-1];
+  extern tree_edge path_edges[MAX_LEVEL-1];
 
   inline tree_edge * (__attribute__((always_inline))getEdges)(unsigned int level){
     if(level+1 > MAX_LEVEL){
       return NULL;
     }
-    return tmp_edges;  
+    return path_edges;  
   }
 
   void edgeFunc(tree_node *, tree_edge *edge, tree_node *);

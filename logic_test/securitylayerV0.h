@@ -1,8 +1,6 @@
 #ifndef __SECURITY_LAYER_V0_H__
 #define __SECURITY_LAYER_V0_H__
 
-#include <stddef.h>
-
 #include "treestate.h"
 #ifdef  __cplusplus
 extern "C" {
@@ -25,7 +23,7 @@ extern "C" {
   }securityHeaderV0;
 #pragma pack()
 
-  unsigned char * parseHeaderV0(unsigned char* , size_t , unsigned int *);
+  unsigned char * parseHeaderV0(unsigned char*, unsigned int *, unsigned int *);
   
   void * getHeaderV0(unsigned int *);
   void * getPermCodeV0(unsigned int *);
@@ -33,11 +31,11 @@ extern "C" {
   STATE_INDEX_TYPE getPermIndexV0(void);
   STATE_INDEX_TYPE getKeyIndexV0(void);
 
-  unsigned int setHeaderV0(unsigned char* , size_t);
-  unsigned int setPermCodeV0(unsigned char* , size_t);
-  unsigned int setSecretIndexV0(unsigned char* , size_t);
-  unsigned int setPermIndexV0(unsigned char* , size_t);
-  unsigned int setKeyIndexV0(unsigned char* , size_t);
+  unsigned int setHeaderV0(unsigned char* , unsigned int);
+  unsigned int setPermCodeV0(unsigned char* , unsigned int);
+  unsigned int setSecretIndexV0(unsigned char* , unsigned int);
+  unsigned int setPermIndexV0(unsigned char* , unsigned int);
+  unsigned int setKeyIndexV0(unsigned char* , unsigned int);
 
 #ifdef  __cplusplus
 }

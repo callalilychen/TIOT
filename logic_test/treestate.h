@@ -17,6 +17,7 @@ extern "C" {
 
 #define STATE_TYPE state_struct
 
+  // TODO als array
   typedef struct state_struct{
     STATE_INDEX_TYPE perm_index;
     STATE_INDEX_TYPE key_index;

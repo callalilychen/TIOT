@@ -1,15 +1,17 @@
 #include "securitylayerV0.h"
 #include <string.h>
 
+// TODO session
 securityHeaderV0 * currHeader = NULL;
 
-unsigned char * parseHeaderV0(unsigned char * msg, size_t msg_size, unsigned int *p_header_size){
-  if(msg[0]>>6 || msg_size < HEADER_LEN_V0 + MAC_LEN_V0){
+unsigned char * parseHeaderV0(unsigned char * msg, unsigned int *p_msg_size, unsigned int *p_header_size){
+  if(msg[0]>>6 || *p_msg_size < HEADER_LEN_V0 + MAC_LEN_V0){
     * p_header_size = 0;
     return NULL;
   }
   currHeader = (securityHeaderV0 *)msg;
   * p_header_size = HEADER_LEN_V0;
+  * p_msg_size -= HEADER_LEN_V0;
   return (unsigned char *)currHeader;
 }
 
@@ -35,7 +37,7 @@ STATE_INDEX_TYPE getKeyIndexV0(){
   return (STATE_INDEX_TYPE)(currHeader->key_index);
 }
 
-unsigned int setHeaderV0(unsigned char* msg, size_t msg_size){
+unsigned int setHeaderV0(unsigned char* msg, unsigned int msg_size){
   if(msg_size < HEADER_LEN_V0){
     return 0;
   }
@@ -43,7 +45,7 @@ unsigned int setHeaderV0(unsigned char* msg, size_t msg_size){
   return HEADER_LEN_V0;
 }
 
-unsigned int setSecretIndexV0(unsigned char* msg, size_t msg_size){
+unsigned int setSecretIndexV0(unsigned char* msg, unsigned int msg_size){
   unsigned int size = sizeof(permCodeV0);
   if(msg_size < size){
     return 0;
@@ -52,7 +54,7 @@ unsigned int setSecretIndexV0(unsigned char* msg, size_t msg_size){
   return size;
 }
 
-unsigned int setPermCodeV0(unsigned char* msg, size_t msg_size){
+unsigned int setPermCodeV0(unsigned char* msg, unsigned int msg_size){
   if(msg_size < 1){
     return 0;
   }
@@ -60,7 +62,7 @@ unsigned int setPermCodeV0(unsigned char* msg, size_t msg_size){
   return 1;
 }
 
-unsigned int setPermIndexV0(unsigned char* msg, size_t msg_size){
+unsigned int setPermIndexV0(unsigned char* msg, unsigned int msg_size){
   if(msg_size < 1){
     return 0;
   }
@@ -68,7 +70,7 @@ unsigned int setPermIndexV0(unsigned char* msg, size_t msg_size){
   return 1;
 }
 
-unsigned int setKeyIndexV0(unsigned char* msg, size_t msg_size){
+unsigned int setKeyIndexV0(unsigned char* msg, unsigned int msg_size){
   if(msg_size < 1){
     return 0;
   }

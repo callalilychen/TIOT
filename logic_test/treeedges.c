@@ -2,7 +2,7 @@
 #include <string.h>
 #include "utils.h"
 
-tree_edge tmp_edges[MAX_LEVEL-1]={0};
+tree_edge path_edges[MAX_LEVEL-1]={0};
 
 void edgeFunc(tree_node *parent_node, tree_edge *edge, tree_node *node)
 {

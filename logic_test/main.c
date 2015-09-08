@@ -34,14 +34,41 @@ int sendC(unsigned char c){
   return 1;
 }
 #define P_SEND &sendC
+
+static inline void receivedUdpPackage(unsigned char* udp_payload, unsigned int *p_udp_payload_size){
+  uint8_t protocol_version = VERSION_BITS(udp_payload[0]);
+  unsigned int header_size = 0;
+  if(SUCC == handleSecurityLayer(protocol_version, udp_payload, p_udp_payload_size, &header_size)){
+    handleApplicationLayer(udp_payload+header_size, *p_udp_payload_size,0);
+  }
+}
+
+static inline void sendUdpPackage(void){
+  unsigned int application_layer_msg_size = 0;
+  unsigned char * application_layer_msg = NULL;
+  unsigned int application_layer_session = NO_SESSION;
+  unsigned int security_layer_session = NO_SESSION;
+  while((application_layer_msg = generateApplicationLayer(&application_layer_msg_size, &application_layer_session, &security_layer_session)) != NULL){
+    generateSecurityLayerHeader(security_layer_session);
+    unsigned char tmp[100] = {0};
+    memcpy(tmp, application_layer_msg, application_layer_msg_size);
+    PRINT("get %s\n", tmp);
+    generateSecurityLayerMAC(security_layer_session);
+    clearApplicationLayerSession(application_layer_session); 
+    clearSecurityLayerSession(security_layer_session); 
+  } 
+}
+
 int main(int argc, char** argv)
 { 
   resetState();
-  unsigned char udp_payload[100] = "testtesttesttestlalalalalalalalalalallalalalalalalalallalalalalalalalalalalalalalalal";
+  unsigned char udp_payload[100] = "testtest";
+  unsigned int udp_payload_size = (unsigned int)strlen((const char *)udp_payload);
+  printf("len of %s is %d\n", udp_payload, udp_payload_size);
+
   udp_payload[0] = 0;
 
   const char root[5] = "test";
-
   unsigned char xoredRoot[4] = "eses";
   
   for(int i = 0; i < strlen(root); i++){
@@ -61,21 +88,15 @@ int main(int argc, char** argv)
   printBlock("Node 1", nodes[1], HASH_SIZE);
 
   unsigned int hmac_size =0;
-  hmac(&sha_construction, nodes[1], HASH_SIZE,(const unsigned char*)udp_payload+4, 76, nodes[2], &hmac_size);
+  hmac(&sha_construction, nodes[1], HASH_SIZE,(const unsigned char*)udp_payload+4, udp_payload_size-4, nodes[2], &hmac_size);
   printBlock("Node 2", nodes[2], HASH_SIZE);
   
-  memcpy(udp_payload+80, nodes[2], 20);
+  memcpy(udp_payload+8, nodes[2], 20);
+  udp_payload_size += 20;
   
   setRoot((unsigned char *)root, 4);
-  size_t udp_payload_size = 100;
-  printf("len of %s is %lu\n", udp_payload, udp_payload_size);
-  uint8_t protocol_version = VERSION_BITS(udp_payload[0]);
-  unsigned int header_size = 0;
-  if(SUCC == handleSecurityLayer(protocol_version, (unsigned char *)(udp_payload), udp_payload_size, &header_size)){
-    unsigned char * response_payload;
-    size_t response_payload_size = 0;
-    //handleApplicationLayer(payload, payload_size, response_payload, &response_payload_size, sendBuf, &sendBufIdx);
-    //sendBufIdx = 0;
-    //handleSecurityLayerAfterPayload(protocol_version, response_payload, response_payload_size, sendBuf+sendBufIdx, &sendBufIdx);
+  if(udp_payload_size > 0){
+    receivedUdpPackage((unsigned char *)(udp_payload), &udp_payload_size);
   }
+  sendUdpPackage();
 }
