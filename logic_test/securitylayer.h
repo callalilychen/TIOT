@@ -10,33 +10,40 @@
 extern "C" {
 #endif
 
+//TODO value
+#define NO_DESCRIPTOR 0xffff
 #define MAX_VERSION 3
 #define VERSION_BITS(x) (x>>6) & MAX_VERSION
 
-typedef struct securityLayerImplementation{
-  unsigned char * (*parseHeader)(unsigned char* , unsigned int* , unsigned int *);
+  typedef struct securityLayerImplementation{
+    unsigned char * (*parseHeader)(unsigned char* , unsigned int* , unsigned int *);
 
-  void * (*getHeader)(unsigned int*);
-  void * (*getPermCode)(unsigned int*);
-  STATE_INDEX_TYPE (*getSecretIndex)(void);
-  STATE_INDEX_TYPE (*getPermIndex)(void);
-  STATE_INDEX_TYPE (*getKeyIndex)(void);
-  
-  unsigned int (*setHeader)(unsigned char* , unsigned int);
-  unsigned int (*setPermCode)(unsigned char* , unsigned int);
-  unsigned int (*setSecretIndex)(unsigned char* , unsigned int);
-  unsigned int (*setPermIndex)(unsigned char* , unsigned int);
-  unsigned int (*setKeyIndex)(unsigned char* , unsigned int);
- 
-  unsigned int MACsize;
-}securityLayerImplementation;
+    void * (*getHeader)(unsigned int*);
+    void * (*getPermCode)(unsigned int*);
+    STATE_TYPE (*getSecretIndex)(void);
+    STATE_TYPE (*getPermIndex)(void);
+    STATE_TYPE (*getKeyIndex)(void);
+
+    unsigned int (*setHeader)(unsigned char* , unsigned int);
+    unsigned int (*setPermCode)(unsigned char* , unsigned int);
+    unsigned int (*setSecretIndex)(unsigned char* , unsigned int);
+    unsigned int (*setPermIndex)(unsigned char* , unsigned int);
+    unsigned int (*setKeyIndex)(unsigned char* , unsigned int);
+
+    unsigned int MACsize;
+  }securityLayerImplementation;
 
 
-int handleSecurityLayer(uint8_t, unsigned char *, unsigned int*, unsigned int*);
-int handleSecurityLayerAfterPayload(uint8_t, unsigned char *, unsigned int, unsigned char* res, unsigned int *);
-void clearSecurityLayerSession(unsigned int);
+  unsigned int handleSecurityLayer(unsigned char *, unsigned int*, unsigned int*);
+  unsigned int generateSecurityLayerHeader(unsigned int, unsigned char*, unsigned int);
+  unsigned int generateSecurityLayerMAC(unsigned int, unsigned char*, unsigned int, unsigned char*, unsigned int);
 
-void resetKey(void);
+  inline void  (__attribute__((always_inline))removeSecurityLayerDescriptor)(unsigned int index){
+    ;
+  }
+
+
+  void resetKey(void);
 
 
 #ifdef  __cplusplus

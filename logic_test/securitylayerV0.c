@@ -25,16 +25,16 @@ void * getPermCodeV0(unsigned int * size){
   return &(currHeader->perm_code);
 }
 
-STATE_INDEX_TYPE getSecretIndexV0(){
-  return (STATE_INDEX_TYPE)((currHeader->perm_code).secret_index);
+STATE_TYPE getSecretIndexV0(){
+  return (STATE_TYPE)((currHeader->perm_code).secret_index);
 }
 
-STATE_INDEX_TYPE getPermIndexV0(){
-  return (STATE_INDEX_TYPE)((currHeader->perm_code).perm_index);
+STATE_TYPE getPermIndexV0(){
+  return (STATE_TYPE)((currHeader->perm_code).perm_index);
 }
 
-STATE_INDEX_TYPE getKeyIndexV0(){
-  return (STATE_INDEX_TYPE)(currHeader->key_index);
+STATE_TYPE getKeyIndexV0(){
+  return (STATE_TYPE)(currHeader->key_index);
 }
 
 unsigned int setHeaderV0(unsigned char* msg, unsigned int msg_size){

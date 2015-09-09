@@ -33,8 +33,8 @@ typedef struct token{
   uint16_t len;
   uint16_t as_id;
   uint16_t rs_id;
-  STATE_INDEX_TYPE secret_index;
-  STATE_INDEX_TYPE perm_index;
+  STATE_TYPE secret_index;
+  STATE_TYPE perm_index;
   timestamps time;
   police polices;
   uint8_t padding;
@@ -45,7 +45,7 @@ typedef struct token{
 typedef struct securityHeaderV1{
   uint8_t indicator;
   token authorization_token;
-  STATE_INDEX_TYPE key_index;
+  STATE_TYPE key_index;
   uint8_t cipher;
   uint8_t res_cipher;
 }securityHeaderV1;
@@ -62,9 +62,9 @@ typedef struct message{
 
   unsigned char * setHeaderV1(unsigned char* , size_t , uint8_t *);
 
-  STATE_INDEX_TYPE getSecretIndexV1(void);
-  STATE_INDEX_TYPE getPermIndexV1(void);
-  STATE_INDEX_TYPE getKeyIndexV1(void);
+  STATE_TYPE getSecretIndexV1(void);
+  STATE_TYPE getPermIndexV1(void);
+  STATE_TYPE getKeyIndexV1(void);
 
   uint8_t setSecretIndexV1(unsigned char* , size_t);
   uint8_t setPermIndexV1(unsigned char* , size_t);

@@ -1,38 +1,32 @@
 #include "applicationlayer.h"
+#include "application_interface.h"
 
-applicationlayer_session applicationlayer_sessions[MAX_APPLICATION_LAYER_SESSION] = {0};
+application_session application_sessions[MAX_APPLICATION_SESSION] = {0};
 
-int handleApplicationLayer(unsigned char * payload, size_t payload_size, unsigned int header_session){
+unsigned int handleApplicationLayer(unsigned char * payload, unsigned int payload_size, unsigned int next_layer_descriptor){
   if(payload_size < 1){
-    return FAIL;
+    return NO_SESSION;
   }
 
-  for(int i=0; i<MAX_APPLICATION_LAYER_SESSION; i++){
-    if(applicationlayer_sessions[i].message_size==0){
-      applicationlayer_sessions[i].next_header_session = header_session;
-      applicationlayer_sessions[i].message_size = handleApplication(payload, payload_size, applicationlayer_sessions[i].message ,MAX_APPLICATION_MESSAGE_SIZE);
-      return SUCC;   
+  for(int i=0; i<MAX_APPLICATION_SESSION; i++){
+    if(application_sessions[i].application_id==NO_APPLICATION){
+      application_sessions[i].next_layer_descriptor = next_layer_descriptor;
+      application_sessions[i].message_size = handleApplication(payload, payload_size, &application_sessions[i]);
+      return i+1;   
     }
   }
 
-  return FAIL;
+  return NO_SESSION;
 }
 
-unsigned char * generateApplicationLayer(unsigned int *p_size, unsigned int *session, unsigned int *p_next_layer_session){
-  for(int i=0; i<MAX_APPLICATION_LAYER_SESSION; i++){
-    if((*p_size = applicationlayer_sessions[i].message_size)>0){
-      *session = i;
-      *p_next_layer_session = applicationlayer_sessions[i].next_header_session;
-      return applicationlayer_sessions[i].message;   
+unsigned char * generateApplicationLayer(unsigned int *session, unsigned int *p_size, unsigned int *p_next_layer_descritpor){
+  for(int i=0; i<MAX_APPLICATION_SESSION; i++){
+    if((*p_size = application_sessions[i].message_size)>0){
+      *session = i+1;
+      *p_next_layer_descritpor = application_sessions[i].next_layer_descriptor;
+      return application_sessions[i].message;   
     }
   }
   return NULL;
   
-}
-
-void clearApplicationLayerSession(unsigned int session_index){
-  if(session_index < MAX_APPLICATION_LAYER_SESSION){
-    applicationlayer_sessions[session_index].message_size = 0;
-    applicationlayer_sessions[session_index].next_header_session = NO_SESSION;
-  }
 }

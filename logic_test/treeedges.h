@@ -17,8 +17,8 @@ extern "C" {
   
   extern tree_edge path_edges[MAX_LEVEL-1];
 
-  inline tree_edge * (__attribute__((always_inline))getEdges)(unsigned int level){
-    if(level+1 > MAX_LEVEL){
+  inline tree_edge * (__attribute__((always_inline))getEdges)(unsigned int count){
+    if(count+1 > MAX_LEVEL){
       return NULL;
     }
     return path_edges;  

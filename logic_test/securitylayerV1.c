@@ -37,9 +37,9 @@ int parser1(unsigned char* msg, uint8_t msg_len,  message *p_message){
     msg +=2;
     atl -= 2;
   } 
-  msg = dynamicParse((uint8_t *)&(p_token->secret_index), sizeof(STATE_INDEX_TYPE), msg, SIL(t_len));
+  msg = dynamicParse((uint8_t *)&(p_token->secret_index), sizeof(STATE_TYPE), msg, SIL(t_len));
   atl -= SIL(t_len);
-  msg = dynamicParse((uint8_t *)&(p_token->perm_index), sizeof(STATE_INDEX_TYPE), msg, PIL(t_len));
+  msg = dynamicParse((uint8_t *)&(p_token->perm_index), sizeof(STATE_TYPE), msg, PIL(t_len));
   atl -= PIL(t_len);
   msg = dynamicParse((uint8_t *)&(p_token->polices), sizeof(police), msg, APL(t_len));
   atl -= APL(t_len);
@@ -59,9 +59,9 @@ int parser1(unsigned char* msg, uint8_t msg_len,  message *p_message){
 
   msg += atl;
   
-  msg = dynamicParse((uint8_t *)&(p_header->key_index), sizeof(STATE_INDEX_TYPE), msg, KIL(t_len));
+  msg = dynamicParse((uint8_t *)&(p_header->key_index), sizeof(STATE_TYPE), msg, KIL(t_len));
 
-  printf("dynamic parse len %lu %lu, %lu\n", sizeof(STATE_INDEX_TYPE), sizeof(police), sizeof(timestamps));
+  printf("dynamic parse len %lu %lu, %lu\n", sizeof(STATE_TYPE), sizeof(police), sizeof(timestamps));
 
   if(CIPHER_FLAG(p_header -> indicator)){
     if((--msg_len)<MAC_LEN){
@@ -93,16 +93,16 @@ unsigned char * setHeaderV1(unsigned char * msg, size_t msg_size, uint8_t *p_hea
   return currHeader;
 }
 
-STATE_INDEX_TYPE getSecretIndexV1(){
-  return (STATE_INDEX_TYPE)((currHeader->authorization_token).secret_index);
+STATE_TYPE getSecretIndexV1(){
+  return (STATE_TYPE)((currHeader->authorization_token).secret_index);
 }
 
-STATE_INDEX_TYPE getPermIndexV1(){
-  return (STATE_INDEX_TYPE)((currHeader->authorization_token).perm_index);
+STATE_TYPE getPermIndexV1(){
+  return (STATE_TYPE)((currHeader->authorization_token).perm_index);
 }
 
-STATE_INDEX_TYPE getKeyIndexV1(){
-  return (STATE_INDEX_TYPE)(currHeader->key_index);
+STATE_TYPE getKeyIndexV1(){
+  return (STATE_TYPE)(currHeader->key_index);
 }
 
 uint8_t setSecretIndexV1(unsigned char* msg, size_t msg_size){

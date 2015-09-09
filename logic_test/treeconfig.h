@@ -6,7 +6,6 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#define MAX_LEVEL 4
 #define NODE_SIZE HASH_SIZE
 #define HASH_FUNC sha_construction.func
 

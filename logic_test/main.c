@@ -6,6 +6,7 @@
 #include "treestate.h"
 #include "tree.h" 
 #include "hmac.h"
+#include "applicationexample.h"
 #include "securitylayer.h" 
 #include "applicationlayer.h" 
 #include "testcase.h"
@@ -21,48 +22,39 @@ static void printBlock(char* name, unsigned char* block, size_t block_len){
   }
   PRINT("\n");
 }
-unsigned char sendBuf[100];
-size_t sendBufIdx = 0;
 
-int sendC(unsigned char c){
-  if(sendBufIdx < 100){
-  putchar(c);
-  sendBuf[sendBufIdx++] = c;
-  } else{
-    printf("Too long!\n");
-  }
-  return 1;
-}
-#define P_SEND &sendC
-
-static inline void receivedUdpPackage(unsigned char* udp_payload, unsigned int *p_udp_payload_size){
-  uint8_t protocol_version = VERSION_BITS(udp_payload[0]);
+static inline void receivedUdpPackage(unsigned char* udp_payload, unsigned int udp_payload_size){
+  unsigned int security_descriptor = 0;
   unsigned int header_size = 0;
-  if(SUCC == handleSecurityLayer(protocol_version, udp_payload, p_udp_payload_size, &header_size)){
-    handleApplicationLayer(udp_payload+header_size, *p_udp_payload_size,0);
+  if(NO_DESCRIPTOR != (security_descriptor = handleSecurityLayer(udp_payload, &udp_payload_size, &header_size))){
+    handleApplicationLayer(udp_payload+header_size, udp_payload_size, security_descriptor);
   }
 }
 
-static inline void sendUdpPackage(void){
-  unsigned int application_layer_msg_size = 0;
-  unsigned char * application_layer_msg = NULL;
-  unsigned int application_layer_session = NO_SESSION;
-  unsigned int security_layer_session = NO_SESSION;
-  while((application_layer_msg = generateApplicationLayer(&application_layer_msg_size, &application_layer_session, &security_layer_session)) != NULL){
-    generateSecurityLayerHeader(security_layer_session);
-    unsigned char tmp[100] = {0};
-    memcpy(tmp, application_layer_msg, application_layer_msg_size);
-    PRINT("get %s\n", tmp);
-    generateSecurityLayerMAC(security_layer_session);
-    clearApplicationLayerSession(application_layer_session); 
-    clearSecurityLayerSession(security_layer_session); 
+static inline unsigned int sendUdpPackage(unsigned char* send_buf, unsigned int max_send_buf){
+  unsigned int  application_layer_msg_size = 0;
+  unsigned char *  application_layer_msg = NULL;
+  unsigned int buf_size = 0;
+  unsigned char *buf = send_buf;
+  unsigned int application_session = NO_SESSION;
+  unsigned int security_descriptor = NO_SESSION;
+  while(NULL!=(application_layer_msg = generateApplicationLayer(&application_session, & application_layer_msg_size, &security_descriptor))){
+    buf_size = 0;
+    buf = send_buf;
+    buf_size = generateSecurityLayerHeader(security_descriptor, buf, max_send_buf);
+    memcpy(buf+buf_size, application_layer_msg, application_layer_msg_size);
+    buf_size +=application_layer_msg_size;
+    buf_size +=generateSecurityLayerMAC(security_descriptor, application_layer_msg, application_layer_msg_size, buf, max_send_buf-buf_size);
+    clearApplicationLayerSession(application_session); 
+    removeSecurityLayerDescriptor(security_descriptor); 
   } 
+  return buf_size;
 }
 
 int main(int argc, char** argv)
 { 
-  resetState();
-  unsigned char udp_payload[100] = "testtest";
+  resetAllStates();
+  unsigned char udp_payload[100] = "testrep";
   unsigned int udp_payload_size = (unsigned int)strlen((const char *)udp_payload);
   printf("len of %s is %d\n", udp_payload, udp_payload_size);
 
@@ -91,12 +83,21 @@ int main(int argc, char** argv)
   hmac(&sha_construction, nodes[1], HASH_SIZE,(const unsigned char*)udp_payload+4, udp_payload_size-4, nodes[2], &hmac_size);
   printBlock("Node 2", nodes[2], HASH_SIZE);
   
-  memcpy(udp_payload+8, nodes[2], 20);
+  memcpy(udp_payload+udp_payload_size, nodes[2], 20);
+  printBlock("udp_payload", udp_payload, udp_payload_size+20);
   udp_payload_size += 20;
   
   setRoot((unsigned char *)root, 4);
   if(udp_payload_size > 0){
-    receivedUdpPackage((unsigned char *)(udp_payload), &udp_payload_size);
+    receivedUdpPackage((unsigned char *)(udp_payload), udp_payload_size);
   }
-  sendUdpPackage();
+  
+  unsigned char send_buf[100] = {0};
+  unsigned int send_buf_size = sendUdpPackage(send_buf, 100);
+
+  if(send_buf_size == udp_payload_size && memcmp(send_buf, udp_payload, udp_payload_size)){
+    PRINT("SEND AND RECEIVE TESTCASE: OK\n");
+  }else{
+    PRINT("SEND AND RECEIVE TESTCASE: FAIL\n");
+  }
 }

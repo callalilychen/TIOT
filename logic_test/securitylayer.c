@@ -31,16 +31,21 @@ const static securityLayerImplementation securityLayerImplementationV0 = {
 
 static const securityLayerImplementation* implementations[MAX_VERSION + 1] = {&securityLayerImplementationV0, NULL, NULL, NULL};
 
-//TODO session?
+//TODO descriptors?
+uint8_t currVersion = 0;
 static tree_node * currKeyNode = NULL;
+unsigned char currMAC[HASH_SIZE] = {0};
 
 void resetKey(void){
   currKeyNode = NULL;
 }
 
-static inline tree_node * getKeyNode(STATE_INDEX_TYPE secret_index, unsigned char * perm_code, unsigned int perm_code_size, STATE_INDEX_TYPE key_index, unsigned int flag){
+static inline tree_node * getKeyNode(STATE_TYPE secret_index, unsigned char * perm_code, unsigned int perm_code_size, STATE_TYPE key_index, unsigned int flag){
   
-  tree_edge * edges = getEdges(3);
+  tree_edge * edges = getEdges(2);
+  if(edges == NULL){
+    return NULL;
+  }
 
   edges[0].func = edgeFunc;
   edges[1].func = edgeFunc;
@@ -50,7 +55,7 @@ static inline tree_node * getKeyNode(STATE_INDEX_TYPE secret_index, unsigned cha
 
 
   edges[1].params = (unsigned char *)(&key_index);
-  edges[1].params_size = STATE_INDEX_SIZE;
+  edges[1].params_size = STATE_SIZE;
 
   if(flag){
     return fillNodes(getPathFromRoot(3), edges, 3, flag);
@@ -69,47 +74,61 @@ static void printBlock(char* name, unsigned char* block, unsigned int block_len)
 }
 
 static inline int verifyMAC(tree_node * key, unsigned char * msg, unsigned int *p_msg_size, unsigned int mac_size){
-  unsigned char mac[HASH_SIZE] = {0};
   unsigned int size = 0;
   *p_msg_size -= mac_size;
-  hmac(&sha_construction, key->block, key->size, msg, *p_msg_size, mac, &size);
+  hmac(&sha_construction, key->block, key->size, msg, *p_msg_size, currMAC, &size);
 
-  printBlock("MAC", mac, size);
+  printBlock("MAC", currMAC, size);
   
-  return memcmp(&mac, msg+*p_msg_size, (unsigned int)mac_size);
+  return memcmp(currMAC, msg+*p_msg_size, (unsigned int)mac_size);
 }
 
 
-int handleSecurityLayer(uint8_t version, unsigned char *msg, unsigned int * p_msg_size, unsigned int *p_header_size){
-    if(*p_msg_size < MAC_LEN + 1 || version>MAX_VERSION){
-    return FAIL;
+unsigned int handleSecurityLayer(unsigned char *msg, unsigned int * p_msg_size, unsigned int *p_header_size){
+  currVersion = VERSION_BITS(msg[0]);
+    if(*p_msg_size < MAC_LEN + 1 || currVersion>MAX_VERSION){
+    return NO_DESCRIPTOR;
   }
-  const securityLayerImplementation * implementation = implementations[version];
+  const securityLayerImplementation * implementation = implementations[currVersion];
   if(NULL == implementation){
-    return FAIL;
+    return NO_DESCRIPTOR;
   }
   if(NULL == (implementation->parseHeader(msg, p_msg_size, p_header_size))){
-    return FAIL;
+    return NO_DESCRIPTOR;
   }
 
   unsigned int perm_code_size = 0;
   unsigned char* perm_code = implementation->getPermCode(&perm_code_size);
-  STATE_INDEX_TYPE secret_index = implementation->getSecretIndex();
-  STATE_INDEX_TYPE perm_index = implementation->getPermIndex();
-  STATE_INDEX_TYPE key_index = implementation->getKeyIndex();
+  STATE_TYPE secret_index = implementation->getSecretIndex();
+  STATE_TYPE indexes [2] = {implementation->getPermIndex(),  implementation->getKeyIndex()};
   unsigned int forceUpdate = 1;
-  if(SUCC == setState(secret_index, perm_index, key_index, &forceUpdate)){
-    if(0 == verifyMAC((currKeyNode = getKeyNode(secret_index, perm_code, perm_code_size, key_index, forceUpdate)), msg+*p_header_size, p_msg_size, implementation->MACsize)){
-    return SUCC;
+  if(SUCC == setStates(secret_index, indexes, 1, &forceUpdate)){
+    if(0 == verifyMAC((currKeyNode = getKeyNode(secret_index, perm_code, perm_code_size, indexes[1], forceUpdate)), msg+*p_header_size, p_msg_size, implementation->MACsize)){
+    return 0;
     }
   }
 
-  return FAIL;
+  return NO_DESCRIPTOR;
 }
 
 
-int handleSecurityLayerAfterPayload(uint8_t version, unsigned char *payload, unsigned int payload_size, unsigned char *buf, unsigned int *buf_size){
-  hmac(&sha_construction, currKeyNode->block, currKeyNode->size, payload, payload_size, buf, (unsigned int *)buf_size);
-  return SUCC;
+unsigned int generateSecurityLayerHeader(unsigned int security_descriptor, unsigned char *buf, unsigned int max_buf_size){
+  //TODO
+  if(security_descriptor!=0){
+    return 0;
+  }
+  return implementations[currVersion]->setHeader(buf, max_buf_size);
+}
+
+unsigned int generateSecurityLayerMAC(unsigned int security_descriptor, unsigned char *payload, unsigned int payload_size, unsigned char *buf, unsigned int max_buf_size){
+  // TODO 
+  if(security_descriptor!=0 || max_buf_size < implementations[currVersion]->MACsize){
+    return 0;
+  }
+  unsigned int mac_size = 0;
+  hmac(&sha_construction, currKeyNode->block, currKeyNode->size, payload, payload_size, currMAC, &mac_size);
+  mac_size = implementations[currVersion]->MACsize;
+  memcpy(buf, currMAC, max_buf_size);
+  return mac_size;
 }
 

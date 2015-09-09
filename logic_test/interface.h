@@ -10,6 +10,9 @@ extern "C" {
 
 #define PRINT(...) printf(__VA_ARGS__)
 
+//TODO somewhere else
+#define MAX_CLIENTS 0xff
+#define MAX_LEVEL 3
 #define SUCC 0
 #define FAIL -1
 

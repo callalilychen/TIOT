@@ -13,8 +13,9 @@ extern "C" {
   unsigned int handleTest(unsigned char* , unsigned int);
   unsigned int handleAckReq(unsigned char* , unsigned int);
 
-  inline unsigned int (__attribute__((always_inline))generateTest)(){
-    unsigned char* res = addApplicationLayerSession(4, NO_SESSION);
+  inline unsigned int (__attribute__((always_inline))generateTest)(unsigned int next_layer_descriptor){
+    //TODO default session?
+    unsigned char* res = addApplicationSession(4, next_layer_descriptor);
     if(res==NULL){
       return 0;
     }
@@ -25,8 +26,8 @@ extern "C" {
     return 4;
   }
 
-  inline unsigned int (__attribute__((always_inline))generateAckReq)(){
-    unsigned char* res = addApplicationLayerSession(3, NO_SESSION);
+  inline unsigned int (__attribute__((always_inline))generateAckReq)(unsigned int next_layer_descriptor){
+    unsigned char* res = addApplicationSession(3, next_layer_descriptor);
     if(res==NULL){
       return 0;
     }

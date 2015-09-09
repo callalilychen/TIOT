@@ -27,9 +27,9 @@ extern "C" {
   
   void * getHeaderV0(unsigned int *);
   void * getPermCodeV0(unsigned int *);
-  STATE_INDEX_TYPE getSecretIndexV0(void);
-  STATE_INDEX_TYPE getPermIndexV0(void);
-  STATE_INDEX_TYPE getKeyIndexV0(void);
+  STATE_TYPE getSecretIndexV0(void);
+  STATE_TYPE getPermIndexV0(void);
+  STATE_TYPE getKeyIndexV0(void);
 
   unsigned int setHeaderV0(unsigned char* , unsigned int);
   unsigned int setPermCodeV0(unsigned char* , unsigned int);
