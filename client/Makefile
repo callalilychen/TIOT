@@ -23,7 +23,7 @@ C_FLAGS += -ffunction-sections -fdata-sections
 LDFLAGS = -Wl,-Map=$(TARGET).map,--cref
 # --gc-sections will allow the linker to remove unused sections
 LDFLAGS += -Wl,--gc-sections
-LDFLAGS += -lssl -lcrypto
+LDFLAGS += -lssl -lcrypto -pthread
 
 DEBUGGER_FLAGS = $(TARGET)
 

@@ -9,7 +9,15 @@ extern "C" {
 #define NODE_SIZE HASH_SIZE
 #define HASH_FUNC sha_construction.func
 
-#define MAX_CACHED_NODES 5
+#define MAX_LEVEL 2
+#define MAX_CACHED_NODES 0
+#define MAX_VALID_STATES 0xff
+#if(MAX_VALID_STATES & 0x7)
+#define BIT_MAP_SIZE MAX_VALID_STATES>>3
+#elif
+#define BIT_MAP_SIZE (MAX_VALID_STATES>>3) + 1
+#endif
+
 
 #ifdef  __cplusplus
 }
