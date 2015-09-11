@@ -46,20 +46,20 @@ unsigned int setHeaderV0(unsigned char* msg, unsigned int msg_size){
 }
 
 unsigned int setSecretIndexV0(unsigned char* msg, unsigned int msg_size){
+  if(msg_size < 1){
+    return 0;
+  }
+  msg[0] = (unsigned char)((currHeader->perm_code).secret_index);
+  return 1;
+}
+
+unsigned int setPermCodeV0(unsigned char* msg, unsigned int msg_size){
   unsigned int size = sizeof(permCodeV0);
   if(msg_size < size){
     return 0;
   }
   memcpy(msg, &(currHeader->perm_code), size);
   return size;
-}
-
-unsigned int setPermCodeV0(unsigned char* msg, unsigned int msg_size){
-  if(msg_size < 1){
-    return 0;
-  }
-  msg[0] = (unsigned char)((currHeader->perm_code).secret_index);
-  return 1;
 }
 
 unsigned int setPermIndexV0(unsigned char* msg, unsigned int msg_size){

@@ -13,7 +13,7 @@ extern "C" {
     unsigned char block[NODE_SIZE];
     unsigned int size;
   }tree_node;
-
+  // TODO multiple trees and configuration
   extern tree_node path_nodes[MAX_LEVEL];
   extern tree_node cached_nodes[MAX_CACHED_NODES];
 

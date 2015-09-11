@@ -1,25 +1,38 @@
 #include "treestate.h"
 
+#ifdef USE_STATE
 
-STATE_TYPE expected_states[MAX_VALID_STATES][MAX_LEVEL-1] = {0};  
+STATE_TYPE expected_states[STATE_TABLE_LEN][STATE_VECTOR_LEN] = {0};
 
-int incState(unsigned int states_index, unsigned int state_level, unsigned int inc_pre_state)
+int incState(unsigned int state_row, unsigned int state_col, unsigned int inc_pre_state);
 {
-  if(states_index < MAX_VALID_STATES){
-    if(expected_states[states_index][state_level] == MAX_STATE){
-      if(!inc_pre_state || 0 == state_level){
+  if(state_row < STATE_TABLE_LEN){
+    if(expected_states[state_row][state_col]+1 < STATE_UPPER_BOUNDARY){
+      /*!
+       * If the to increased state +1 is still in upper boundary
+       */
+      expected_states[state_row][state_col]++;
+      return SUCC;
+    }else{
+      if(!inc_pre_state || 0 == state_col){
+      /*!
+       * If increase the previous column state is not wished or
+       * if the state is already in the first column
+       */
         return FAIL;
       }
-      if(SUCC == incState(states_index, state_level-1, inc_pre_state)){
-        expected_states[states_index][state_level] = 0;
+      if(SUCC == incState(state_row, state_col-1, inc_pre_state)){
+        /*!
+         * the previous column state is successfully increased,
+         * the to increased state can be increased from zero in the future
+         */
+        expected_states[state_row][state_col] = 0;
         return SUCC;
       }
-    }else{
-      expected_states[states_index][state_level]++;
-      return SUCC;
     }
   }
   return FAIL;
 }
 
+#endif
 

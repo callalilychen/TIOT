@@ -25,9 +25,9 @@
 #define PORT 9090
 #define AS_PORT 9000
 #define AS_IP "127.0.0.1"
-#define RS_PORT 9000
+//#define RS_PORT AS_PORT
+#define RS_PORT 9999
 #define RS_IP "127.0.0.1"
-//#define RS_PORT 9999
 
 static inline void receivedUdpPackage(unsigned char* udp_payload, unsigned int udp_payload_size){
   unsigned int security_descriptor = 0;
@@ -36,6 +36,7 @@ static inline void receivedUdpPackage(unsigned char* udp_payload, unsigned int u
     handleApplicationLayer(udp_payload+header_size, udp_payload_size, security_descriptor);
   }
 }
+unsigned char header[10] ={0};
 
 static inline unsigned int sendUdpPackage(unsigned char* send_buf, unsigned int max_send_buf){
   unsigned int  application_layer_msg_size = 0;
@@ -45,12 +46,12 @@ static inline unsigned int sendUdpPackage(unsigned char* send_buf, unsigned int 
   unsigned int application_session = NO_SESSION;
   unsigned int security_descriptor = NO_SESSION;
   while(NULL!=(application_layer_msg = generateApplicationLayer(&application_session, &application_layer_msg_size, &security_descriptor))){
-    buf_size = 0;
-    buf = send_buf;
-    buf_size = generateSecurityLayerHeader(security_descriptor, buf, max_send_buf);
-    memcpy(buf+buf_size, application_layer_msg, application_layer_msg_size);
+    buf_size = 4;
+    // FIXME generateSecurityLayerHeader(security_descriptor, buf, max_send_buf);
+    memcpy(send_buf, header, 4);
+    memcpy(send_buf+buf_size, application_layer_msg, application_layer_msg_size);
     buf_size +=application_layer_msg_size;
-    buf_size +=generateSecurityLayerMAC(security_descriptor, application_layer_msg, application_layer_msg_size, buf, max_send_buf-buf_size);
+    buf_size +=generateSecurityLayerMAC(security_descriptor, application_layer_msg, application_layer_msg_size, send_buf+buf_size, max_send_buf-buf_size);
     clearApplicationLayerSession(application_session); 
     removeSecurityLayerDescriptor(security_descriptor); 
   } 
@@ -64,6 +65,7 @@ static void printBlock(char* name, unsigned char* block, size_t block_len){
   }
   PRINT("\n");
 }
+
 static void * udpthread(void* p_fd){
   struct sockaddr_in si_remote;
   socklen_t addrlen = sizeof(si_remote);
@@ -71,7 +73,6 @@ static void * udpthread(void* p_fd){
   int rs_index;
   // TODO Storage
   unsigned char perm_code[10];
-  unsigned char secret[HASH_SIZE];
   while(1){
     int recvlen = recvfrom(*(int*)p_fd, buf, BUFSIZE, 0, (struct sockaddr *)&si_remote, &addrlen);
     if(recvlen > 0 ){
@@ -92,12 +93,17 @@ static void * udpthread(void* p_fd){
           perm_code[ii++] = buf[i];
         }
         printBlock("permcode", perm_code, ii);
+        //TODO make header
+        memcpy(header+1, perm_code, ii);
         i++;
+        tree_node *root = getRoot();
         for(ii=0; i < recvlen && ii<HASH_SIZE; i++){
-          secret[ii++] = buf[i];
+          root->block[ii++] = buf[i];
         }
-        printBlock("secret", secret, ii);
+        root->size = ii;
+        printBlock("secret", root->block, ii);
         printf("F\n");
+            
       }
       //sendto(*(int*)p_fd, buf, recvlen, 0, (struct sockaddr *)&si_remote, addrlen);
     }
@@ -105,6 +111,8 @@ static void * udpthread(void* p_fd){
   return NULL;
 }
 
+  unsigned char send_buf[BUFSIZE] = {0};
+  unsigned int send_buf_size = 0;
 int main(int argc, char** argv)
 { 
   resetAllStates();
@@ -143,22 +151,40 @@ int main(int argc, char** argv)
   socklen_t addrlen = sizeof(si_as);
 
   while(1){
+    // TODO in thread
+    send_buf_size = sendUdpPackage(send_buf, BUFSIZE);
+    if(send_buf_size >0){
+      sendto(fd, send_buf, send_buf_size, 0, (struct sockaddr *)&si_rs, addrlen);
+    }
     char str[100];
     scanf("%s",str);
     printf("%s (%lu)\n",str, strlen(str));
-    int rs_index, perm_index,key_index;
+    int rs_index, perm_index;
+    STATE_TYPE key_index;
     if(sscanf(str, "%d:%d", &rs_index, &perm_index)==2){
       printf("Send %s (%lu)\n",str, strlen(str));
       sendto(fd, str, strlen(str), 0, (struct sockaddr *)&si_as, addrlen);
     }
-    if(sscanf(str, "r%d", &rs_index)==1){
+    else if(sscanf(str, "r%d", &rs_index)==1){
       printf("Send %s (%lu)\n",str, strlen(str));
       sendto(fd, str, strlen(str), 0, (struct sockaddr *)&si_as, addrlen);
     }
-    if(sscanf(str, "k%d", &key_index)==1){
+    else if(sscanf(str, "k%d", &key_index)==1){
       printf("Send %s (%lu)\n",str, strlen(str));
       //TODO generate version 0 protocol
-      sendto(fd, str, strlen(str), 0, (struct sockaddr *)&si_rs, addrlen);
+      tree_edge * edges = getEdges(1);
+      edges[0].func = edgeFunc;
+
+      edges[0].params = (unsigned char *)(&key_index);
+      edges[0].params_size = STATE_SIZE;
+      // FIXME 
+      header[3] = (uint8_t) key_index; 
+      generateTest(createSecurityDescriptor(0,fillNodes(getPathFromRoot(2), edges, 2, 1)));
+      
+    }
+    else if(memcmp(str, &"cmd", 3)){
+      printf("Send %s (%lu)\n",str, strlen(str));
+      //TODO get key index from state
     }
   }
   

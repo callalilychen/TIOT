@@ -33,6 +33,7 @@ extern "C" {
     unsigned int MACsize;
   }securityLayerImplementation;
 
+  unsigned int createSecurityDescriptor(uint8_t, tree_node *);
 
   unsigned int handleSecurityLayer(unsigned char *, unsigned int*, unsigned int*);
   unsigned int generateSecurityLayerHeader(unsigned int, unsigned char*, unsigned int);

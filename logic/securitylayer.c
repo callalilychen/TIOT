@@ -40,6 +40,13 @@ void resetKey(void){
   currKeyNode = NULL;
 }
 
+// TODO multi descriptors
+unsigned int createSecurityDescriptor(uint8_t version, tree_node * p_key){
+  currVersion = version;
+  currKeyNode = p_key;
+  return 0;
+}
+
 static inline tree_node * getKeyNode(STATE_TYPE secret_index, unsigned char * perm_code, unsigned int perm_code_size, STATE_TYPE key_index, unsigned int flag){
   
   tree_edge * edges = getEdges(2);
@@ -114,7 +121,7 @@ unsigned int handleSecurityLayer(unsigned char *msg, unsigned int * p_msg_size, 
 
 unsigned int generateSecurityLayerHeader(unsigned int security_descriptor, unsigned char *buf, unsigned int max_buf_size){
   //TODO
-  if(security_descriptor!=0){
+  if(security_descriptor!=0 || currVersion>MAX_VERSION){
     return 0;
   }
   return implementations[currVersion]->setHeader(buf, max_buf_size);
@@ -128,7 +135,8 @@ unsigned int generateSecurityLayerMAC(unsigned int security_descriptor, unsigned
   unsigned int mac_size = 0;
   hmac(&sha_construction, currKeyNode->block, currKeyNode->size, payload, payload_size, currMAC, &mac_size);
   mac_size = implementations[currVersion]->MACsize;
-  memcpy(buf, currMAC, max_buf_size);
+  memcpy(buf, currMAC, mac_size);
+  printBlock("MAC", currMAC, mac_size);
   return mac_size;
 }
 

@@ -9,22 +9,47 @@
 extern "C" {
 #endif
 
-#define STATE_SIZE 2
-#define STATE_TYPE uint16_t
-#define MAX_STATE 0xffff
+#ifdef USE_STATE
 
+  /*!
+   * \brief State table with to expected state
+   *
+   *        At the beginning, all states will be set to zero 
+   *
+   * \return         None
+   */
+  extern STATE_TYPE expected_states[STATE_TABLE_LEN][STATE_VECTOR_LEN];
 
-  extern STATE_TYPE expected_states[MAX_VALID_STATES][MAX_LEVEL-1];
-
+  /*!
+   * \brief Reset all states to zero
+   *
+   * \return         None
+   */
   inline void (__attribute__((always_inline))resetAllStates)(void){
     bzero(expected_states, MAX_VALID_STATES*(MAX_LEVEL-1)*STATE_SIZE);  
   }
 
-  inline void (__attribute__((always_inline))resetStates)(unsigned int index){
+  /*!
+   * \brief Reset a state vector to zero
+   *
+   * \param index  index of to be reset state vector (row number) 
+   *
+   * \return         None
+   */
+  inline void (__attribute__((always_inline))resetStateVector)(unsigned int index){
     bzero(expected_states+index, (MAX_LEVEL-1)*STATE_SIZE);  
   }
 
-  int incState(unsigned int, unsigned int, unsigned int);
+  /*!
+   * \brief Increase the value of a state
+   *
+   * \param state_row      Row number of this state
+   * \param state_col      Column number of this state
+   * \param inc_pre_state  Flag to indicate, whether increase the previous state (in the previous column), if the to increased state reach the upper boundary
+   *
+   * \return               On success SUCC is returned, otherwise FAIL.
+   */
+  int incState(unsigned int state_row, unsigned int state_col, unsigned int inc_pre_state);
 
   inline STATE_TYPE * (__attribute__((always_inline))getStates)(unsigned int index){
     if(index < MAX_VALID_STATES)
@@ -46,8 +71,18 @@ extern "C" {
     }
     return FAIL;
   }
-
-  inline int (__attribute__((always_inline))setStates)(unsigned int states_index, STATE_TYPE * states, unsigned int inc_pre_state, unsigned int* first_state_changed)
+  // TODO remove first_state_changed, add states len
+  /*!
+   * \brief  Exemplarische Funktion
+   *
+   *         Diese Funktion gibt den übergebenen Parameter
+   *         auf der Konsole aus.
+   *
+   * \param	parameter   Auszugebender Parameter
+   * \return	            Status-Code
+   *
+   */
+  inline int (__attribute__((always_inline))setStates)(unsigned int states_index, STATE_TYPE * states, unsigned int inc_pre_state)
   {
     if(states_index >= MAX_VALID_STATES || states == NULL){
       return FAIL;
@@ -133,6 +168,8 @@ extern "C" {
     }
     return SUCC;
   }
+
+#endif
 
 #ifdef  __cplusplus
 }
