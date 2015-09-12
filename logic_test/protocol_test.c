@@ -1,4 +1,14 @@
+#include <string.h>
+#include <openssl/sha.h>
+#include <openssl/hmac.h>
+#include <openssl/evp.h>
+#include <openssl/md5.h>
 #include "testcase.h"
+#include "tree.h" 
+#include "hmac.h"
+#include "applicationexample.h"
+#include "securitylayer.h" 
+#include "applicationlayer.h" 
 
 static void printBlock(char* name, unsigned char* block, size_t block_len){
   PRINT("%s:\n", name);
@@ -38,7 +48,7 @@ static inline unsigned int sendUdpPackage(unsigned char* send_buf, unsigned int 
 
 
 int protocol_test(void){
-  resetAllStates();
+  resetAllExpectedStates();
   unsigned char udp_payload[100] = "testrep";
   unsigned int udp_payload_size = (unsigned int)strlen((const char *)udp_payload);
   printf("len of %s is %d\n", udp_payload, udp_payload_size);
@@ -84,5 +94,6 @@ int protocol_test(void){
     PRINT("SEND AND RECEIVE TESTCASE: OK\n");
   }else{
     PRINT("SEND AND RECEIVE TESTCASE: FAIL\n");
-  }d
+  }
+  return 0;
 }

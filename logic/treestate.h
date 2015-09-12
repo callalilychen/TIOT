@@ -21,49 +21,34 @@ extern "C" {
   extern STATE_TYPE expected_states[STATE_TABLE_LEN][STATE_VECTOR_LEN];
 
   /*!
-   * \brief Reset all states to zero
+   * \brief Reset all expected states to zero
    *
    * \return         None
    */
-  inline void (__attribute__((always_inline))resetAllStates)(void){
-    bzero(expected_states, MAX_VALID_STATES*(MAX_LEVEL-1)*STATE_SIZE);  
+  inline void (__attribute__((always_inline))resetAllExpectedStates)(void){
+    bzero(expected_states, STATE_TABLE_LEN*(MAX_LEVEL-1)*STATE_SIZE);  
   }
 
   /*!
-   * \brief Reset a state vector to zero
+   * \brief Reset a expected state vector to zero
    *
    * \param index  index of to be reset state vector (row number) 
    *
    * \return         None
    */
-  inline void (__attribute__((always_inline))resetStateVector)(unsigned int index){
+  inline void (__attribute__((always_inline))resetExpectedStateVector)(unsigned int index){
     bzero(expected_states+index, (MAX_LEVEL-1)*STATE_SIZE);  
   }
 
   /*!
-   * \brief Increase the value of a state
+   * \brief check, whether a state is valid 
+   *        A state is valid, iff this state is bigger than the shall-state
    *
-   * \param state_row      Row number of this state
-   * \param state_col      Column number of this state
-   * \param inc_pre_state  Flag to indicate, whether increase the previous state (in the previous column), if the to increased state reach the upper boundary
+   * \param is            The state to be checked
+   * \param shall         The shall-state
    *
    * \return               On success SUCC is returned, otherwise FAIL.
    */
-  int incState(unsigned int state_row, unsigned int state_col, unsigned int inc_pre_state);
-
-  inline STATE_TYPE * (__attribute__((always_inline))getStates)(unsigned int index){
-    if(index < MAX_VALID_STATES)
-      return expected_states[index];
-    return NULL;
-  }
-
-  inline STATE_TYPE (__attribute__((always_inline))getState)(unsigned int index, unsigned int level){
-    if(index >= MAX_VALID_STATES || level >= MAX_LEVEL-1)
-      return NULL;
-    return expected_states[index][level];
-  }
-
-
   inline int (__attribute__((always_inline))validState)(STATE_TYPE is, STATE_TYPE shall)
   {
     if(is >= shall){
@@ -71,102 +56,174 @@ extern "C" {
     }
     return FAIL;
   }
-  // TODO remove first_state_changed, add states len
+
   /*!
-   * \brief  Exemplarische Funktion
+   * \brief Increase the value of a state from the expected states
    *
-   *         Diese Funktion gibt den übergebenen Parameter
-   *         auf der Konsole aus.
+   * \param state_row      Row number of this state
+   * \param state_col      Column number of this state
+   * \param inc_pre_state  Flag to indicate, whether increase the previous state (in the previous column), if the to increased state reach the upper boundary
    *
-   * \param	parameter   Auszugebender Parameter
-   * \return	            Status-Code
-   *
+   * \return               On success SUCC is returned, otherwise FAIL.
    */
-  inline int (__attribute__((always_inline))setStates)(unsigned int states_index, STATE_TYPE * states, unsigned int inc_pre_state)
+  int incExpectedState(unsigned int state_row, unsigned int state_col, unsigned int inc_pre_state);
+
+  /*!
+   * \brief get a state-vector from the expected states
+   *
+   * \param index       Index of wished state-vector (row number)
+   *
+   * \return            The index-th state-vector if exists, otherwise NULL
+   */
+  inline STATE_TYPE * (__attribute__((always_inline))getExpectedStates)(unsigned int index){
+    if(index < STATE_TABLE_LEN)
+      return expected_states[index];
+    return NULL;
+  }
+
+  /*!
+   * \brief get a state from the expected states
+   *
+   * \param state_row      Row number of this state
+   * \param state_col      Column number of this state
+   *
+   * \return               The state_row-th state_col-th state if exists, otherwise NULL
+   */
+  inline STATE_TYPE (__attribute__((always_inline))getExpectedState)(unsigned int state_row, unsigned int state_col){
+    if(state_row >= STATE_TABLE_LEN || state_col >= STATE_VECTOR_LEN)
+      return NULL;
+    return expected_states[state_row][state_col];
+  }
+
+  /*!
+   * \brief  Set a state vector of the expected states
+   *
+   * \param states_index        Index of to be modified state-vector (row number)
+   * \param p_states            Pointer to the new state-vector
+   *
+   * \return                    On success SUCC is returned, otherwise FAIL.
+   *
+   * \note                      The length of states must be equal to STATE_VECTOR_LEN 
+   */
+  inline int (__attribute__((always_inline))setStateVector)(unsigned int states_index, STATE_TYPE * p_state_vector)
   {
-    if(states_index >= MAX_VALID_STATES || states == NULL){
+    if(states_index <= STATE_TABLE_LEN || p_state_vector== NULL){
       return FAIL;
     }
-    if(first_state_changed!=NULL){
-      *first_state_changed = (*states != *(expected_states[states_index]));
-    }
-    for(int i = 0; i < MAX_LEVEL - 1; i++){
-      if(SUCC != validState(states[i], expected_states[states_index][i])){
+    for(int i = 0; i < STATE_VECTOR_LEN; i++){
+      if(SUCC != validState(p_state_vector[i], expected_states[states_index][i])){
         return FAIL;
       }
-      expected_states[states_index][i] = states[i];
-      if(FAIL == incState(states_index, i, inc_pre_state)){
-        return FAIL;
-      }
+      expected_states[states_index][i] = p_state_vector[i];
     }
     return SUCC;
   }
 
-  inline int (__attribute__((always_inline))setFirstStates)(unsigned int states_index, STATE_TYPE * states, unsigned int states_len, unsigned int inc_pre_state, unsigned int* first_state_changed)
+  /*!
+   * \brief   Set a state vector of the expected states partly
+   *          Not a complete state vector will be set, but only a part of a state-vector
+   *
+   * \param state_row      Row number of this state
+   * \param p_states        Pointer to the new state-vector
+   * \param start_col       Start number of column to be set
+   * \param states_len      Length of the new state-vector
+   *
+   * \return                On success SUCC is returned, otherwise FAIL.
+   */
+  inline int (__attribute__((always_inline))setStateVectorPartly)(unsigned int state_row, STATE_TYPE * p_states, unsigned int start_col, unsigned int states_len)
   {
-    if(states_index >= MAX_VALID_STATES || states_len >= MAX_LEVEL || states == NULL){
+    if(state_row >= STATE_TABLE_LEN || states_len >= STATE_VECTOR_LEN || p_states == NULL){
       return FAIL;
     }
-    if(first_state_changed!=NULL){
-      *first_state_changed = (*states != *(expected_states[states_index]));
-    }
-    for(int i = 0; i < states_len; i++){
-      if(SUCC != validState(states[i], expected_states[states_index][i])){
+    for(int i = start_col; i < start_col + states_len; i++){
+      if(SUCC != validState(p_states[i], expected_states[state_row][i])){
         return FAIL;
       }
-      expected_states[states_index][i] = states[i];
-      if(FAIL == incState(states_index, i, inc_pre_state)){
-        return FAIL;
-      }
+      expected_states[state_row][i] = p_states[i];
     }
     return SUCC;
   }
 
-  inline int (__attribute__((always_inline))setLastStates)(unsigned int states_index, STATE_TYPE * states, unsigned int states_len, unsigned int inc_pre_state, unsigned int* first_state_changed)
+  /*!
+   * \brief  Set a state of the expected states
+   *
+   * \param state_row       Row number of this state
+   * \param state_col       Column number of this state
+   * \param state           New state value
+   *
+   * \return                On success SUCC is returned, otherwise FAIL.
+   */
+  inline int (__attribute__((always_inline))setState)(unsigned int state_row, unsigned int state_col, STATE_TYPE state)
   {
-    if(states_index >= MAX_VALID_STATES || states_len >= MAX_LEVEL || states == NULL){
+    if(state_row >= STATE_TABLE_LEN || state_col >= STATE_VECTOR_LEN){
       return FAIL;
     }
-    if(first_state_changed!=NULL){
-      if(MAX_LEVEL-1==states_len){
-        *first_state_changed = (*states != *(expected_states[states_index]));
-      }else{
-        *first_state_changed = 0;
-      }
+    if(SUCC != validState(state, expected_states[state_row][state_col])){
+      return FAIL;
     }
-    for(int i = MAX_LEVEL-1-states_len; i < MAX_LEVEL - 1; i++){
-      if(SUCC != validState(states[i], expected_states[states_index][i])){
-        return FAIL;
-      }
-      expected_states[states_index][i] = states[i];
-      if(FAIL == incState(states_index, i, inc_pre_state)){
-        return FAIL;
-      }
-    }
+    expected_states[state_row][state_col] = state;
     return SUCC;
   }
 
-
-  inline int (__attribute__((always_inline))setState)(unsigned int states_index, unsigned int state_level, STATE_TYPE state,  unsigned int inc_pre_state, unsigned int* first_state_changed)
+  /*!
+   * \brief   Update a state vector of the expected states
+   *          Check the validation of the given state vector and set the state in the expected states table to the vector value 
+   *          and then increase the last state of the vector, if it's valid
+   *
+   * \param states_index        Index of to be modified state-vector (row number)
+   * \param p_states            Pointer to the new state-vector
+   * \param inc_pre_state       Flag to indicate, whether increase the previous state (in the previous column), if the to increased state reach the upper boundary
+   *
+   * \return                    On success SUCC is returned, otherwise FAIL.
+   *
+   * \note                      The length of states must be equal to STATE_VECTOR_LEN 
+   */
+  inline int (__attribute__((always_inline))updateExpectedStateVector)(unsigned int state_index, STATE_TYPE * p_state_vector, unsigned int inc_pre_state)
   {
-    if(states_index >= MAX_VALID_STATES || state_level >= MAX_LEVEL-1){
-      return FAIL;
+    if(SUCC == setStateVector(state_index, p_state_vector)){
+      return incExpectedState(state_index, STATE_VECTOR_LEN-1, inc_pre_state);
     }
-    if(first_state_changed!=NULL){
-      if(state_level==0){
-        *first_state_changed = (state != *(expected_states[states_index]));
-      }else{
-        *first_state_changed = 0;
-      }
+    return FAIL;
+  }
+
+  /*!
+   * \brief   Update the state vector of the expected states partly
+   *          Check the validation of the given state vector and set the state in the expected states table to the vector value 
+   *          and then increase the last state of the vector, if it's valid
+   *
+   * \param state_row       Row number of this state
+   * \param p_states        Pointer to the new state-vector
+   * \param start_col       Start number of column to be set
+   * \param states_len      Length of the new state-vector
+   * \param inc_pre_state   Flag to indicate, whether increase the previous state (in the previous column), if the to increased state reach the upper boundary
+   *
+   * \return                On success SUCC is returned, otherwise FAIL.
+   */
+  inline int (__attribute__((always_inline))updateExpectedStateVectorPartly)(unsigned int state_row, STATE_TYPE * p_states, unsigned int start_col, unsigned int states_len, unsigned int inc_pre_state)
+  {
+    if(SUCC == setStateVectorPartly(state_row, p_states, start_col, states_len)){
+      return incExpectedState(state_row, start_col+states_len-1, inc_pre_state);
     }
-    if(SUCC != validState(state, expected_states[states_index][state_level])){
-      return FAIL;
+    return FAIL;
+  }
+
+  /*!
+   * \brief   Update a state of the expected states
+   *          Check the validation of the given state and set the state in the expected states table with its value plus 1, if it's valid
+   *
+   * \param state_row       Row number of this state
+   * \param state_col       Column number of this state
+   * \param state           New state value
+   * \param inc_pre_state   Flag to indicate, whether increase the previous state (in the previous column), if the to increased state reach the upper boundary
+   *
+   * \return                On success SUCC is returned, otherwise FAIL.
+   */
+  inline int (__attribute__((always_inline))updateExpectedState)(unsigned int state_row, unsigned int state_col, STATE_TYPE state, unsigned int inc_pre_state)
+  {
+    if(SUCC == setState(state_row, state_col, state)){
+      return incExpectedState(state_row, state_col, inc_pre_state);
     }
-    expected_states[states_index][state_level] = state;
-    if(FAIL == incState(states_index, state_level, inc_pre_state)){
-      return FAIL;
-    }
-    return SUCC;
+    return FAIL;
   }
 
 #endif

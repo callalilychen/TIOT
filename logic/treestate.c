@@ -4,7 +4,7 @@
 
 STATE_TYPE expected_states[STATE_TABLE_LEN][STATE_VECTOR_LEN] = {0};
 
-int incState(unsigned int state_row, unsigned int state_col, unsigned int inc_pre_state);
+int incExpectedState(unsigned int state_row, unsigned int state_col, unsigned int inc_pre_state)
 {
   if(state_row < STATE_TABLE_LEN){
     if(expected_states[state_row][state_col]+1 < STATE_UPPER_BOUNDARY){
