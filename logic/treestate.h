@@ -1,6 +1,14 @@
+/*
+ * treestate.h - A state manager for the tree data structure with static memeory allocation
+ *
+*/
+
 #ifndef __TREE_STATE_H__
 #define __TREE_STATE_H__
 
+/*****************************************************************************/
+/* Include files                                                             */
+/*****************************************************************************/
 #include <stdint.h>
 #include <strings.h>
 #include "treeconfig.h"
@@ -75,7 +83,7 @@ extern "C" {
    *
    * \return            The index-th state-vector if exists, otherwise NULL
    */
-  inline STATE_TYPE * (__attribute__((always_inline))getExpectedStates)(unsigned int index){
+  inline STATE_TYPE * (__attribute__((always_inline))getExpectedStateVector)(unsigned int index){
     if(index < STATE_TABLE_LEN)
       return expected_states[index];
     return NULL;
@@ -107,7 +115,7 @@ extern "C" {
    */
   inline int (__attribute__((always_inline))setStateVector)(unsigned int states_index, STATE_TYPE * p_state_vector)
   {
-    if(states_index <= STATE_TABLE_LEN || p_state_vector== NULL){
+    if(states_index >= STATE_TABLE_LEN || p_state_vector== NULL){
       return FAIL;
     }
     for(int i = 0; i < STATE_VECTOR_LEN; i++){
@@ -123,23 +131,23 @@ extern "C" {
    * \brief   Set a state vector of the expected states partly
    *          Not a complete state vector will be set, but only a part of a state-vector
    *
-   * \param state_row      Row number of this state
-   * \param p_states        Pointer to the new state-vector
+   * \param state_row       Row number of this state
    * \param start_col       Start number of column to be set
+   * \param p_states        Pointer to the new state-vector
    * \param states_len      Length of the new state-vector
    *
    * \return                On success SUCC is returned, otherwise FAIL.
    */
-  inline int (__attribute__((always_inline))setStateVectorPartly)(unsigned int state_row, STATE_TYPE * p_states, unsigned int start_col, unsigned int states_len)
+  inline int (__attribute__((always_inline))setStateVectorPartly)(unsigned int state_row, unsigned int start_col, STATE_TYPE * p_states, unsigned int states_len)
   {
     if(state_row >= STATE_TABLE_LEN || states_len >= STATE_VECTOR_LEN || p_states == NULL){
       return FAIL;
     }
-    for(int i = start_col; i < start_col + states_len; i++){
-      if(SUCC != validState(p_states[i], expected_states[state_row][i])){
+    for(int i = 0; i < states_len; i++){
+      if(SUCC != validState(p_states[i], expected_states[state_row][start_col+i])){
         return FAIL;
       }
-      expected_states[state_row][i] = p_states[i];
+      expected_states[state_row][start_col+i] = p_states[i];
     }
     return SUCC;
   }
@@ -189,20 +197,20 @@ extern "C" {
   /*!
    * \brief   Update the state vector of the expected states partly
    *          Check the validation of the given state vector and set the state in the expected states table to the vector value 
-   *          and then increase the last state of the vector, if it's valid
+   *          and then increase the last state of the state-vector, if it's valid
    *
    * \param state_row       Row number of this state
-   * \param p_states        Pointer to the new state-vector
    * \param start_col       Start number of column to be set
+   * \param p_states        Pointer to the new state-vector
    * \param states_len      Length of the new state-vector
    * \param inc_pre_state   Flag to indicate, whether increase the previous state (in the previous column), if the to increased state reach the upper boundary
    *
    * \return                On success SUCC is returned, otherwise FAIL.
    */
-  inline int (__attribute__((always_inline))updateExpectedStateVectorPartly)(unsigned int state_row, STATE_TYPE * p_states, unsigned int start_col, unsigned int states_len, unsigned int inc_pre_state)
+  inline int (__attribute__((always_inline))updateExpectedStateVectorPartly)(unsigned int state_row, unsigned int start_col, STATE_TYPE * p_states, unsigned int states_len, unsigned int inc_pre_state)
   {
-    if(SUCC == setStateVectorPartly(state_row, p_states, start_col, states_len)){
-      return incExpectedState(state_row, start_col+states_len-1, inc_pre_state);
+    if(SUCC == setStateVectorPartly(state_row, start_col, p_states, states_len)){
+      return incExpectedState(state_row, STATE_VECTOR_LEN-1, inc_pre_state);
     }
     return FAIL;
   }
@@ -221,7 +229,7 @@ extern "C" {
   inline int (__attribute__((always_inline))updateExpectedState)(unsigned int state_row, unsigned int state_col, STATE_TYPE state, unsigned int inc_pre_state)
   {
     if(SUCC == setState(state_row, state_col, state)){
-      return incExpectedState(state_row, state_col, inc_pre_state);
+      return incExpectedState(state_row, STATE_VECTOR_LEN-1, inc_pre_state);
     }
     return FAIL;
   }

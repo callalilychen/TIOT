@@ -10,6 +10,7 @@ int hmac_test(void);
 int tree_test(void);
 int edge_func_test(void);
 int protocol_test(void);
+int state_test(void);
 
 #ifdef  __cplusplus
 }

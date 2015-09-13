@@ -29,18 +29,18 @@ extern "C" {
  *
  * */
 #define USE_STATE          /*!< Macro flag to indicate, whether a state table will be used for state management */
-#define STATE_TABLE_LEN 0xff     /*!< Number of state vectors in the table (Number of table rows) */
+#define STATE_TABLE_LEN 0x4     /*!< Number of state vectors in the table (Number of table rows) */
 #define STATE_VECTOR_LEN 2  /*!< Number of states in each state vector (Number of table columns) */
 
 #define STATE_SIZE 2          /*!< Size of state in Bytes*/
 #define STATE_TYPE uint16_t   /*!< Type of each state */
-#define STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than the STATE_UPPER_BOUNDARY */
+#define STATE_UPPER_BOUNDARY 0xff  /*!< All allowed states should be smaller than the STATE_UPPER_BOUNDARY */
 
 
 /*!
  * \brief Configuration of bit map
  *
- *        The bitmap can be used with the state table together to indicate, whether a state can be updated 
+ *        The bitmap can be used with the state table together to indicate, whether a state vector can be updated 
  * */
 #define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
 #ifdef USE_STATE

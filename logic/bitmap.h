@@ -10,7 +10,8 @@
 extern "C" {
 #endif
 
-
+#ifdef USE_BIT_MAP
+// TODO bit map array
   extern uint8_t bitmap [BIT_MAP_SIZE];
   
   inline void (__attribute__((always_inline))clearAllBits)(void){
@@ -75,7 +76,7 @@ extern "C" {
     }
   }
 
-
+#endif
 
 #ifdef  __cplusplus
 }

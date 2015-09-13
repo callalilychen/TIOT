@@ -19,15 +19,17 @@ int incExpectedState(unsigned int state_row, unsigned int state_col, unsigned in
        * If increase the previous column state is not wished or
        * if the state is already in the first column
        */
+        expected_states[state_row][state_col] = STATE_UPPER_BOUNDARY;
         return FAIL;
-      }
-      if(SUCC == incState(state_row, state_col-1, inc_pre_state)){
+      } else if(SUCC == incExpectedState(state_row, state_col-1, inc_pre_state)){
         /*!
          * the previous column state is successfully increased,
          * the to increased state can be increased from zero in the future
          */
         expected_states[state_row][state_col] = 0;
         return SUCC;
+      } else{
+        expected_states[state_row][state_col] = STATE_UPPER_BOUNDARY;
       }
     }
   }
