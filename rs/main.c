@@ -64,7 +64,7 @@ static inline unsigned int sendUdpPackage(unsigned char* send_buf, unsigned int 
 
 int main(int argc, char** argv)
 { 
-  resetAllStates();
+  resetAllExpectedStates();
   unsigned char udp_payload[BUFSIZE] = {0};
   unsigned int udp_payload_size = 0;
   unsigned char send_buf[BUFSIZE] = {0};

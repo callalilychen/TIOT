@@ -2,12 +2,13 @@
 #define __SECURITY_LAYER_V0_H__
 
 #include "treestate.h"
+#include "protocolconfig.h"
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-
-#define HEADER_LEN_V0 4
+#define SECURITY_LAYER_VERSION_V0 0
+#define SECURITY_LAYER_HEADER_LEN_V0 4
 #define MAC_LEN_V0 20
 
 #pragma pack(1)
@@ -23,19 +24,19 @@ extern "C" {
   }securityHeaderV0;
 #pragma pack()
 
-  unsigned char * parseHeaderV0(unsigned char*, unsigned int *, unsigned int *);
-  
-  void * getHeaderV0(unsigned int *);
-  void * getPermCodeV0(unsigned int *);
-  STATE_TYPE getSecretIndexV0(void);
-  STATE_TYPE getPermIndexV0(void);
-  STATE_TYPE getKeyIndexV0(void);
+  unsigned int parseHeaderV0(unsigned int security_descriptor, unsigned char * msg, unsigned int *p_msg_size);
 
-  unsigned int setHeaderV0(unsigned char* , unsigned int);
-  unsigned int setPermCodeV0(unsigned char* , unsigned int);
-  unsigned int setSecretIndexV0(unsigned char* , unsigned int);
-  unsigned int setPermIndexV0(unsigned char* , unsigned int);
-  unsigned int setKeyIndexV0(unsigned char* , unsigned int);
+  void * getHeaderV0(unsigned int security_descriptor, unsigned int *size);
+  void * getPermCodeV0(unsigned int security_descriptor, unsigned int * size);
+  STATE_TYPE getSecretIndexV0(unsigned int security_descriptor);
+  STATE_TYPE getPermIndexV0(unsigned int security_descriptor);
+  STATE_TYPE getKeyIndexV0(unsigned int security_descriptor);
+
+  unsigned int setHeaderV0(unsigned int security_descriptor, unsigned char* msg, unsigned int msg_size);
+  unsigned int setSecretIndexV0(unsigned int security_descriptor, unsigned char* msg, unsigned int msg_size);
+  unsigned int setPermCodeV0(unsigned int security_descriptor, unsigned char* msg, unsigned int msg_size);
+  unsigned int setPermIndexV0(unsigned int security_descriptor, unsigned char* msg, unsigned int msg_size);
+  unsigned int setKeyIndexV0(unsigned int security_descriptor, unsigned char* msg, unsigned int msg_size);
 
 #ifdef  __cplusplus
 }

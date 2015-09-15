@@ -73,32 +73,30 @@ static void * udpthread(void* p_fd){
       buf[recvlen] = 0;
       printf("received message: %s\n", buf);
       if(sscanf(buf, "%d:%d", &secret_index, &perm_index)==2){
-        if(secret_index < MAX_VALID_STATES && perm_index < MAX_STATE){
-          if(getBit(secret_index) && SUCC == clearBit(secret_index)){
-            if(SUCC == setState(secret_index,0, perm_index,0, NULL)){
-              unsigned char perm_code[2] = {(unsigned char)secret_index, (unsigned char)perm_index};
-              tree_edge * edges = getEdges(1);
-              edges[0].func = edgeFunc;
+        if(getBit(secret_index) && SUCC == clearBit(secret_index)){
+          if(SUCC == updateExpectedState(secret_index,0, perm_index,0)){
+            unsigned char perm_code[2] = {(unsigned char)secret_index, (unsigned char)perm_index};
+            tree_edge * edges = getEdges(1);
+            edges[0].func = edgeFunc;
 
-              edges[0].params = perm_code;
-              edges[0].params_size = 2;
-              tree_node * p_client_secret = fillNodes(getPathFromRoot(2), edges, 2, 1);
-              printf("GET key\n");
-              // FIXME do better
-              int i = 0;
-              for(; i < recvlen; i++){
-                if(buf[i] == ':')
-                  break;
-              }
-              buf[++i] = (uint8_t)secret_index;
-              buf[++i] = (uint8_t)perm_index;
-              buf[++i] = ':';
-              memcpy(buf+i+1, p_client_secret->block, p_client_secret->size);
-              sendto(*(int*)p_fd, buf, i+1+p_client_secret->size, 0, (struct sockaddr *)&si_remote, addrlen);
-              printBlock("Sc", p_client_secret->block, p_client_secret->size);
-            }else{
-              setBit(secret_index);
+            edges[0].params = perm_code;
+            edges[0].params_size = 2;
+            tree_node * p_client_secret = fillNodes(getPathFromRoot(2), edges, 2, 1);
+            printf("GET key\n");
+            // FIXME do better
+            int i = 0;
+            for(; i < recvlen; i++){
+              if(buf[i] == ':')
+                break;
             }
+            buf[++i] = (uint8_t)secret_index;
+            buf[++i] = (uint8_t)perm_index;
+            buf[++i] = ':';
+            memcpy(buf+i+1, p_client_secret->block, p_client_secret->size);
+            sendto(*(int*)p_fd, buf, i+1+p_client_secret->size, 0, (struct sockaddr *)&si_remote, addrlen);
+            printBlock("Sc", p_client_secret->block, p_client_secret->size);
+          }else{
+            setBit(secret_index);
           }
         }
       }
@@ -117,7 +115,7 @@ static void * udpthread(void* p_fd){
 
 int main(int argc, char** argv)
 { 
-  resetAllStates();
+  resetAllExpectedStates();
   setAllBits();
 
   const char root[5] = "test";
@@ -152,21 +150,19 @@ int main(int argc, char** argv)
     scanf("%s",str);
     printf("%s\n",str);
     int secret_index, perm_index;
-    if(sscanf(str, "%d,%d", &secret_index, &perm_index)==2){
-      if(secret_index < MAX_VALID_STATES && perm_index < MAX_STATE){
-        if(getBit(secret_index) && SUCC == clearBit(secret_index)){
-          if(SUCC == setState(secret_index,0, perm_index,0, NULL)){
-            unsigned char perm_code[2] = {(unsigned char)secret_index, (unsigned char)perm_index};
-            tree_edge * edges = getEdges(1);
-            edges[0].func = edgeFunc;
+    if(sscanf(str, "%d:%d", &secret_index, &perm_index)==2){
+      if(getBit(secret_index) && SUCC == clearBit(secret_index)){
+        if(SUCC == updateExpectedState(secret_index,0, perm_index, 0)){
+          unsigned char perm_code[2] = {(unsigned char)secret_index, (unsigned char)perm_index};
+          tree_edge * edges = getEdges(1);
+          edges[0].func = edgeFunc;
 
-            edges[0].params = perm_code;
-            edges[0].params_size = 2;
-            tree_node * p_client_secret = fillNodes(getPathFromRoot(2), edges, 2, 1);
-            printf("GET key\n");
-          }else{
-            setBit(secret_index);
-          }
+          edges[0].params = perm_code;
+          edges[0].params_size = 2;
+          tree_node * p_client_secret = fillNodes(getPathFromRoot(2), edges, 2, 1);
+          printf("GET key\n");
+        }else{
+          setBit(secret_index);
         }
       }
     }

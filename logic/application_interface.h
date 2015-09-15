@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 #define NO_APPLICATION 0
+#define NO_SESSION 0x0
 #define MAX_APPLICATION_SESSION 2
 #define MAX_APPLICATION_MESSAGE_SIZE 10
 
@@ -36,7 +37,6 @@ extern "C" {
     return NULL;
   }
 
-#define NO_SESSION 0x0
 #define MAX_APPLICATION_COUNT 2
 #define MAX_APPLICATION_NAME 4
 

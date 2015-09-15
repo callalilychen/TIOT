@@ -115,7 +115,7 @@ static void * udpthread(void* p_fd){
   unsigned int send_buf_size = 0;
 int main(int argc, char** argv)
 { 
-  resetAllStates();
+  resetAllExpectedStates();
 
   // Create a UDP socket and listen on a port
   struct sockaddr_in si_me;
@@ -179,7 +179,7 @@ int main(int argc, char** argv)
       edges[0].params_size = STATE_SIZE;
       // FIXME 
       header[3] = (uint8_t) key_index; 
-      generateTest(createSecurityDescriptor(0,fillNodes(getPathFromRoot(2), edges, 2, 1)));
+      generateTest(addSecurityDescriptor(0,fillNodes(getPathFromRoot(2), edges, 2, 1)));
       
     }
     else if(memcmp(str, &"cmd", 3)){
