@@ -1,4 +1,7 @@
 #include "udp.h"
+#include "utils.h"
+
+#define NO_OF_PACKETS   1
 
 static _i16 SockID = 0;
 static _u8 recvBuf[BUF_SIZE+1] = {0};
@@ -45,9 +48,12 @@ _i16 Buf_Read(void)
   Buf_Flush(1);
   _i16 Status = sl_RecvFrom(SockID, recvBuf, BUF_SIZE, 0, &diUdpSockAddr, (SlSocklen_t*)&AddrSize);
   if(Status > 0){
-    if((Status = sl_SendTo(SockID, recvBuf, Status, 0, &diUdpSockAddr, AddrSize))<0){
-      print("Send '%s' failed", recvBuf);
-    }
+    PRINT("received message: %s ", recvBuf);
+    printIPv4("from", sl_Htonl((((SlSockAddrIn_t*)&diUdpSockAddr)->sin_addr).s_addr));
+    PRINT(":%u\n", sl_Htons(((SlSockAddrIn_t*)&diUdpSockAddr)->sin_port));
+
+    handleUdpPackage(recvBuf, Status, (ADDR_TYPE *)(&diUdpSockAddr));
+    sendUdpPackage(SockID, sendBuf, BUF_SIZE);
   }
   return Status;
 }
@@ -123,7 +129,7 @@ _i32 initializeUDPVariables()
 
     \warning
 */
-_i32 testBsdUdpClient(_u32 server_ip, _u16 Port)
+_i32 testBsdUdpClient(IP_TYPE server_ip, _u16 Port)
 {
     SlSockAddrIn_t  Addr;
     _u16            idx = 0;

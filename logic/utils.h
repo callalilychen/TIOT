@@ -26,7 +26,33 @@ extern "C" {
 #endif
 
 #define X(a, b, len, res) optimizedXOR(a, b, len, res) 
-uint8_t * optimizedXOR(uint8_t *, uint8_t *, size_t, uint8_t *);
+
+  inline uint8_t * (__attribute__((always_inline))optimizedXOR)(uint8_t * a, uint8_t * b, size_t len, uint8_t * res){
+  int index = 0;
+
+  int end_index = len >> WORD_SHIFT_SCALAR;
+
+  for(; index < end_index; index++){
+    (WORD_TYPE res)[index] = (WORD_TYPE a)[index] ^ (WORD_TYPE b)[index];
+  }
+
+  index = (index << WORD_SHIFT_SCALAR);
+  for(; index < len; index ++){
+    res[index] = a[index] ^ b[index];
+  }
+  return res;
+}
+
+inline void (__attribute__((always_inline))printIPv4)(char* name, uint32_t ip){
+  PRINT(name);
+  PRINT(":0x%w\n", ip);
+  for(int i = 24; i >= 0; i-=8){
+    uint8_t t = (uint8_t)(ip >> i);
+    PRINT(".%d", t);
+  }
+  PRINT("\n");
+}
+
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

@@ -9,23 +9,16 @@
 #include <pthread.h>
 #include <arpa/inet.h>
 
-#include "treestate.h"
-#include "tree.h" 
-#include "hmac.h"
-#include "addr_descriptor.h"
-#include "applicationexample.h"
-#include "securitylayer.h" 
-#include "applicationlayer.h" 
-#include "utils.h"
+#include "packagehandler.h"
 
 #define BUFSIZE 512
 #define PORT 9001
-#define RS_PORT 9999
+#define RS_PORT 5001  
 #define RS_IP "127.0.0.1"
 
 static pthread_mutex_t lock;
 
-unsigned char send_buf[BUFSIZE] = {0};
+unsigned char send_buf[BUFSIZE+1] = {0};
 unsigned int send_buf_size = 0;
 
 socklen_t addrlen = sizeof(ADDR_TYPE);
@@ -38,46 +31,6 @@ static void printBlock(char* name, unsigned char* block, size_t block_len){
   PRINT("\n");
 }
 
-static inline void sendUdpPackage(int fd){
-  unsigned int application_layer_msg_size = 0;
-  unsigned char * application_layer_msg = NULL;
-  unsigned int application_session = NO_SESSION;
-  unsigned int security_descriptor = NO_SESSION;
-  pthread_mutex_lock(&lock);
-  while(NULL!=(application_layer_msg = generateApplicationLayer(&application_session, &application_layer_msg_size, &security_descriptor))){
-    send_buf_size = generateSecurityLayerHeader(security_descriptor, send_buf, BUFSIZE);
-    memcpy(send_buf+send_buf_size, application_layer_msg, application_layer_msg_size);
-    send_buf_size += (application_layer_msg_size + generateSecurityLayerMAC(security_descriptor, send_buf+send_buf_size, application_layer_msg_size, BUFSIZE-send_buf_size));
-    printBlock("send", send_buf, send_buf_size);
-    struct sockaddr * addr = (struct sockaddr *)getAddr(getApplicationSession(application_session)->addr_descriptor);
-    if(NULL != addr){
-      sendto(fd, send_buf, send_buf_size, 0, addr, addrlen);
-    }else{
-      send_buf[send_buf_size] = 0;
-      PRINT("NO Addr for \"%s\"\n", send_buf);
-    }
-    clearApplicationSession(application_session); 
-    removeSecurityLayerDescriptor(security_descriptor); 
-  } 
-  pthread_mutex_unlock(&lock);
-}
-
-static inline void handleUdpPackage(unsigned char* udp_payload, unsigned int udp_payload_size, ADDR_TYPE *p_addr){
-  unsigned int header_size = 0;
-  pthread_mutex_lock(&lock);
-  unsigned int security_descriptor = handleSecurityLayer(udp_payload, &udp_payload_size, &header_size);
-  if(udp_payload_size > 0){
-    unsigned int addr_descriptor = addAddrDescriptors(p_addr, (size_t)addrlen);
-    if(NO_DESCRIPTOR == addr_descriptor){
-      PRINT("[ERROR] Failed to add the addr descritptor!\n");
-    }else if(NO_SESSION == handleApplicationLayer(udp_payload+header_size, udp_payload_size, security_descriptor, addr_descriptor)){
-      udp_payload[udp_payload_size+header_size] = 0;
-      PRINT("[WARN] No application session for message \"%s\"!\n", (const char *)(udp_payload+header_size));
-    }
-  }
-  pthread_mutex_unlock(&lock);
-}
-
 static void * recvUdpThread(void* p_fd){
   char buf[BUFSIZE];
   struct sockaddr_in si_remote;
@@ -85,39 +38,31 @@ static void * recvUdpThread(void* p_fd){
     int recvlen = recvfrom(*(int*)p_fd, buf, BUFSIZE, 0, (struct sockaddr *)&si_remote, &addrlen);
     if(recvlen > 0 ){
       printBlock("recv", (unsigned char *)buf, recvlen);
+  pthread_mutex_lock(&lock);
       handleUdpPackage((unsigned char*)buf, recvlen, (ADDR_TYPE *)&si_remote);
-      sendUdpPackage(* (int *)p_fd);
+      sendUdpPackage(* (int *)p_fd, send_buf, BUFSIZE);
+
+  pthread_mutex_unlock(&lock);
     }
   }
   return NULL;
 }
+
 #if(UI_APPLICATION_COUNT>0)
-static inline void handleCmdPackage(unsigned char* str, unsigned int str_size){
-  if(str_size > 0){
-    pthread_mutex_lock(&lock);
-    unsigned int session_id = createApplicationSession(NO_DESCRIPTOR, NO_DESCRIPTOR);
-    if(NO_SESSION != session_id){
-      handleApplication(str, str_size, session_id, ui_application);
-    }else{
-      PRINT("[ERROR] No session for the application!");
-    }
-    pthread_mutex_unlock(&lock);
-  }
-}
 static void * cmdThread(void* p_fd){
   char str[BUFSIZE];
 
   while(1){
     SCAN("%s",str);
     PRINT("%s (%lu)\n",str, strlen(str));
+  pthread_mutex_lock(&lock);
     handleCmdPackage((unsigned char *)str, strlen(str));
-    
-    sendUdpPackage(*(int *)p_fd);
+    sendUdpPackage(* (int *)p_fd, send_buf, BUFSIZE);
+    pthread_mutex_unlock(&lock);
   }
   return NULL;
 }
 #endif
-
 int main(int argc, char** argv)
 { 
   resetAllExpectedStates();
@@ -135,7 +80,7 @@ int main(int argc, char** argv)
     return 0;
   }
   
-  si_me.sin_family = AF_INET;
+  si_me.sin_family = ADDR_FAMILY;
   si_me.sin_addr.s_addr = htonl(INADDR_ANY);
   si_me.sin_port = htons(PORT);
 

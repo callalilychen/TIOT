@@ -16,7 +16,7 @@ extern "C" {
 #endif
 #if(BIT_MAP_LEN & 0x7)
 #define BIT_MAP_SIZE BIT_MAP_LEN >>3   /*!< Size of bit map in bit */
-#elif
+#else
 #define BIT_MAP_SIZE (STATE_TABLE_LEN>>3) + 1
 #endif
   

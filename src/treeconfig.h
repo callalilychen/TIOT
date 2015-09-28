@@ -9,20 +9,20 @@
 /*****************************************************************************/
 /* Include files                                                             */
 /*****************************************************************************/
+#include <stdint.h>
 #include "interface.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include "simplelink.h"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#define PRINT(...) printf(__VA_ARGS__)
-#define SCAN(...) scanf(__VA_ARGS__)
-#define SSCAN(...) sscanf(__VA_ARGS__)
-#define SPRINT(...) sprintf(__VA_ARGS__)
+#define PRINT(...) print(__VA_ARGS__)
+#define SCAN(...) 
+#define SSCAN(...) sscanf(__VA_ARGS__) 
+#define SPRINT(...) 
 
-#define DEFAULT_VERSION 0
 #define MAX_SECURITY_LAYER_VERSION 0xff
+#define DEFAULT_VERSION 0
 
 #define NO_DESCRIPTOR 0xffff
 #define DESCRIPTOR_ACTIVE 1
@@ -32,19 +32,19 @@ extern "C" {
 #define MAX_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN - 1 
 #define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN-1
 
-#define IP IPv4
+#define IP_TYPE IPv4
 #define IPv4 uint32_t 
-#define HTONS htons
-#define HTONL htonl
-#define ASSIGN_IP(addr, ip) inet_aton(ip, &addr)
+#define HTONS sl_Htons
+#define HTONL sl_Htonl
+#define ASSIGN_IP(addr, ip) addr = HTONL(ip)
 
-#define ADDR_FAMILY AF_INET
-#define ADDR_TYPE struct sockaddr_in
-#define ADDR_SEND_TYPE struct sockaddr
-#define ADDR_LEN_TYPE socklen_t
-#define SENDTO_FUNC sendto
+#define ADDR_FAMILY SL_AF_INET
+#define ADDR_TYPE SlSockAddrIn_t
+#define ADDR_SEND_TYPE SlSockAddr_t
+#define ADDR_LEN_TYPE SlSocklen_t
+#define SENDTO_FUNC sl_SendTo
 #define ADDR_DESCRIPTORS_LEN 4 
-#define MAX_ADDR_DESCRIPTOR ADDR_DESCRIPTORS_LEN - 3 
+#define MAX_ADDR_DESCRIPTOR ADDR_DESCRIPTORS_LEN - 2 
 #define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN-2
 #define PREDEF_RS_ADDR ADDR_DESCRIPTORS_LEN-1
 
@@ -52,17 +52,21 @@ extern "C" {
 #define HASH_FUNC sha_construction.func
 
 #define APPLICATION_SESSIONS_LEN 2
-#define MAX_APPLICATION_MESSAGE_SIZE 20
+#define MAX_APPLICATION_MESSAGE_SIZE 20 
 
 #define MSG_APPLICATION_COUNT 3
-#define UI_APPLICATION_COUNT 5
+#define UI_APPLICATION_COUNT 0 
 #define MAX_APPLICATION_NAME_SIZE 5
 
 /*!
  * \brief Configuration of tree
  *
+ *        0. level -> root
+ *        1. level -> secrets
+ *        2. level -> key // FIXME AS can also behavior as C
+ *
  * */
-#define MAX_LEVEL 2
+#define MAX_LEVEL 3
 #define CACHED_NODES_LEN ADDR_DESCRIPTORS_LEN
 
 /*!
@@ -87,11 +91,11 @@ extern "C" {
  *
  *        The bitmap can be used with the state table together to indicate, whether a state can be updated 
  * */
-#define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
-#define NO_BIT 0xffff
-#ifdef USE_STATE
-#define BIT_MAP_LEN STATE_TABLE_LEN                      /*!< Number of to used bit map*/
-#endif
+//#define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
+//#define NO_BIT 0xffff
+//#ifdef USE_STATE
+//#define BIT_MAP_LEN STATE_TABLE_LEN                      /*!< Number of to used bit map*/
+//#endif
 
 
 #ifdef  __cplusplus

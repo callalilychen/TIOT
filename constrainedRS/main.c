@@ -10,14 +10,9 @@
 #include "udp.h"
 #include "handler.h"
 
-#include "treeconfig.h"
-#include "securitylayer.h" 
-#include "applicationlayer.h" 
-#include "application_interface.h"
-#include "addr_descriptor.h"
-
 #define APPLICATION_VERSION "1.2.0"
-
+#define AS_PORT 9001
+#define AS_IP SL_IPV4_VAL(127,0,0,1)
 
 /*
  * STATIC FUNCTION DEFINITIONS -- Start
@@ -148,6 +143,13 @@ int main(int argc, char** argv)
     print("family = %d\n",LocalAddr.sin_family);
     print("port = %d\n",sl_Htons(LocalAddr.sin_port));
     printIP("LocalAddr", LocalAddr.sin_addr.s_addr);
+
+    resetAllExpectedStates();
+    initApplicationSession();
+    initSecurityDescriptor();
+      
+    /* Init predef addr of AS */
+    updateAddrDescriptor(PREDEF_AS_ADDR, AS_PORT, AS_IP);
 
     initWDT(WDT_ADLY_16);
     setupButton(15, 50);

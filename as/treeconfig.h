@@ -16,9 +16,10 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#define SCAN scanf
-#define SSCAN sscanf
-#define SPRINT sprintf
+#define PRINT(...) printf(__VA_ARGS__)
+#define SCAN(...) scanf(__VA_ARGS__)
+#define SSCAN(...) sscanf(__VA_ARGS__)
+#define SPRINT(...) sprintf(__VA_ARGS__)
 
 #define MAX_SECURITY_LAYER_VERSION 0xff
 #define DEFAULT_VERSION 0
@@ -31,9 +32,17 @@ extern "C" {
 #define MAX_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN - 1 
 #define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN-1
 
+#define IP IPv4
+#define IPv4 uint32_t 
+#define HTONS htons
+#define HTONL htonl
+#define ASSIGN_IP(addr, ip) inet_aton(ip, &addr)
+
 #define ADDR_FAMILY AF_INET
-#define ADDR_ATON inet_aton
 #define ADDR_TYPE struct sockaddr_in
+#define ADDR_SEND_TYPE struct sockaddr
+#define ADDR_LEN_TYPE socklen_t
+#define SENDTO_FUNC sendto
 #define ADDR_DESCRIPTORS_LEN 4 
 #define MAX_ADDR_DESCRIPTOR ADDR_DESCRIPTORS_LEN - 3 
 #define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN-2

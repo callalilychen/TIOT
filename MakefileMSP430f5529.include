@@ -33,8 +33,8 @@ C_FLAGS += -I$(GCC_INCLUDE_PATH)
 # Linker settings
 LDFLAGS = -Wl,-Map=$(TARGET).map,--cref
 # --gc-sections will allow the linker to remove unused sections
-LDFLAGS += --gc-sections
-LDFLAGS += -Wl,-L$(GCC_LIBRARY_PATH)
+LDFLAGS += -Wl,--gc-sections
+LDFLAGS += -L$(GCC_LIBRARY_PATH)
 
 PROGRAMMER_FLAGS = "prog $(TARGET).elf"
 TERM_FLAGS += $(PORT) -b 115200

@@ -99,7 +99,7 @@ extern "C" {
    */
   inline STATE_TYPE (__attribute__((always_inline))getExpectedState)(unsigned int state_row, unsigned int state_col){
     if(state_row >= STATE_TABLE_LEN || state_col >= STATE_VECTOR_LEN)
-      return NULL;
+      return STATE_UPPER_BOUNDARY;
     return expected_states[state_row][state_col];
   }
 

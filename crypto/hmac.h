@@ -13,7 +13,7 @@ extern "C" {
 #define WORD_TYPE (uint16_t *)
 #endif
 
-unsigned char* hmac(const struct hash_function_construction*, const void*, int, const unsigned char*,int , unsigned char* , unsigned int *);
+unsigned char* hmac(const struct hash_function_construction* hash, const void* key, int key_size, const unsigned char* message, int message_size, unsigned char* res, unsigned int * res_size);
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

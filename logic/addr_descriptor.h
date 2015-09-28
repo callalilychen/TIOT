@@ -22,11 +22,11 @@ inline ADDR_TYPE * (__attribute__((always_inline))getAddr)(unsigned int index){
   return NULL;
 }
 
-inline void (__attribute__((always_inline))updateAddrDescriptor)(unsigned int index, unsigned int port, const char * ip){
+inline void (__attribute__((always_inline))updateAddrDescriptor)(unsigned int index, unsigned int port, IPv4 ip){
   if(index < ADDR_DESCRIPTORS_LEN){
     addr_descriptors[index].addr.sin_family = ADDR_FAMILY;
-    addr_descriptors[index].addr.sin_port = htons(port);
-    ADDR_ATON(ip, &(addr_descriptors[index].addr.sin_addr.s_addr));
+    addr_descriptors[index].addr.sin_port = HTONS(port);
+    ASSIGN_IP(addr_descriptors[index].addr.sin_addr.s_addr, ip);
     addr_descriptors[index].state = DESCRIPTOR_ACTIVE;
   }
 }

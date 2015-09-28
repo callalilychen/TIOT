@@ -8,7 +8,6 @@
 extern "C" {
 #endif
 
-#define PRINT(...) printf(__VA_ARGS__)
 
 //TODO somewhere else
 #define SUCC 0

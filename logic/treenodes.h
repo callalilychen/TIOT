@@ -1,9 +1,9 @@
 #ifndef __TREE_NODES_H__
 #define __TREE_NODES_H__
 
+#include <string.h>
+#include <strings.h>
 #include "treeconfig.h"
-#include "string.h"
-#include "strings.h"
 #ifdef  __cplusplus
 extern "C" {
 #endif
