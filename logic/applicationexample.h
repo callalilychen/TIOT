@@ -9,13 +9,15 @@ extern "C" {
 
   extern const application exampleapplication;
   extern const application ackapplication;
+  extern const application repapplication;
   
-  unsigned int handleTest(unsigned char* , unsigned int);
-  unsigned int handleAckReq(unsigned char* , unsigned int);
+  unsigned int handleTest(unsigned char* , unsigned int, application_session *);
+  unsigned int handleAckReq(unsigned char* , unsigned int, application_session *);
+  unsigned int handleRep(unsigned char* , unsigned int, application_session *);
 
-  inline unsigned int (__attribute__((always_inline))generateTest)(unsigned int next_layer_descriptor){
+  inline unsigned int (__attribute__((always_inline))generateTest)(unsigned int next_layer_descriptor, unsigned int addr_descriptor){
     //TODO default session?
-    unsigned char* res = addApplicationSession(4, next_layer_descriptor);
+    unsigned char* res = addApplicationSession(4, next_layer_descriptor, addr_descriptor);
     if(res==NULL){
       return 0;
     }
@@ -26,8 +28,8 @@ extern "C" {
     return 4;
   }
 
-  inline unsigned int (__attribute__((always_inline))generateAckReq)(unsigned int next_layer_descriptor){
-    unsigned char* res = addApplicationSession(3, next_layer_descriptor);
+  inline unsigned int (__attribute__((always_inline))generateAckReq)(unsigned int next_layer_descriptor, unsigned int addr_descriptor){
+    unsigned char* res = addApplicationSession(3, next_layer_descriptor, addr_descriptor);
     if(res==NULL){
       return 0;
     }

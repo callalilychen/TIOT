@@ -10,15 +10,51 @@
 /* Include files                                                             */
 /*****************************************************************************/
 #include "interface.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
+#define SCAN scanf
+#define SSCAN sscanf
+#define SPRINT sprintf
+
+#define DEFAULT_VERSION 0
+#define MAX_SECURITY_LAYER_VERSION 0xff
+
+#define NO_DESCRIPTOR 0xffff
+#define DESCRIPTOR_ACTIVE 1
+#define DESCRIPTOR_INACTIVE 0
+
+#define SECURITY_DESCRIPTORS_LEN 3
+#define MAX_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN - 1 
+#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN-1
+
+#define ADDR_FAMILY AF_INET
+#define ADDR_ATON inet_aton
+#define ADDR_TYPE struct sockaddr_in
+#define ADDR_DESCRIPTORS_LEN 4 
+#define MAX_ADDR_DESCRIPTOR ADDR_DESCRIPTORS_LEN - 3 
+#define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN-2
+#define PREDEF_RS_ADDR ADDR_DESCRIPTORS_LEN-1
+
 #define NODE_SIZE HASH_SIZE
 #define HASH_FUNC sha_construction.func
 
+#define APPLICATION_SESSIONS_LEN 2
+#define MAX_APPLICATION_MESSAGE_SIZE 20
+
+#define MSG_APPLICATION_COUNT 3
+#define UI_APPLICATION_COUNT 5
+#define MAX_APPLICATION_NAME_SIZE 5
+
+/*!
+ * \brief Configuration of tree
+ *
+ * */
 #define MAX_LEVEL 2
-#define MAX_CACHED_NODES 0
+#define CACHED_NODES_LEN ADDR_DESCRIPTORS_LEN
 
 /*!
  * \brief Configuration of state manangement
@@ -43,14 +79,9 @@ extern "C" {
  *        The bitmap can be used with the state table together to indicate, whether a state can be updated 
  * */
 #define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
+#define NO_BIT 0xffff
 #ifdef USE_STATE
-#define BIT_MAP_LEN MAX_LEVEL-1                      /*!< Number of to used bit map*/
-#if(STATE_TABLE_LEN & 0x7)
-#define BIT_MAP_SIZE STATE_TABLE_LEN>>3   /*!< Size of bit map in bit */
-
-#elif
-#define BIT_MAP_SIZE (STATE_TABLE_LEN>>3) + 1
-#endif
+#define BIT_MAP_LEN STATE_TABLE_LEN                      /*!< Number of to used bit map*/
 #endif
 
 

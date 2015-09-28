@@ -7,10 +7,8 @@
 extern "C" {
 #endif
 
-  unsigned int handleApplicationLayer(unsigned char *, unsigned int, unsigned int);
+  unsigned int handleApplicationLayer(unsigned char *, unsigned int, unsigned int, unsigned int);
   unsigned char * generateApplicationLayer(unsigned int *, unsigned int *, unsigned int *);
-
-
 
 #ifdef  __cplusplus
 }

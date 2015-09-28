@@ -11,8 +11,43 @@ extern "C" {
 #endif
 
 #ifdef USE_BIT_MAP
-// TODO bit map array
-  extern uint8_t bitmap [BIT_MAP_SIZE];
+#if BIT_MAP_LEN > NO_BIT
+#error "NO_BIT should be greater then or equal to BIT_MAP_LEN"
+#endif
+#if(BIT_MAP_LEN & 0x7)
+#define BIT_MAP_SIZE BIT_MAP_LEN >>3   /*!< Size of bit map in bit */
+#elif
+#define BIT_MAP_SIZE (STATE_TABLE_LEN>>3) + 1
+#endif
+  
+  extern uint8_t bitmap[BIT_MAP_SIZE];
+  
+  inline unsigned int (__attribute__((always_inline))getFirstSetBit)(void){
+    for(int i =0; i < BIT_MAP_SIZE; i++){
+      if(bitmap[i]!=0){
+        for(int ii=0; ii<8; ii++){
+          if(bitmap[i]&(1<<ii)){
+            return ii+i*8;
+          }
+        }  
+      }
+    }
+    return NO_BIT;
+  }
+
+  inline unsigned int (__attribute__((always_inline))getFirstNotSetBit)(void){
+    PRINT("BIT_MAP_SIZE is %d\n", BIT_MAP_SIZE);
+    for(int i =0; i < BIT_MAP_SIZE; i++){
+      if(bitmap[i]!=0xff){
+        for(int ii=0; ii<8; ii++){
+          if(0==(bitmap[i]&(1<<ii))){
+            return ii+i*8;
+          }
+        }  
+      }
+    }
+    return NO_BIT;
+  }
   
   inline void (__attribute__((always_inline))clearAllBits)(void){
     bzero(bitmap, BIT_MAP_SIZE);

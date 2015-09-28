@@ -2,8 +2,8 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <netinet/in.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <pthread.h>
@@ -12,18 +12,14 @@
 #include "treestate.h"
 #include "tree.h" 
 #include "hmac.h"
+#include "addr_descriptor.h"
 #include "applicationexample.h"
 #include "securitylayer.h" 
 #include "applicationlayer.h" 
-#include "addr_descriptor.h"
-
 #include "utils.h"
 
 #define BUFSIZE 512
-#define PORT 9090
-#define AS_PORT 9001
-#define AS_IP "127.0.0.1"
-//#define RS_PORT AS_PORT
+#define PORT 9001
 #define RS_PORT 9999
 #define RS_IP "127.0.0.1"
 
@@ -31,7 +27,6 @@ static pthread_mutex_t lock;
 
 unsigned char send_buf[BUFSIZE] = {0};
 unsigned int send_buf_size = 0;
-
 
 socklen_t addrlen = sizeof(ADDR_TYPE);
 
@@ -44,8 +39,8 @@ static void printBlock(char* name, unsigned char* block, size_t block_len){
 }
 
 static inline void sendUdpPackage(int fd){
-  unsigned int  application_layer_msg_size = 0;
-  unsigned char *  application_layer_msg = NULL;
+  unsigned int application_layer_msg_size = 0;
+  unsigned char * application_layer_msg = NULL;
   unsigned int application_session = NO_SESSION;
   unsigned int security_descriptor = NO_SESSION;
   pthread_mutex_lock(&lock);
@@ -54,8 +49,13 @@ static inline void sendUdpPackage(int fd){
     memcpy(send_buf+send_buf_size, application_layer_msg, application_layer_msg_size);
     send_buf_size += (application_layer_msg_size + generateSecurityLayerMAC(security_descriptor, send_buf+send_buf_size, application_layer_msg_size, BUFSIZE-send_buf_size));
     printBlock("send", send_buf, send_buf_size);
-    sendto(fd, send_buf, send_buf_size, 0,
-        (struct sockaddr *)getAddr(getApplicationSession(application_session)->addr_descriptor), addrlen);
+    struct sockaddr * addr = (struct sockaddr *)getAddr(getApplicationSession(application_session)->addr_descriptor);
+    if(NULL != addr){
+      sendto(fd, send_buf, send_buf_size, 0, addr, addrlen);
+    }else{
+      send_buf[send_buf_size] = 0;
+      PRINT("NO Addr for \"%s\"\n", send_buf);
+    }
     clearApplicationSession(application_session); 
     removeSecurityLayerDescriptor(security_descriptor); 
   } 
@@ -91,7 +91,6 @@ static void * recvUdpThread(void* p_fd){
   }
   return NULL;
 }
-
 #if(UI_APPLICATION_COUNT>0)
 static inline void handleCmdPackage(unsigned char* str, unsigned int str_size){
   if(str_size > 0){
@@ -105,7 +104,6 @@ static inline void handleCmdPackage(unsigned char* str, unsigned int str_size){
     pthread_mutex_unlock(&lock);
   }
 }
-
 static void * cmdThread(void* p_fd){
   char str[BUFSIZE];
 
@@ -126,6 +124,9 @@ int main(int argc, char** argv)
   initApplicationSession();
   initSecurityDescriptor();
 
+  const char root[5] = "test";
+  setRoot((unsigned char *)root, 4);
+
   // Create a UDP socket and listen on a port
   struct sockaddr_in si_me;
   int fd;
@@ -143,10 +144,12 @@ int main(int argc, char** argv)
     return 0;
   }
 
-  /* Init predef addr of AS and RS */
-  updateAddrDescriptor(PREDEF_AS_ADDR, AS_PORT, AS_IP);
-  updateAddrDescriptor(PREDEF_RS_ADDR, RS_PORT, RS_IP);
-  
+  /* Init predef addr of RS */
+  addr_descriptors[PREDEF_RS_ADDR].addr.sin_family = AF_INET;
+  addr_descriptors[PREDEF_RS_ADDR].addr.sin_port = htons(RS_PORT);
+  inet_aton(RS_IP, &(addr_descriptors[PREDEF_RS_ADDR].addr.sin_addr.s_addr));
+  addr_descriptors[PREDEF_RS_ADDR].state = DESCRIPTOR_ACTIVE;
+
   pthread_mutex_init (&lock, NULL);
   /* UDP Thread to handle received UDP messages */
   pthread_t udp_thread;
@@ -163,7 +166,7 @@ int main(int argc, char** argv)
     return 0;
   }
 #endif
-
+  
   pthread_join (udp_thread, NULL);
 #if(UI_APPLICATION_COUNT>0)
   pthread_join (cmd_thread, NULL);

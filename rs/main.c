@@ -18,6 +18,7 @@
 #include "applicationexample.h"
 #include "securitylayer.h" 
 #include "applicationlayer.h" 
+#include "addr_descriptor.h"
 
 
 #include "utils.h"
@@ -25,6 +26,7 @@
 #define PORT 9999
 
 #define BUFSIZE 100
+socklen_t addrlen = sizeof(ADDR_TYPE);
 
 static void printBlock(char* name, unsigned char* block, size_t block_len){
   PRINT("%s:\n", name);
@@ -34,41 +36,52 @@ static void printBlock(char* name, unsigned char* block, size_t block_len){
   PRINT("\n");
 }
 
-static inline void receivedUdpPackage(unsigned char* udp_payload, unsigned int udp_payload_size){
-  unsigned int security_descriptor = 0;
+
+static inline void handleUdpPackage(unsigned char* udp_payload, unsigned int udp_payload_size, ADDR_TYPE *p_addr){
   unsigned int header_size = 0;
-  if(NO_DESCRIPTOR != (security_descriptor = handleSecurityLayer(udp_payload, &udp_payload_size, &header_size))){
-    handleApplicationLayer(udp_payload+header_size, udp_payload_size, security_descriptor);
+  unsigned int security_descriptor = handleSecurityLayer(udp_payload, &udp_payload_size, &header_size);
+  if(udp_payload_size > 0){
+    unsigned int addr_descriptor = addAddrDescriptors(p_addr, (size_t)addrlen);
+    if(NO_DESCRIPTOR == addr_descriptor){
+      PRINT("[ERROR] Failed to add the addr descritptor!\n");
+    }else if(NO_SESSION == handleApplicationLayer(udp_payload+header_size, udp_payload_size, security_descriptor, addr_descriptor)){
+      udp_payload[udp_payload_size+header_size] = 0;
+      PRINT("[WARN] No application session for message \"%s\"!\n", (const char *)(udp_payload+header_size));
+    }
   }
 }
 
-static inline unsigned int sendUdpPackage(unsigned char* send_buf, unsigned int max_send_buf){
+static inline unsigned int generateUdpPackage(unsigned char* send_buf, unsigned int max_send_buf){
   unsigned int  application_layer_msg_size = 0;
   unsigned char *  application_layer_msg = NULL;
-  unsigned int buf_size = 0;
-  unsigned char *buf = send_buf;
+  unsigned int send_buf_size = 0;
   unsigned int application_session = NO_SESSION;
   unsigned int security_descriptor = NO_SESSION;
   while(NULL!=(application_layer_msg = generateApplicationLayer(&application_session, & application_layer_msg_size, &security_descriptor))){
-    buf_size = 0;
-    buf = send_buf;
-    buf_size = generateSecurityLayerHeader(security_descriptor, buf, max_send_buf);
-    memcpy(buf+buf_size, application_layer_msg, application_layer_msg_size);
-    buf_size +=application_layer_msg_size;
-    buf_size +=generateSecurityLayerMAC(security_descriptor, application_layer_msg, application_layer_msg_size, buf, max_send_buf-buf_size);
-    clearApplicationLayerSession(application_session); 
+    send_buf_size = 0;
+    send_buf_size = generateSecurityLayerHeader(security_descriptor, send_buf, max_send_buf);
+    memcpy(send_buf+send_buf_size, application_layer_msg, application_layer_msg_size);
+    send_buf_size += (application_layer_msg_size+
+        generateSecurityLayerMAC(security_descriptor, send_buf+send_buf_size, application_layer_msg_size, max_send_buf-send_buf_size));
+    clearApplicationSession(application_session); 
     removeSecurityLayerDescriptor(security_descriptor); 
   } 
-  return buf_size;
+  return send_buf_size;
 }
 
 int main(int argc, char** argv)
 { 
   resetAllExpectedStates();
+  initApplicationSession();
+  initSecurityDescriptor();
+
   unsigned char udp_payload[BUFSIZE] = {0};
   unsigned int udp_payload_size = 0;
   unsigned char send_buf[BUFSIZE] = {0};
   unsigned int send_buf_size = 0;
+  
+  const char root[5] = "test";
+  setRoot((unsigned char *)root, 4);
   
 
   // Create a UDP socket and listen on a port
@@ -78,10 +91,6 @@ int main(int argc, char** argv)
     perror("Can not create socket\n");
     return 0;
   }
-  
-  const char root[5] = "test";
-  
-  setRoot((unsigned char *)root, 4);
   
   si_me.sin_family = AF_INET;
   si_me.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -98,11 +107,13 @@ int main(int argc, char** argv)
     if(udp_payload_size>0){
       printf("received message: %s from %s:%d\n",udp_payload, inet_ntoa(si_remote.sin_addr), si_remote.sin_port);
 
-      receivedUdpPackage(udp_payload, udp_payload_size);
+      handleUdpPackage(udp_payload, udp_payload_size, (ADDR_TYPE *)(&si_remote));
     }
-    send_buf_size = sendUdpPackage(send_buf, BUFSIZE);
+    send_buf_size = generateUdpPackage(send_buf, BUFSIZE);
     if(send_buf_size>0){
-     sendto(fd, send_buf, send_buf_size, 0, (struct sockaddr *)&si_remote, addrlen); 
+      sendto(fd, send_buf, send_buf_size, 0, (struct sockaddr *)&si_remote, addrlen); 
+      printBlock("send", send_buf, send_buf_size);
+
     }
 
   
