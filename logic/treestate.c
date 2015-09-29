@@ -1,3 +1,17 @@
+/*-
+ * treestate.c - A state manager for the tree data structure with static memeory allocation
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+/*!
+ * @addtogroup    tree_logic
+ * @{
+ *
+ * @file
+ * @brief       Implementation of the tree state management functions
+ *
+ * @author      Wenwen Chen 
+ */
 #include "treestate.h"
 
 #ifdef USE_STATE
@@ -35,6 +49,8 @@ int incExpectedState(unsigned int state_row, unsigned int state_col, unsigned in
   }
   return FAIL;
 }
-
 #endif
+/*!
+ * @}
+ */ 
 

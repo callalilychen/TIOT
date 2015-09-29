@@ -12,13 +12,14 @@
 #include "interface.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "scanString.h"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
 #define PRINT(...) printf(__VA_ARGS__)
 #define SCAN(...) scanf(__VA_ARGS__)
-#define SSCAN(...) sscanf(__VA_ARGS__)
+#define SSCAN(...) sscan(__VA_ARGS__)
 #define SPRINT(...) sprintf(__VA_ARGS__)
 
 #define MAX_SECURITY_LAYER_VERSION 0xff
@@ -32,7 +33,7 @@ extern "C" {
 #define MAX_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN - 1 
 #define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN-1
 
-#define IP IPv4
+#define IP_TYPE IPv4
 #define IPv4 uint32_t 
 #define HTONS htons
 #define HTONL htonl

@@ -19,7 +19,6 @@
 static pthread_mutex_t lock;
 
 unsigned char send_buf[BUFSIZE+1] = {0};
-unsigned int send_buf_size = 0;
 
 socklen_t addrlen = sizeof(ADDR_TYPE);
 

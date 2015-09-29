@@ -1,5 +1,6 @@
 #include "applicationcmd.h"
 
+
 const application keyapplication = {
   .name = "key:",
   .name_size = 4,

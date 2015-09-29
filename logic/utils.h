@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "treeconfig.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -45,7 +46,6 @@ extern "C" {
 
 inline void (__attribute__((always_inline))printIPv4)(char* name, uint32_t ip){
   PRINT(name);
-  PRINT(":0x%w\n", ip);
   for(int i = 24; i >= 0; i-=8){
     uint8_t t = (uint8_t)(ip >> i);
     PRINT(".%d", t);

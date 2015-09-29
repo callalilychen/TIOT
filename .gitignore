@@ -4,6 +4,13 @@
 *.elf
 *.hex
 *.map
+/html
+html
+*.html
+/latex
+latex
+/man
+man
 /build
 build
 *.as

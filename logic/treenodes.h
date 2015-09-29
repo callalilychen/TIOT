@@ -1,3 +1,18 @@
+/*-
+ * treenodes.h - Tree structure for nodes
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * @addtogroup    tree_structure
+ * @{
+ *
+ * @file
+ * @brief       Header definitions for the tree structure of nodes
+ *
+ * @author      Wenwen Chen 
+ */
 #ifndef __TREE_NODES_H__
 #define __TREE_NODES_H__
 
@@ -72,4 +87,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /* __TREE_NODES_H__ */
-
+/*!
+ * @}
+ */

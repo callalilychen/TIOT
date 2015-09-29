@@ -1,3 +1,19 @@
+/*-
+ * treestate.h - A static bit map
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * @addtogroup  tree_logic
+ * @{
+ *
+ * @file
+ * @brief       Header definitions for the bit map functions
+ *
+ * @author      Wenwen Chen 
+ */
+
 #ifndef __BIT_MAP_H__
 #define __BIT_MAP_H__
 
@@ -20,8 +36,18 @@ extern "C" {
 #define BIT_MAP_SIZE (STATE_TABLE_LEN>>3) + 1
 #endif
   
+  /*!
+   * \brief Bit map with predefined size by BIT_MAP_SIZE 
+   *
+   *        At the beginning, all states will be set to zero 
+   */
   extern uint8_t bitmap[BIT_MAP_SIZE];
   
+/**
+ * @brief Search the first set bit
+ *
+ * @return the bit index
+ */
   inline unsigned int (__attribute__((always_inline))getFirstSetBit)(void){
     for(int i =0; i < BIT_MAP_SIZE; i++){
       if(bitmap[i]!=0){
@@ -35,6 +61,11 @@ extern "C" {
     return NO_BIT;
   }
 
+/**
+ * @brief Search the first not set bit
+ *
+ * @return the bit index
+ */
   inline unsigned int (__attribute__((always_inline))getFirstNotSetBit)(void){
     PRINT("BIT_MAP_SIZE is %d\n", BIT_MAP_SIZE);
     for(int i =0; i < BIT_MAP_SIZE; i++){
@@ -118,4 +149,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /* __BIT_MAP_H__ */
+/*!
+ * @} 
+ */
+
 

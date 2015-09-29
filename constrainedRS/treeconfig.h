@@ -9,7 +9,6 @@
 /*****************************************************************************/
 /* Include files                                                             */
 /*****************************************************************************/
-#include <stdint.h>
 #include "interface.h"
 #include "simplelink.h"
 
@@ -17,8 +16,8 @@
 extern "C" {
 #endif
 #define PRINT(...) print(__VA_ARGS__)
-#define SCAN(...) 
-#define SSCAN(...)  
+#define SCAN(...)  
+#define SSCAN(...) sscan(__VA_ARGS__)  
 #define SPRINT(...) 
 
 #define MAX_SECURITY_LAYER_VERSION 0xff

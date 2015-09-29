@@ -32,10 +32,12 @@ extern "C" {
 #define MAX_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN - 1 
 #define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN-1
 
+#define IP_TYPE IPv4
+#define IPv4 uint32_t 
 #define HTONS htons
-#define IP IPv4
-#define IPv4 const char*
+#define HTONL htonl
 #define ASSIGN_IP(addr, ip) inet_aton(ip, &addr)
+
 #define HTONS htons
 #define ADDR_FAMILY AF_INET
 #define ADDR_TYPE struct sockaddr_in

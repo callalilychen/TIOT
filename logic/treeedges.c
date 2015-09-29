@@ -1,3 +1,18 @@
+/*-
+ * treeedges.c - Tree structure for edges 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * @addtogroup    tree_structure
+ * @{
+ *
+ * @file
+ * @brief       Implementation of the tree structure of edges
+ *
+ * @author      Wenwen Chen 
+ */
 #include "treeedges.h"
 #include <string.h>
 #include "utils.h"
@@ -19,3 +34,6 @@ void edgeFunc(tree_node *parent_node, tree_edge *edge, tree_node *node)
   HASH_FUNC(node->block, (size_t)(parent_node->size), node->block);
   node->size = NODE_SIZE; 
 }
+/*!
+ * @}
+ */

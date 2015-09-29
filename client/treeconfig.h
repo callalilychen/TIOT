@@ -32,7 +32,7 @@ extern "C" {
 #define MAX_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN - 1 
 #define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN-1
 
-#define IP IPv4
+#define IP_TYPE IPv4
 #define IPv4 uint32_t 
 #define HTONS htons
 #define HTONL htonl

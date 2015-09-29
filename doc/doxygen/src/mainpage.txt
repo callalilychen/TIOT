@@ -1,0 +1,101 @@
+/*! @mainpage hash tree Documentation
+ *
+ * \section overview Overview
+ *
+ * This project is an implementation of lightweight security protocol for IoT
+
+ * \subsection structure Structure
+ *
+ * The implementation contains the following ten subdirectories:
+ *  * crypto
+ *  * logic
+ *
+ * \section features Special features
+ *
+ * ####The build system
+ *
+ * This project uses GNU make as build system. 
+ * The simplest way to compile and link 
+ * application is to set up a Makefile providing
+ * at least the following variables:
+ *  * APPLICATION
+ *  * BOARD
+ *  * RIOTBASE
+ *
+ * by invoking make like this:
+ *
+ * \code
+ * make BOARD=telosb
+ * \endcode
+ *
+ * Besides typical targets like `clean`, `all`, or `doc`, RIOT provides the special
+ * targets `flash` and `term` to invoke the configured flashing and terminal tools
+ * for the specified platform. These targets use the variable `PORT` for the serial
+ * communication to the device. Neither this variable nor the targets `flash` and
+ * `term` are mandatory for the native port.
+ *
+ * ####Including modules
+ *
+ * By default a RIOT application comprises only the applications' code itself, the kernel,
+ * and platform specific code. In order to use additional modules, such as a
+ * particular device driver or a system library, you have to append the modules'
+ * names to the USEMODULE variable. For example, to build a application using the SHT11
+ * temperature sensor and 6LoWPAN network stack, your Makefile needs to contain
+ * these lines:
+ * \code
+ * USEMODULE += sht11
+ * USEMODULE += sixlowpan
+ * \endcode
+ * To contribute a new module to RIOT, your module's Makefile needs to set the
+ * variable `MODULE` to a unique name. If the module depends on other modules, this
+ * information needs to be added to RIOT's `Makefile.dep`.
+ *
+ * ####The main function
+ *
+ * After the board is initialized, RIOT starts two threads: the idle thread and the
+ * main thread. The idle thread has the lowest priority and will run, whenever no
+ * other thread is ready to run. It will automatically use the lowest possible
+ * power mode for the device. The main thread - configured with a default priority
+ * that is right in the middle between the lowest and the highest available
+ * priority - is the first thread that runs and calls the main function. This
+ * function needs to be defined by the application.
+ *
+ * ####Choosing the right stack size
+ *
+ * Choosing the right stack size for a new thread is not an easy, but a very
+ * crucial task. Since memory is usually a scarce resource in IoT scenarios,
+ * one most be careful not to assign too much stack to a single thread.
+ * However, if you allocate too little memory for a stack, your application
+ * will probably crash. The minimum stack size depends also on some RIOT
+ * internal structs and is hardware dependent. In order to help developers
+ * finding the right stack size, RIOT defines some typical stack sizes in
+ * `cpu_conf.` (which should be provided by the implementation for all
+ * supported MCUs). The constants for these stack sizes are
+ *
+ * * `THREAD_STACKSIZE_IDLE`
+ * * `THREAD_STACKSIZE_DEFAULT`
+ * * `THREAD_EXTRA_STACKSIZE_PRINTF`
+ * * `THREAD_STACKSIZE_MAIN`
+ *
+ * and can be used by including `kernel.h`. ARM based platforms additionally
+ * define `THREAD_EXTRA_STACKSIZE_PRINTF_FLOAT`, because newlibs printf
+ * implementation uses more memory for printing floating point numbers.
+ *
+ * `THREAD_STACKSIZE_IDLE` is the stack size for the idle thread and
+ * probably the smallest sensible stack size. `THREAD_STACKSIZE_DEFAULT`
+ * is a default size for any typical thread, _not_ using printf.
+ * `THREAD_EXTRA_STACKSIZE_PRINTF` defines additional stack space needed if the
+ * thread needs to call printf (which requires additional memory when using
+ * newlib). `THREAD_STACKSIZE_MAIN` is the stack size for the main thread
+ * and probably a good size for your application. (Note, that on most
+ * non-newlib dependent platforms this will probably equal
+ * `THREAD_STACKSIZE_DEFAULT`.
+ *
+ * ####The IPC
+ *
+ *
+ * \section info_sec Community
+ *
+ * Whether you are looking for help with writing an application for RIOT, want to learn more about it, or just stay in the loop you are invited to join the RIOT-users mailing list. For developers who want to participate and contribute to the kernel development or integrate new MCU and platform support the [RIOT-devel mailing list](http://lists.riot-os.org/mailman/listinfo/devel) is the right place.
+ *
+ */

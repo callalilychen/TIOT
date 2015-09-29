@@ -1,3 +1,18 @@
+/*-
+ * treeedges.h - Tree structure for edges 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * @addtogroup    tree_structure
+ * @{
+ *
+ * @file
+ * @brief       Header definitions for the tree structure of edges
+ *
+ * @author      Wenwen Chen 
+ */
 #ifndef __TREE_EDGES_H__
 #define __TREE_EDGES_H__
 
@@ -33,4 +48,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /* __TREE_EDGES_H__ */
-
+/*!
+ * @}
+ */

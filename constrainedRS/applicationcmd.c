@@ -70,7 +70,7 @@ const application revapplication = {
       return 0;
     }
     unsigned int secret_index;
-    //if(SSCAN((const char*)req, "%u", &secret_index)==1){
+    if(SSCAN((const char*)req, "%u", &secret_index)==1){
     //  // add security layer descriptor
     //  p_session->next_layer_descriptor = PREDEF_NO_SECURITY_DESCRIPTOR;
     //  if(SUCC == setBit(secret_index)){
@@ -80,7 +80,7 @@ const application revapplication = {
     //  }
     //  p_session->message_size = strlen((const char *)(p_session->message));
     //  return p_session->message_size;
-    //}
+    }
     return 0;
   }
 

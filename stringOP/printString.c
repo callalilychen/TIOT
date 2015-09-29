@@ -18,6 +18,8 @@
  *       for use on NJC's MSP430 LaunchPad Blog.
  ******************************************************************************/
 #include "printString.h" 
+#include <stdint.h>
+#include <stdarg.h>
 
 static int nohandle(char c)
 {

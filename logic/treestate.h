@@ -1,7 +1,18 @@
-/*
+/*-
  * treestate.h - A state manager for the tree data structure with static memeory allocation
- *
+ * 
+ * Copyright 2005 Wenwen Chen
 */
+
+/*!
+ * @defgroup    tree_logic
+ * @{
+ *
+ * @file
+ * @brief       Header definitions for the tree state management functions
+ *
+ * @author      Wenwen Chen 
+ */
 
 #ifndef __TREE_STATE_H__
 #define __TREE_STATE_H__
@@ -23,8 +34,6 @@ extern "C" {
    * \brief State table with to expected state
    *
    *        At the beginning, all states will be set to zero 
-   *
-   * \return         None
    */
   extern STATE_TYPE expected_states[STATE_TABLE_LEN][STATE_VECTOR_LEN];
 
@@ -239,6 +248,8 @@ extern "C" {
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */
-
 #endif /* __TREE_STATE_H__ */
+/*! 
+ * @} 
+ */
 

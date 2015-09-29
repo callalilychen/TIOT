@@ -69,7 +69,7 @@ int main(int argc, char** argv)
   while(1){
     udp_payload_size = recvfrom(fd, udp_payload, BUFSIZE, 0, (struct sockaddr *)&si_remote, &addrlen);
     if(udp_payload_size>0){
-      printf("received message: %s from %s:%d\n",udp_payload, inet_ntoa(si_remote.sin_addr), si_remote.sin_port);
+      PRINT("received message: %s from %s:%d\n",udp_payload, inet_ntoa(si_remote.sin_addr), si_remote.sin_port);
       handleUdpPackage(udp_payload, udp_payload_size, (ADDR_TYPE *)(&si_remote));
     }
     sendUdpPackage(fd, send_buf, BUFSIZE);
