@@ -1,3 +1,18 @@
+/*-
+ * securitylayerhandler.c - Security layer handler 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * \addtogroup    handler 
+ * \{
+ *
+ * \file
+ * \brief       Header definitions for the security layer functions
+ *
+ * \author      Wenwen Chen 
+ */
 #include "securitylayer.h"
 #include "securitylayerV0.h"
 //#include "securitylayerV1.h"
@@ -109,5 +124,7 @@ unsigned int handleSecurityLayer(unsigned char *msg, unsigned int * p_msg_size, 
 
   return NO_DESCRIPTOR;
 }
-
+/*!
+ * \}
+ */
 

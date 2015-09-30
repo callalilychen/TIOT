@@ -4,7 +4,7 @@
  * Copyright 2005 Wenwen Chen
 */
 /*!
- * @addtogroup    tree_logic
+ * @addtogroup    tree_state
  * @{
  *
  * @file

@@ -65,7 +65,7 @@ extern "C" {
  *        2. level -> key // FIXME AS can also behavior as C
  *
  * */
-#define MAX_LEVEL 3
+#define TREE_HEIGTH 2
 #define CACHED_NODES_LEN ADDR_DESCRIPTORS_LEN
 
 /*!
@@ -91,7 +91,7 @@ extern "C" {
  *        The bitmap can be used with the state table together to indicate, whether a state can be updated 
  * */
 //#define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
-//#define NO_BIT 0xffff
+//#define NO_BIT 0xff
 //#ifdef USE_STATE
 //#define BIT_MAP_LEN STATE_TABLE_LEN                      /*!< Number of to used bit map*/
 //#endif

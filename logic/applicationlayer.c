@@ -1,3 +1,18 @@
+/*-
+ * applicationlayerhandler.c - Application layer handler 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * \addtogroup    handler
+ * \{
+ *
+ * \file
+ * \brief       Implementation of the application layer functions
+ *
+ * \author      Wenwen Chen 
+ */
 #include "applicationlayer.h"
 #include "application_interface.h"
 
@@ -31,3 +46,6 @@ unsigned char * generateApplicationLayer(unsigned int *session, unsigned int *p_
   return NULL;
   
 }
+/*!
+ * \}
+ */

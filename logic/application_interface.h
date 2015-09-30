@@ -1,3 +1,18 @@
+/*-
+ * applicationsession.h - Application session 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * \defgroup    application_session Application session
+ * \{
+ *
+ * \file
+ * \brief       Header definitions for the application session functions
+ *
+ * \author      Wenwen Chen 
+ */
 #ifndef __APPLICATION_INTERFACE_H__
 #define __APPLICATION_INTERFACE_H__
 // TODO rename application_session
@@ -129,4 +144,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /* __APPLICATION_INTERFACE_H__ */
-
+/*!
+ * \}
+ */

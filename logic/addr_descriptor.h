@@ -1,3 +1,18 @@
+/*-
+ * addr_descriptor.h - IP address descriptor 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * \defgroup    descriptor Descriptor
+ * \{
+ *
+ * \file
+ * \brief       Header definitions for the ip Address descriptor functions
+ *
+ * \author      Wenwen Chen 
+ */
 #ifndef __ADDR_DESCRIPTOR_H__
 #define __ADDR_DESCRIPTOR_H__
 
@@ -54,4 +69,6 @@ inline unsigned int (__attribute__((always_inline))addAddrDescriptors)(ADDR_TYPE
 #endif /* __cplusplus */
 
 #endif /* __ADDR_DESCRIPTOR_H__ */
-
+/*!
+ * \}
+ */

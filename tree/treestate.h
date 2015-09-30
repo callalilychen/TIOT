@@ -2,10 +2,10 @@
  * treestate.h - A state manager for the tree data structure with static memeory allocation
  * 
  * Copyright 2005 Wenwen Chen
-*/
+ */
 
 /*!
- * @defgroup    tree_logic
+ * @defgroup    tree_state Tree state 
  * @{
  *
  * @file
@@ -43,7 +43,11 @@ extern "C" {
    * \return         None
    */
   inline void (__attribute__((always_inline))resetAllExpectedStates)(void){
-    bzero(expected_states, STATE_TABLE_LEN*(MAX_LEVEL-1)*STATE_SIZE);  
+    for(int i = 0; i < STATE_TABLE_LEN; i++){
+      for(int ii = 0; ii < TREE_HEIGTH; ii++){
+        expected_states[i][ii]  = 0;
+      }
+    }
   }
 
   /*!
@@ -54,7 +58,10 @@ extern "C" {
    * \return         None
    */
   inline void (__attribute__((always_inline))resetExpectedStateVector)(unsigned int index){
-    bzero(expected_states+index, (MAX_LEVEL-1)*STATE_SIZE);  
+    for(int ii = 0; ii < TREE_HEIGTH; ii++){
+      expected_states[index][ii]  = 0;
+    }
+    bzero(expected_states+index, (TREE_HEIGTH-1)*STATE_SIZE);  
   }
 
   /*!
@@ -122,19 +129,19 @@ extern "C" {
    *
    * \note                      The length of states must be equal to STATE_VECTOR_LEN 
    */
-  inline int (__attribute__((always_inline))setStateVector)(unsigned int states_index, STATE_TYPE * p_state_vector)
-  {
-    if(states_index >= STATE_TABLE_LEN || p_state_vector== NULL){
-      return FAIL;
-    }
-    for(int i = 0; i < STATE_VECTOR_LEN; i++){
-      if(SUCC != validState(p_state_vector[i], expected_states[states_index][i])){
+    inline int (__attribute__((always_inline))setStateVector)(unsigned int states_index, STATE_TYPE * p_state_vector)
+    {
+      if(states_index >= STATE_TABLE_LEN || p_state_vector== NULL){
         return FAIL;
       }
-      expected_states[states_index][i] = p_state_vector[i];
+      for(int i = 0; i < STATE_VECTOR_LEN; i++){
+        if(SUCC != validState(p_state_vector[i], expected_states[states_index][i])){
+          return FAIL;
+        }
+        expected_states[states_index][i] = p_state_vector[i];
+      }
+      return SUCC;
     }
-    return SUCC;
-  }
 
   /*!
    * \brief   Set a state vector of the expected states partly
@@ -235,13 +242,13 @@ extern "C" {
    *
    * \return                On success SUCC is returned, otherwise FAIL.
    */
-  inline int (__attribute__((always_inline))updateExpectedState)(unsigned int state_row, unsigned int state_col, STATE_TYPE state, unsigned int inc_pre_state)
-  {
-    if(SUCC == setState(state_row, state_col, state)){
-      return incExpectedState(state_row, STATE_VECTOR_LEN-1, inc_pre_state);
+    inline int (__attribute__((always_inline))updateExpectedState)(unsigned int state_row, unsigned int state_col, STATE_TYPE state, unsigned int inc_pre_state)
+    {
+      if(SUCC == setState(state_row, state_col, state)){
+        return incExpectedState(state_row, STATE_VECTOR_LEN-1, inc_pre_state);
+      }
+      return FAIL;
     }
-    return FAIL;
-  }
 
 #endif
 

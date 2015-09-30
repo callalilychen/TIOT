@@ -1,3 +1,19 @@
+/*-
+ * applicationexample.c - Example applications 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * \addtogroup    applicationss
+ * \{
+ *
+ * \file
+ * \brief       Implementation of the example applications
+ *
+ * \author      Wenwen Chen 
+ */
+
 #include "applicationexample.h"
 
 const application exampleapplication = {
@@ -35,3 +51,6 @@ const application repapplication = {
     memcpy(p_session->message, req, req_size);
     return req_size;
   }
+/*!
+ * \}
+ */

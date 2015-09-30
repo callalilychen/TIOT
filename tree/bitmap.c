@@ -5,7 +5,7 @@
 */
 
 /*!
- * @addtogroup  tree_logic
+ * @addtogroup  tree_state
  * @{
  *
  * @file

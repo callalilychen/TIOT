@@ -1,3 +1,18 @@
+/*-
+ * securitydescriptor.h - Security descriptor 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * \addtogroup    descriptor 
+ * \{
+ *
+ * \file
+ * \brief       Header definitions for the security descriptor functions
+ *
+ * \author      Wenwen Chen 
+ */
 #ifndef __SECURITY_DESCRIPTOR_H__
 #define __SECURITY_DESCRIPTOR_H__
 
@@ -97,3 +112,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /* __SECURITY_DESCRIPTOR_H__ */
+/*!
+ * \}
+ */

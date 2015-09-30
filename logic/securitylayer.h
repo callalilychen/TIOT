@@ -1,5 +1,20 @@
-#ifndef __SECURITY_LAYER_H__
-#define __SECURITY_LAYER_H__
+/*-
+ * securitylayerhandler.h - Security layer handler 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * \addtoroup    handler
+ * \{
+ *
+ * \file
+ * \brief       Implementation of the security layer functions
+ *
+ * \author      Wenwen Chen 
+ */
+#ifndef __SECURITY_LAYER_HANDLER_H__
+#define __SECURITY_LAYER_HANDLER_H__
 
 #include "interface.h"
 #include "securitydescriptor.h"
@@ -127,4 +142,7 @@ extern "C" {
 }
 #endif /* __cplusplus */
 
-#endif /* __SECURITY_LAYER_H__ */
+#endif /* __SECURITY_LAYER_HANDLER_H__ */
+/*!
+ * \}
+ */

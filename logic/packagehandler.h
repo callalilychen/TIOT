@@ -1,3 +1,18 @@
+/*-
+ * applicationlayer.c - UDP package handler 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * \defgroup    handler Handler
+ * \{
+ *
+ * \file
+ * \brief       Header definitions for the udp package functions
+ *
+ * \author      Wenwen Chen 
+ */
 #ifndef __PACKAGE_HANDLER_H__
 #define __PACKAGE_HANDLER_H__
 #include "treeconfig.h"
@@ -89,3 +104,6 @@ inline void (__attribute__((always_inline))sendUdpPackage)(int fd, unsigned char
 #endif /* __cplusplus */
 
 #endif /* __PACKAGE_HANDLER_H__ */
+/*!
+ * \}
+ */

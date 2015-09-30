@@ -1,3 +1,18 @@
+/*-
+ * applicationexample.h - Example applications 
+ *
+ * Copyright 2005 Wenwen Chen
+*/
+
+/*!
+ * \defgroup    applications Applications
+ * \{
+ *
+ * \file
+ * \brief       Header definitions for the example applications
+ *
+ * \author      Wenwen Chen 
+ */
 #ifndef __APPLICATION_EXAMPLE_H__
 #define __APPLICATION_EXAMPLE_H__
 
@@ -44,3 +59,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /* __APPLICATION_EXAMPLE_H__ */
+/*!
+ * \}
+ */
