@@ -5,7 +5,7 @@
 */
 
 /*!
- * \addtogroup    applicationss
+ * \addtogroup    application
  * \{
  *
  * \file
@@ -19,6 +19,7 @@
 const application exampleapplication = {
   .name = "test",
   .name_size = 4,
+  .required_right = NO_RIGHT,
   .func = handleTest
 };
 
@@ -31,6 +32,7 @@ const application exampleapplication = {
 const application ackapplication = {
   .name = "ack",
   .name_size = 3,
+  .required_right = NO_RIGHT,
   .func = handleAckReq
 };
   unsigned int handleAckReq(unsigned char* req, unsigned int req_size, application_session * p_session){
@@ -41,6 +43,7 @@ const application ackapplication = {
 const application repapplication = {
   .name = "req",
   .name_size = 3,
+  .required_right = NO_RIGHT,
   .func = handleRep
 };
   unsigned int handleRep(unsigned char* req, unsigned int req_size, application_session * p_session){

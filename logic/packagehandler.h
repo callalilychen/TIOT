@@ -18,7 +18,7 @@
 #include "treeconfig.h"
 #include "securitylayer.h" 
 #include "applicationlayer.h" 
-#include "application_interface.h"
+#include "applicationhandler.h"
 #include "addr_descriptor.h"
 #ifdef  __cplusplus
 extern "C" {

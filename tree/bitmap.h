@@ -26,8 +26,9 @@ extern "C" {
 #endif
 
 #ifdef USE_BIT_MAP
-#if BIT_MAP_LEN > NO_BIT
-#error "NO_BIT should be greater then or equal to BIT_MAP_LEN"
+#define NO_BIT 0xff
+#if  NO_BIT < BIT_MAP_LEN
+#error "NO_BIT should be not smaller then BIT_MAP_LEN, change NO_BIT in bitmap.h"
 #endif
 #if(BIT_MAP_LEN & 0x7)
 #define BIT_MAP_SIZE BIT_MAP_LEN >>3   /*!< Size of bit map in bit */
@@ -60,7 +61,7 @@ extern "C" {
     return NO_BIT;
   }
 
-  /**
+  /*!
    * \brief Search the first not set bit
    *
    * \return the bit index
@@ -79,7 +80,7 @@ extern "C" {
     return NO_BIT;
   }
 
-  /**
+  /*!
    * \brief Clear all bits in the bit map (set to 0)
    *
    * \return         None
@@ -90,7 +91,7 @@ extern "C" {
     }
   }
 
-  /**
+  /*!
    * \brief Set all bits in the bit map to 1
    *
    * \return         None

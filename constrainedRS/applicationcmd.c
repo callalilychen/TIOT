@@ -3,6 +3,7 @@
 const application keyapplication = {
   .name = "key:",
   .name_size = 4,
+  .required_right = NO_RIGHT,
   .func = handleKey
 };
 
@@ -62,6 +63,7 @@ const application keyapplication = {
 const application revapplication = {
   .name = "rev:",
   .name_size = 4,
+  .required_right = NO_RIGHT,
   .func = handleRevocation
 };
 
@@ -87,6 +89,7 @@ const application revapplication = {
 const application permreqapplication = {
   .name = "perm:",
   .name_size = 5,
+  .required_right = NO_RIGHT,
   .func = handlePermReq
 };
 

@@ -5,7 +5,7 @@
 */
 
 /*!
- * \defgroup    applications Applications
+ * \addtogroup    application
  * \{
  *
  * \file
@@ -16,7 +16,7 @@
 #ifndef __APPLICATION_EXAMPLE_H__
 #define __APPLICATION_EXAMPLE_H__
 
-#include "application_interface.h"
+#include "applicationhandler.h"
 
 #ifdef  __cplusplus
 extern "C" {

@@ -30,7 +30,7 @@ extern "C" {
    *
    */
   typedef struct tree_edge{
-    void (*func)(tree_node *p_parent_node, struct tree_edge p_*edge, tree_node *p_node);
+    void (*func)(tree_node *p_parent_node, struct tree_edge *p_edge, tree_node *p_node);
     unsigned char * params;
     unsigned int params_size;
   }tree_edge;

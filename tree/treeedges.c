@@ -5,13 +5,13 @@
 */
 
 /*!
- * @addtogroup    tree_structure
- * @{
+ * \addtogroup    tree_structure
+ * \{
  *
- * @file
- * @brief       Implementation of the tree structure of edges
+ * \file
+ * \brief       Implementation of the tree structure of edges
  *
- * @author      Wenwen Chen 
+ * \author      Wenwen Chen 
  */
 #include "treeedges.h"
 #include <string.h>
@@ -35,5 +35,5 @@ void edgeFunc(tree_node *p_parent_node, tree_edge *p_edge, tree_node *p_node)
   p_node->size = NODE_SIZE; 
 }
 /*!
- * @}
+ * \}
  */

@@ -20,6 +20,8 @@ extern "C" {
 #define SSCAN(...) sscan(__VA_ARGS__)  
 #define SPRINT(...) 
 
+#define RIGHT_TYPE uint32_t
+
 #define MAX_SECURITY_LAYER_VERSION 0xff
 #define DEFAULT_VERSION 0
 
@@ -91,7 +93,6 @@ extern "C" {
  *        The bitmap can be used with the state table together to indicate, whether a state can be updated 
  * */
 //#define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
-//#define NO_BIT 0xff
 //#ifdef USE_STATE
 //#define BIT_MAP_LEN STATE_TABLE_LEN                      /*!< Number of to used bit map*/
 //#endif

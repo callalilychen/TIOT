@@ -5,7 +5,7 @@
 */
 
 /*!
- * \addtoroup    handler
+ * \addtogroup    handler
  * \{
  *
  * \file

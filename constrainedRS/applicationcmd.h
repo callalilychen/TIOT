@@ -1,7 +1,7 @@
 #ifndef __APPLICATION_CMD_H__
 #define __APPLICATION_CMD_H__
 
-#include "application_interface.h"
+#include "applicationhandler.h"
 #include "bitmap.h"
 #include "treeconfig.h"
 

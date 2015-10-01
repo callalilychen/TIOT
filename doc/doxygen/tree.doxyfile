@@ -767,7 +767,10 @@ WARN_LOGFILE           =
 
 INPUT                  =  ../../logic \
                           ../../tree \
+                          ../../handler \
+                          ../../application \
                           ../../crypto \
+                          ../../stringOP \
                           ../../constrainedRS \
                           ../../rs \
                           ../../as \

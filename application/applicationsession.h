@@ -5,7 +5,7 @@
 */
 
 /*!
- * \defgroup    application_session Application session
+ * \defgroup    application Application
  * \{
  *
  * \file
@@ -13,21 +13,32 @@
  *
  * \author      Wenwen Chen 
  */
-#ifndef __APPLICATION_INTERFACE_H__
-#define __APPLICATION_INTERFACE_H__
-// TODO rename application_session
-#include <string.h>
-#include "securitylayer.h"
-
+#ifndef __APPLICATION_SESSION_H__
+#define __APPLICATION_SESSION_H__
+#include "securityhandler.h"
+#include "treeconfig.h"
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-#define NO_APPLICATION 0xff
+/*!
+ * \brief Macro as indicator when no session exists 
+ */
 #define NO_SESSION 0xff
+#if NO_SESSION < APPLICATION_SESSIONS_LEN
+#error "NO_SESSION should be not smaller then APPLICATION_SESSIONS_LEN, change NO_SESSION in applicationsession.h"
+#endif
 
+/*!
+ * \brief Macro as indicator when no application is defined 
+ */
+#define NO_APPLICATION 0xff
+#if NO_APPLICATION < MSG_APPLICATION_COUNT || NO_APPLICATION < UI_APPLICATION_COUNT
+#error "NO_APPLICATION should be not smaller then MSG_APPLICATION_COUNT and UI_APPLICATION_COUNT, change NO_APPLICATION in applicationsession.h"
+#endif
   typedef struct application_session{
     unsigned int application_id;
+    RIGHT_TYPE has_right;
     unsigned int next_layer_descriptor;
     unsigned int addr_descriptor;
     unsigned char message[MAX_APPLICATION_MESSAGE_SIZE];
@@ -39,6 +50,7 @@ extern "C" {
   inline void(__attribute__((always_inline))initApplicationSession)(void){
     for(int i=0; i<APPLICATION_SESSIONS_LEN; i++){
       application_sessions[i].application_id = NO_APPLICATION;
+      application_sessions[i].has_right = NO_RIGHT;
       application_sessions[i].next_layer_descriptor = NO_DESCRIPTOR;
       application_sessions[i].next_layer_descriptor = NO_DESCRIPTOR;
     }
@@ -90,60 +102,12 @@ extern "C" {
     }
   }
 
-  typedef struct application{
-    unsigned char name[MAX_APPLICATION_NAME_SIZE];
-    unsigned int name_size;
-    unsigned int (*func)(unsigned char*, unsigned int, application_session *);
-  }application;
-
-  extern const application * msg_applications[MSG_APPLICATION_COUNT];
-#if(UI_APPLICATION_COUNT>0)
-  extern const application * ui_applications[UI_APPLICATION_COUNT];
-  
-  enum{msg_application = 0, ui_application};
-#else
-#define applications msg_applications
-#define applications_len MSG_APPLICATION_COUNT
-#endif
-
-
-#if(UI_APPLICATION_COUNT>0)
-  inline unsigned int (__attribute__((always_inline))handleApplication)(unsigned char* req, unsigned int req_size, unsigned int session_id, int application_type){
-    application ** applications; 
-    int applications_len = 0;
-    switch(application_type){
-      case msg_application:
-        applications = (application **)msg_applications;
-        applications_len = MSG_APPLICATION_COUNT;
-        break;
-      case ui_application:
-        applications = (application **)ui_applications;
-        applications_len = UI_APPLICATION_COUNT;
-        break;
-      default:
-        return 0;
-    }
-#else
-  inline unsigned int (__attribute__((always_inline))handleApplication)(unsigned char* req, unsigned int req_size, unsigned int session_id){
-#endif
-    for(int i = 0; i < applications_len; i++){
-      if(req_size >= applications[i]->name_size && memcmp(applications[i]->name, req, applications[i]->name_size)==0){
-        if((getApplicationSession(session_id)->message_size = applications[i]->func(req+applications[i]->name_size, req_size-applications[i]->name_size, getApplicationSession(session_id)))>0){
-          updateApplicationSession_Application(session_id, i);
-          return getApplicationSession(session_id)->message_size;
-        }else{
-          clearApplicationSession(session_id);
-        }
-      } 
-    }
-    return 0;
-  }
   
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif /* __APPLICATION_INTERFACE_H__ */
+#endif /* __APPLICATION_SESSION_H__ */
 /*!
  * \}
  */

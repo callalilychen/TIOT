@@ -30,6 +30,8 @@ extern "C" {
 #define SSCAN(...) sscanf(__VA_ARGS__)
 #define SPRINT(...) sprintf(__VA_ARGS__)
 
+#define RIGHT_TYPE uint32_t
+
 #define MAX_SECURITY_LAYER_VERSION 0xff
 #define DEFAULT_VERSION 0
 
@@ -42,7 +44,7 @@ extern "C" {
 #define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN-1
 
 #define IP_TYPE IPv4
-#define IPv4 uint32_t 
+#define IPv4 char* 
 #define HTONS htons
 #define HTONL htonl
 #define ASSIGN_IP(addr, ip) inet_aton(ip, &addr)
@@ -102,7 +104,6 @@ extern "C" {
  *        The bitmap can be used with the state table together to indicate, whether a state can be updated 
  * */
 #define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
-#define NO_BIT 0xff
 #ifdef USE_STATE
 #define BIT_MAP_LEN STATE_TABLE_LEN                      /*!< Number of to used bit map*/
 #endif

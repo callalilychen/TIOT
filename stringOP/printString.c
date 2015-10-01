@@ -24,6 +24,7 @@
 static int nohandle(char c)
 {
   // do nothing
+  return 0;
 }
 int (*handleC)(char) = &nohandle;
 int * getHandler(void)
@@ -34,7 +35,7 @@ void setHandler(int (*handle)(char))
 {
   handleC = handle;
 }
-static inline int handleS(const char *s)
+static inline void handleS(const char *s)
 {
 	char c;
  

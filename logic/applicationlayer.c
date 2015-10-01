@@ -14,7 +14,7 @@
  * \author      Wenwen Chen 
  */
 #include "applicationlayer.h"
-#include "application_interface.h"
+#include "applicationhandler.h"
 
 
 unsigned int handleApplicationLayer(unsigned char * payload, unsigned int payload_size, unsigned int next_layer_descriptor, unsigned int addr_descriptor){

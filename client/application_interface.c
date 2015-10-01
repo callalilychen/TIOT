@@ -1,4 +1,3 @@
-#include "application_interface.h"
 #include "applicationexample.h"
 #include "applicationcmd.h"
 
