@@ -89,11 +89,42 @@ extern "C" {
   }
 
   /*!
+   * \brief Use the application session of the given id
+   *      
+   *        Fill the session informations to the given pointers and return a pointer to the response message of the given session id, if the session is active. That means the session contains some response message: .message_size is bigger than 0
+   *
+   * \param session_id    The given session id
+   * \param p_size        Pointer to store the session message length
+   * \param p_security_descriptor_id Pointer to the security descriptor id
+   * \param p_addr_descriptor_id     Pointer to the address descriptor id
+   *
+   * \return              Pointer to the message of the application or NULL, if the session of the given id is not active or the given id is out of range
+   */
+  inline unsigned char * __attribute__((always_inline))useApplicationSession(unsigned int session_id, unsigned int * p_size, unsigned int * p_security_descriptor_id, unsigned int * p_addr_descriptor_id){
+    if(session_id < APPLICATION_SESSIONS_LEN){
+      unsigned int size = application_sessions[session_id].message_size;
+      if(size > 0){
+        if(p_size!=NULL){
+          *p_size = size;
+        }
+        if(p_security_descriptor_id!=NULL){
+          *p_security_descriptor_id = application_sessions[session_id].security_descriptor_id;
+        }
+        if(p_addr_descriptor_id!=NULL){
+          *p_addr_descriptor_id = application_sessions[session_id].addr_descriptor_id;
+        }
+        return application_sessions[session_id].message;
+      }
+    }
+    return NULL;
+  }
+
+  /*!
    * \brief Get a pointer to the application session of the given id 
    *
    * \param session_id    The given session id
    *
-   * \return              Session id of the new application session or NULL, if the given id is out of range
+   * \return              Pointer to the session of the new application session or NULL, if the given id is out of range
    */
   inline application_session * __attribute__((always_inline))getApplicationSession(unsigned int session_id){
     if(session_id < APPLICATION_SESSIONS_LEN){

@@ -43,7 +43,9 @@ extern "C" {
 
 #define X(a, b, len, res) optimizedXOR(a, b, len, res) 
 
-  inline uint8_t * (__attribute__((always_inline))optimizedXOR)(uint8_t * a, uint8_t * b, size_t len, uint8_t * res){
+
+
+inline uint8_t * (__attribute__((always_inline))optimizedXOR)(uint8_t * a, uint8_t * b, size_t len, uint8_t * res){
   int index = 0;
 
   int end_index = len >> WORD_SHIFT_SCALAR;

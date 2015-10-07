@@ -27,9 +27,12 @@ extern "C" {
    * \note The name of each application should be unique
    */
   typedef struct application{
-    unsigned char name[MAX_APPLICATION_NAME_SIZE];
-    unsigned int name_size;
-    RIGHT_TYPE required_right;
+    const unsigned char name[MAX_APPLICATION_NAME_SIZE];
+    const unsigned int name_size;
+#if(MAX_APPLICATION_USAGE_SIZE>0)
+    const unsigned char usage[MAX_APPLICATION_USAGE_SIZE];
+#endif
+    const RIGHT_TYPE required_right;
     unsigned int (*func)(unsigned char*, unsigned int, application_session *);
   }application;
 
@@ -57,9 +60,20 @@ extern "C" {
 #define applications_len MSG_APPLICATION_COUNT
 #endif
 
-
+  /*! 
+   * \brief handle a application request 
+   *
+   * \param req       Request message after application name
+   * \param req_size  Size of this message
+   * \param session_id The corresponding application session
+   * \param application_type The type of required application, which is needed, if UI_APPLICATION_COUNT is bigger than 0
+   *
+   * \note  In order to make the application id unique, the type of applications is also used to construct a application id
+   *
+   * \return Application response message size
+   */
 #if(UI_APPLICATION_COUNT>0)
-  inline unsigned int (__attribute__((always_inline))handleApplication)(unsigned char* req, unsigned int req_size, unsigned int session_id, int application_type){
+  inline unsigned int __attribute__((always_inline))handleApplication(unsigned char* req, unsigned int req_size, unsigned int session_id, int application_type){
     application ** applications; 
     int applications_len = 0;
     switch(application_type){
@@ -75,16 +89,13 @@ extern "C" {
         return 0;
     }
 #else
-  inline unsigned int (__attribute__((always_inline))handleApplication)(unsigned char* req, unsigned int req_size, unsigned int session_id){
+  inline unsigned int __attribute__((always_inline))handleApplication(unsigned char* req, unsigned int req_size, unsigned int session_id){
 #endif
     for(int i = 0; i < applications_len; i++){
       if(req_size >= applications[i]->name_size && memcmp(applications[i]->name, req, applications[i]->name_size)==0){
         application_session *p_session = getApplicationSession(session_id);
         unsigned int hasRight = checkRight(getDescriptorRight(p_session -> security_descriptor_id), applications[i]->required_right);
 #if(UI_APPLICATION_COUNT>0)
-        if(application_type == ui_application){
-          i+= MSG_APPLICATION_COUNT;
-        }
 #ifdef ADMIN_PASSWORD_HASH 
         if(!hasRight && application_type == ui_application){
           hasRight = (ADMIN_RIGHT == askForAdminRight());
@@ -92,6 +103,11 @@ extern "C" {
 #endif
 #endif
         if (hasRight && (p_session->message_size = applications[i]->func(req+applications[i]->name_size, req_size-applications[i]->name_size, p_session))>0){
+#if(UI_APPLICATION_COUNT>0)
+        if(application_type == ui_application){
+          i+= MSG_APPLICATION_COUNT;
+        }
+#endif
           updateApplicationSession_Application(session_id, i);
           return p_session->message_size;
         }
@@ -102,6 +118,16 @@ extern "C" {
     return 0;
   }
   
+  /*! 
+   * \brief Write application header to the given buf, according to given type 
+   *
+   * \param buf       Buffer to be written
+   * \param buf_size  Size of this buffer
+   * \param type      Type of the header type
+   *
+   * \return Application header size
+   */
+  unsigned int generateApplicationHeader(unsigned char* buf, unsigned int max_buf_size,  int type);
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

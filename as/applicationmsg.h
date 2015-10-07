@@ -22,11 +22,21 @@
 extern "C" {
 #endif
 
+  /*!
+   * \brief Application defination for messages, which begin with '['
+   */
+  extern const application msgapplication;
+
+  /*!
+   * \brief Application defination of revocation
+   */
   extern const application revapplication;
+
+  /*!
+   * \brief Application defination of permission request
+   */
   extern const application permreqapplication;
-  
-  unsigned int handleRevocation(unsigned char* , unsigned int, application_session *);
-  unsigned int handlePermReq(unsigned char* , unsigned int, application_session *);
+ 
 
 #ifdef  __cplusplus
 }

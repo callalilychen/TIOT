@@ -44,6 +44,18 @@ extern "C" {
  * \brief Macro to indicate, whether an operation failed
  */
 #define FAIL -1
+/*!
+ * \brief Macro to indicate, whether an operation is done
+ */
+#define DONE 1
+/*!
+ * \brief Macro to indicate infomations 
+ */
+#define INFO 2
+
+
+#define SUCC_MESSAGE "[SUCCESS]"
+#define SUCC_MESSAGE_SIZE 9
 
 #define DONE_MESSAGE "[DONE]"
 #define DONE_MESSAGE_SIZE 6
@@ -51,6 +63,11 @@ extern "C" {
 #define ERROR_MESSAGE "[ERROR]"
 #define ERROR_MESSAGE_SIZE 7
 
+#define USAGE_MESSAGE "[USAGE]"
+#define USAGE_MESSAGE_SIZE 7
+
+#define INFO_MESSAGE "[INFO]"
+#define INFO_MESSAGE_SIZE 6
 #define RIGHT_TYPE uint8_t
 /*!
  * \brief Macro for when no right is required 
@@ -87,9 +104,10 @@ extern "C" {
 #define APPLICATION_SESSIONS_LEN 2
 #define MAX_APPLICATION_MESSAGE_SIZE 200  
 
-#define MSG_APPLICATION_COUNT 4
+#define MSG_APPLICATION_COUNT 6
 #define UI_APPLICATION_COUNT 0 
 #define MAX_APPLICATION_NAME_SIZE 5
+#define MAX_APPLICATION_USAGE_SIZE 0
 
 /*!
  * \brief Configuration of tree
@@ -126,7 +144,12 @@ extern "C" {
 //#define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
 //#define BIT_MAP_LEN TREE_STATE_TABLE_LEN                      /*!< Number of to used bit map*/
 
-
+#define LED_IS_ON 1
+#define LED_IS_OFF -1
+#define NO_LED 0
+#define LED_ON(x) DONE 
+#define LED_OFF(x) DONE
+#define LED(x) LED_IS_ON
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

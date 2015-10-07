@@ -43,6 +43,31 @@ extern "C" {
  * \brief Macro to indicate, whether an operation failed
  */
 #define FAIL -1
+/*!
+ * \brief Macro to indicate, whether an operation is done
+ */
+#define DONE 1
+/*!
+ * \brief Macro to indicate infomations 
+ */
+#define INFO 2
+
+
+#define SUCC_MESSAGE "[SUCCESS]"
+#define SUCC_MESSAGE_SIZE 9
+
+#define DONE_MESSAGE "[DONE]"
+#define DONE_MESSAGE_SIZE 6
+
+#define ERROR_MESSAGE "[ERROR]"
+#define ERROR_MESSAGE_SIZE 7
+
+#define USAGE_MESSAGE "[USAGE]"
+#define USAGE_MESSAGE_SIZE 7
+
+#define INFO_MESSAGE "[INFO]"
+#define INFO_MESSAGE_SIZE 6
+
 
 #define RIGHT_TYPE uint8_t
 /*!
@@ -80,9 +105,11 @@ extern "C" {
 #define APPLICATION_SESSIONS_LEN 2
 #define MAX_APPLICATION_MESSAGE_SIZE 200  
 
+#define RS_MSG_APPLICATION_COUNT 6
 #define MSG_APPLICATION_COUNT 6
-#define UI_APPLICATION_COUNT 6
+#define UI_APPLICATION_COUNT 9
 #define MAX_APPLICATION_NAME_SIZE 10
+#define MAX_APPLICATION_USAGE_SIZE 100
 
 /*!
  * \brief Configuration of tree

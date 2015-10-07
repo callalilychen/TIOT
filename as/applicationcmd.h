@@ -22,15 +22,10 @@
 extern "C" {
 #endif
 
+  /*!
+   * \brief Application defination for 
+   */
   extern const application keyapplication;
-  extern const application lsaddrapplication;
-  extern const application addaddrapplication;
-  extern const application updateaddrapplication;
-  
-  unsigned int handleKey(unsigned char* , unsigned int, application_session *);
-  unsigned int handleLsAddr(unsigned char* , unsigned int, application_session *);
-  unsigned int handleAddAddr(unsigned char* , unsigned int, application_session *);
-  unsigned int handleUpdateAddr(unsigned char* , unsigned int, application_session *);
 
 #ifdef  __cplusplus
 }

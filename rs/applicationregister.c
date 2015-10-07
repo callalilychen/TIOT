@@ -15,14 +15,15 @@
  */
 
 #include "applicationexample.h"
-#include "applicationcmd.h"
 #include "applicationmsg.h"
 
 const application *msg_applications[MSG_APPLICATION_COUNT] = {
   &exampleapplication, 
   &ackapplication, 
-  &repapplication,
-  &revapplication
+  &revapplication,
+  &ledapplication,
+  &ledapplication,
+  &ledapplication
 };
 
 /*!

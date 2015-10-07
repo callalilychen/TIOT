@@ -22,16 +22,25 @@
 extern "C" {
 #endif
 
+  /*!
+   * \brief Example application defination  
+   */
   extern const application exampleapplication;
+  /*!
+   * \brief Ack application defination  
+   */
   extern const application ackapplication;
-  extern const application repapplication;
-  
-  unsigned int handleTest(unsigned char* , unsigned int, application_session *);
-  unsigned int handleAckReq(unsigned char* , unsigned int, application_session *);
-  unsigned int handleRep(unsigned char* , unsigned int, application_session *);
 
-  inline unsigned int (__attribute__((always_inline))generateTest)(unsigned int next_layer_descriptor_id, unsigned int addr_descriptor_id){
-    application_session *p_session = getApplicationSession(createApplicationSession(next_layer_descriptor_id, addr_descriptor_id));
+  /*!
+   * \brief Generate an example application
+   *
+   * \param security_descriptor_id descriptor id of the security issues
+   * \param addr_descriptor_id     descriptor id of the address
+   *
+   * \return                       Response message size, which is 4
+   */
+  inline unsigned int __attribute__((always_inline))generateTest(unsigned int security_descriptor_id, unsigned int addr_descriptor_id){
+    application_session *p_session = getApplicationSession(createApplicationSession(security_descriptor_id, addr_descriptor_id));
     if(p_session==NULL){
       return 0;
     }
@@ -40,8 +49,16 @@ extern "C" {
     return 4;
   }
 
-  inline unsigned int (__attribute__((always_inline))generateAckReq)(unsigned int next_layer_descriptor_id, unsigned int addr_descriptor_id){
-    application_session *p_session = getApplicationSession(createApplicationSession(next_layer_descriptor_id, addr_descriptor_id));
+  /*!
+   * \brief Generate an ack application
+   *
+   * \param security_descriptor_id descriptor id of the security issues
+   * \param addr_descriptor_id     descriptor id of the address
+   *
+   * \return                       Response message size, which is 3
+   */
+  inline unsigned int __attribute__((always_inline))generateAckReq(unsigned int security_descriptor_id, unsigned int addr_descriptor_id){
+    application_session *p_session = getApplicationSession(createApplicationSession(security_descriptor_id, addr_descriptor_id));
     if(p_session==NULL){
       return 0;
     }

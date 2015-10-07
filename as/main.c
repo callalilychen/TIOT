@@ -19,7 +19,7 @@
 
 static pthread_mutex_t lock;
 
-unsigned char send_buf[BUFSIZE+1] = {0};
+unsigned char main_buf[BUFSIZE+1] = {0};
 
 socklen_t addrlen = sizeof(ADDR_TYPE);
 
@@ -32,7 +32,7 @@ static void * recvUdpThread(void* p_fd){
       printBlock("recv", (unsigned char *)buf, recvlen);
       pthread_mutex_lock(&lock);
       handleUdpPackage((unsigned char*)buf, recvlen, (ADDR_TYPE *)&si_remote);
-      sendUdpPackage(* (int *)p_fd, send_buf, BUFSIZE);
+      sendUdpPackage(* (int *)p_fd, main_buf, BUFSIZE);
 
       pthread_mutex_unlock(&lock);
     }
@@ -49,7 +49,7 @@ static void * cmdThread(void* p_fd){
     PRINT("%s (%lu)\n",str, strlen(str));
     pthread_mutex_lock(&lock);
     handleCmdPackage((unsigned char *)str, strlen(str));
-    sendUdpPackage(* (int *)p_fd, send_buf, BUFSIZE);
+    sendUdpPackage(* (int *)p_fd, main_buf, BUFSIZE);
     pthread_mutex_unlock(&lock);
   }
   return NULL;
@@ -107,4 +107,5 @@ int main(int argc, char** argv)
 #endif
 
   close(fd);
+  return 0;
 }

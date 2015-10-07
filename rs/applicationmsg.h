@@ -22,12 +22,23 @@
 extern "C" {
 #endif
 
+  /*!
+   * \brief Application defination of revocation
+   */
   extern const application revapplication;
-  extern const application permreqapplication;
+  /*!
+   * \brief Application defination to set led on 
+   */
+  extern const application ledonapplication;
+  /*!
+   * \brief Application defination to set led off 
+   */
+  extern const application ledoffapplication;
+  /*!
+   * \brief Application defination to get led status 
+   */
+  extern const application ledapplication;
   
-  unsigned int handleRevocation(unsigned char* , unsigned int, application_session *);
-  unsigned int handlePermReq(unsigned char* , unsigned int, application_session *);
-
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */
