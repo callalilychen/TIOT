@@ -20,14 +20,6 @@ void g1(tree_node *parent_node, tree_edge *edge, tree_node *node)
   node->size = sha_construction.size; 
 }
 
-static void printBlock(char* name, unsigned char* block, size_t block_len){
-  PRINT("%s:\n", name);
-  for (int i=0; i< block_len; i++){
-    PRINT("%x|", block[i]);
-  }
-  PRINT("\n");
-}
-
 unsigned int key_size = 0;
 
 int tree_test(void){

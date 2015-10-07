@@ -63,7 +63,7 @@ const application keyapplication = {
 const application revapplication = {
   .name = "rev:",
   .name_size = 4,
-  .required_right = NO_RIGHT,
+  .required_right = ADMIN_RIGHT,
   .func = handleRevocation
 };
 

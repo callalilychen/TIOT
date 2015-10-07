@@ -1,7 +1,7 @@
 /*-
  * applicationsession.h - Application session 
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 
 /*!
@@ -16,6 +16,7 @@
 #ifndef __APPLICATION_SESSION_H__
 #define __APPLICATION_SESSION_H__
 #include "securityhandler.h"
+#include "securitydescriptor.h"
 #include "treeconfig.h"
 #ifdef  __cplusplus
 extern "C" {
@@ -39,6 +40,7 @@ extern "C" {
   typedef struct application_session{
     unsigned int application_id;
     RIGHT_TYPE has_right;
+    // TODO rename
     unsigned int next_layer_descriptor;
     unsigned int addr_descriptor;
     unsigned char message[MAX_APPLICATION_MESSAGE_SIZE];
@@ -51,7 +53,6 @@ extern "C" {
     for(int i=0; i<APPLICATION_SESSIONS_LEN; i++){
       application_sessions[i].application_id = NO_APPLICATION;
       application_sessions[i].has_right = NO_RIGHT;
-      application_sessions[i].next_layer_descriptor = NO_DESCRIPTOR;
       application_sessions[i].next_layer_descriptor = NO_DESCRIPTOR;
     }
   }

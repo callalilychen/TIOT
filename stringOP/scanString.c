@@ -14,6 +14,7 @@ int sscan(const char *str, const char *fmt, ...)
 
   int *p_int;
   long *p_long;
+  char *p_str;
 
   ret = 0;
 
@@ -27,6 +28,16 @@ int sscan(const char *str, const char *fmt, ...)
       {
         switch (*format_ptr)
         {
+          case 's':
+            format_ptr++;
+            p_str = va_arg(ap, char*);
+            while((*str_ptr != 0x0) && (*str_ptr != *format_ptr)){
+              *(p_str++) = *(str_ptr++);
+            }
+            *p_str = 0;
+            str_ptr ++;
+            ret++;
+            break;
           case 'd':       // expect an int
           case 'u':
             p_int = va_arg( ap, int *);

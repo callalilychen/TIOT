@@ -1,7 +1,7 @@
 /*-
  * applicationexample.h - Example applications 
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 
 /*!

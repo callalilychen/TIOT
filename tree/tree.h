@@ -1,7 +1,7 @@
 /*-
  * trees.h - Tree structure 
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
  *
 */
 
@@ -40,14 +40,20 @@ extern "C" {
     \endverbatim
    *
    * \param   p_nodes  Pointer to the nodes
-   *          p_edges  Pointer to the edges
-   *          len      Length of the tree path, which is equal to the number of nodes or number of edges - 1
-   *          flag     Whether update nodes, if the nodes is not empty (node.size != 0)
+   * \param   p_edges  Pointer to the edges
+   * \param   len      Length of the tree path, which is equal to the number of nodes or number of edges - 1
+   * \param   flag     Whether update nodes, if the nodes is not empty (node.size != 0)
    *
-   * \return           Pointer to the last node 
+   * \return           Pointer to the last node or NULL, if p_nodes is NULL, the first node of p_nodes is empty or p_edges is NULL 
    */
-  inline tree_node *  (__attribute__((always_inline))fillNodes)(tree_node * p_nodes, tree_edge *p_edges, unsigned int len, unsigned int flag){
+  inline tree_node *  __attribute__((always_inline))fillNodes(tree_node * p_nodes, tree_edge *p_edges, unsigned int len, unsigned int flag){
     if(p_nodes == NULL || p_edges == NULL){
+      return NULL;
+    }
+    /*!
+     * If the first node of the p_nodes is empty, its child node can not be filled
+     */
+    if(p_nodes->size == 0){
       return NULL;
     }
     int i = 0;

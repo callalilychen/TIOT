@@ -1,14 +1,29 @@
-#include "applicationcmd.h"
+/*-
+ * applicationmsg.c - Message appliction for authorization server 
+ *
+ * Copyright 2015 Wenwen Chen
+*/
+
+/*!
+ * \addtogroup    as_application 
+ * \{
+ *
+ * \file
+ * \brief       Implementation of the authorization server message applications 
+ *
+ * \author      Wenwen Chen 
+ */
+#include "applicationmsg.h"
 #include "securitydescriptor.h"
-#include "securitylayer.h"
+#include "securitylayerhandler.h"
 #include "tree.h"
-
-
+//#include "treestate.h"
+#include "bitmap.h"
 
 const application revapplication = {
   .name = "rev:",
   .name_size = 4,
-  .required_right = NO_RIGHT,
+  .required_right = ADMIN_RIGHT,
   .func = handleRevocation
 };
 
@@ -20,11 +35,11 @@ const application revapplication = {
     if(SSCAN((const char*)req, "%u", &secret_index)==1){
       // add security layer descriptor
       p_session->next_layer_descriptor = PREDEF_NO_SECURITY_DESCRIPTOR;
-      // TODO rev for rs
-      // if(SUCC == setBit(secret_index)){
-      //}else{
+      if(SUCC == invalidStateVector(secret_index)){
+        SPRINT((char *)(p_session->message), "Rev %d. S", secret_index);
+      }else{
         SPRINT((char *)(p_session->message), "Error to Rev %d. S!", secret_index);
-      //}
+      }
       p_session->message_size = strlen((const char *)(p_session->message));
       return p_session->message_size;
     }
@@ -32,3 +47,6 @@ const application revapplication = {
   }
 
 
+/*!
+ * \}
+ */

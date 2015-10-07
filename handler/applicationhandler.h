@@ -1,7 +1,7 @@
 /*-
  * applicationhandler.h - Application handler 
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 
 /*!
@@ -15,8 +15,9 @@
  */
 #ifndef __APPLICATION_HANDLER_H__
 #define __APPLICATION_HANDLER_H__
-#include "string.h"
+#include <string.h>
 #include "applicationsession.h" 
+#include "interface.h"
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -39,7 +40,6 @@ extern "C" {
 
 
 #if(UI_APPLICATION_COUNT>0)
-
   inline unsigned int (__attribute__((always_inline))handleApplication)(unsigned char* req, unsigned int req_size, unsigned int session_id, int application_type){
     application ** applications; 
     int applications_len = 0;
@@ -61,12 +61,20 @@ extern "C" {
     for(int i = 0; i < applications_len; i++){
       if(req_size >= applications[i]->name_size && memcmp(applications[i]->name, req, applications[i]->name_size)==0){
         application_session *p_session = getApplicationSession(session_id);
-        if(checkRight(p_session -> has_right, applications[i]->required_right) && (p_session->message_size = applications[i]->func(req+applications[i]->name_size, req_size-applications[i]->name_size, p_session))>0){
+        unsigned int hasRight = checkRight(p_session -> has_right, applications[i]->required_right);
+#if(UI_APPLICATION_COUNT>0)
+#ifdef ADMIN_PASSWORD_HASH 
+        if(!hasRight && application_type == ui_application){
+          hasRight = (ADMIN_RIGHT == askForAdminRight());
+        }
+#endif
+#endif
+        if (hasRight && (p_session->message_size = applications[i]->func(req+applications[i]->name_size, req_size-applications[i]->name_size, p_session))>0){
           updateApplicationSession_Application(session_id, i);
           return p_session->message_size;
-        }else{
-          clearApplicationSession(session_id);
         }
+        clearApplicationSession(session_id);
+        return 0;
       } 
     }
     return 0;

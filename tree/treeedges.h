@@ -1,7 +1,7 @@
 /*-
  * treeedges.h - Tree structure for edges 
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 
 /*!
@@ -51,7 +51,7 @@ extern "C" {
    *
    * \return    A pointer to the tree edges or NULL, if len is greater than predefined TREE_HEIGTH 
    */
-  inline tree_edge * (__attribute__((always_inline))getEdges)(unsigned int len){
+  inline tree_edge * __attribute__((always_inline))getEdges(unsigned int len){
     if(len > TREE_HEIGTH){
       return NULL;
     }
@@ -64,11 +64,11 @@ extern "C" {
    *        The given length should be not greater than TREE_HEIGTH, because the maximal tree edges is defined by TREE_HEIGTH
    *
    * \param len   Length of the wished tree edges
-   *        func  The edge function pointer for all edges
+   * \param func  The edge function pointer for all edges
    *
    * \return      A pointer to the tree edges or NULL, if len is greater than predefined TREE_HEIGTH 
    */
-  inline tree_edge * (__attribute__((always_inline))getEdgesWithFunction)(unsigned int len, void (*func)(tree_node *p_parent_node, tree_edge *p_edge, tree_node *p_node)){
+  inline tree_edge * __attribute__((always_inline)) getEdgesWithFunction(unsigned int len, void (*func)(tree_node *p_parent_node, tree_edge *p_edge, tree_node *p_node)){
     if(len > TREE_HEIGTH){
       return NULL;
     }
@@ -107,8 +107,8 @@ extern "C" {
      \endverbatim
    *
    * \param p_parent_node The parent node of the edge
-   *        p_edge        The edge data
-   *        p_node        The child node of the edge
+   * \param p_edge        The edge data
+   * \param p_node        The child node of the edge
    *
    * \return            None 
    */

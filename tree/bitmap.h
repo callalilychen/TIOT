@@ -1,7 +1,7 @@
 /*-
  * treestate.h - A static bit map
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
  */
 
 /*!
@@ -33,7 +33,7 @@ extern "C" {
 #if(BIT_MAP_LEN & 0x7)
 #define BIT_MAP_SIZE BIT_MAP_LEN >>3   /*!< Size of bit map in bit */
 #else
-#define BIT_MAP_SIZE (STATE_TABLE_LEN>>3) + 1
+#define BIT_MAP_SIZE (BIT_MAP_LEN>>3) + 1
 #endif
 
   /*!
@@ -48,7 +48,7 @@ extern "C" {
    *
    * \return the bit index
    */
-  inline unsigned int (__attribute__((always_inline))getFirstSetBit)(void){
+  inline unsigned int __attribute__((always_inline))getFirstSetBit(void){
     for(int i =0; i < BIT_MAP_SIZE; i++){
       if(bitmap[i]!=0){
         for(int ii=0; ii<8; ii++){
@@ -66,7 +66,7 @@ extern "C" {
    *
    * \return the bit index
    */
-  inline unsigned int (__attribute__((always_inline))getFirstNotSetBit)(void){
+  inline unsigned int __attribute__((always_inline))getFirstNotSetBit(void){
     PRINT("BIT_MAP_SIZE is %d\n", BIT_MAP_SIZE);
     for(int i =0; i < BIT_MAP_SIZE; i++){
       if(bitmap[i]!=0xff){
@@ -85,7 +85,7 @@ extern "C" {
    *
    * \return         None
    */
-  inline void (__attribute__((always_inline))clearAllBits)(void){
+  inline void __attribute__((always_inline))clearAllBits(void){
     for(int i=0; i < BIT_MAP_SIZE; i++){
       bitmap[i] = 0;
     }
@@ -96,7 +96,7 @@ extern "C" {
    *
    * \return         None
    */
-  inline void (__attribute__((always_inline))setAllBits)(void){
+  inline void __attribute__((always_inline))setAllBits(void){
     for(int i=0; i < BIT_MAP_SIZE; i++){
       bitmap[i] = 0xff;
     }
@@ -109,7 +109,7 @@ extern "C" {
    *
    * \return         On success SUCC is returned, otherwise FAIL.
    */
-  inline int (__attribute__((always_inline))setBit)(unsigned int index){
+  inline int __attribute__((always_inline))setBit(unsigned int index){
     if(index>>3 < BIT_MAP_SIZE){
       bitmap[index>>3] |= 1<<(index-((index>>3)<<3));
       return SUCC;
@@ -124,7 +124,7 @@ extern "C" {
    *
    * \return         On success SUCC is returned, otherwise FAIL.
    */
-  inline int (__attribute__((always_inline))clearBit)(unsigned int index){
+  inline int __attribute__((always_inline))clearBit(unsigned int index){
     if(index>>3 < BIT_MAP_SIZE){
       bitmap[index>>3] &= ~(1<<(index-((index>>3)<<3)));  
       return SUCC;
@@ -139,7 +139,7 @@ extern "C" {
    *
    * \return         The bit at the given index or NO_BIT, if index is out of range
    */
-  inline uint8_t (__attribute__((always_inline))getBit)(unsigned int index){
+  inline uint8_t __attribute__((always_inline))getBit(unsigned int index){
     if(index>>3 < BIT_MAP_SIZE){
       return bitmap[index>>3] & (1<<(index-((index>>3)<<3)));
     }
@@ -153,7 +153,7 @@ extern "C" {
    *
    * \return         On success SUCC is returned, otherwise FAIL.
    */
-  inline int (__attribute__((always_inline))setByte)(unsigned int index){
+  inline int __attribute__((always_inline))setByte(unsigned int index){
     if(index < BIT_MAP_SIZE){
       bitmap[index] = 0xff;
       return SUCC;
@@ -168,7 +168,7 @@ extern "C" {
    *
    * \return         On success SUCC is returned, otherwise FAIL.
    */
-  inline int (__attribute__((always_inline))clearByte)(unsigned int index){
+  inline int __attribute__((always_inline))clearByte(unsigned int index){
     if(index < BIT_MAP_SIZE){
       bitmap[index] = 0; 
       return SUCC;
@@ -183,7 +183,7 @@ extern "C" {
    *
    * \return         The byte at the given index or NO_BIT, if index is out of range
    */
-  inline uint8_t (__attribute__((always_inline))getByte)(unsigned int index){
+  inline uint8_t __attribute__((always_inline))getByte(unsigned int index){
     if(index < BIT_MAP_SIZE){
       return bitmap[index]; 
     }
@@ -194,12 +194,12 @@ extern "C" {
    * \brief Set bytes from the given index
    *
    * \param   index  Index of the rist to be set byte 
-   *          bytes  Pointer to the bytes values 
-   *          size   Size of the bytes 
+   * \param   bytes  Pointer to the bytes values 
+   * \param   size   Size of the bytes 
    *
    * \return         None
    */
-  inline void (__attribute__((always_inline))setBytes)(unsigned int index, uint8_t* bytes, unsigned int size){
+  inline void __attribute__((always_inline))setBytes(unsigned int index, uint8_t* bytes, unsigned int size){
     for(int i=index; i<BIT_MAP_SIZE && i<size; i++){
       bitmap[i] = bytes[i];
     }

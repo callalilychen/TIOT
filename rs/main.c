@@ -16,24 +16,16 @@
 #include "packagehandler.h"
 
 #define PORT 5001 
-#define AS_PORT 9001
+#define AS_PORT 9002
 #define AS_IP "127.0.0.1"
 #define BUFSIZE 100
-
-static void printBlock(char* name, unsigned char* block, size_t block_len){
-  PRINT("%s:\n", name);
-  for (int i=0; i< block_len; i++){
-    PRINT("%x|", block[i]);
-  }
-  PRINT("\n");
-}
 
 
 int main(int argc, char** argv)
 { 
   resetAllExpectedStates();
   initApplicationSession();
-  initSecurityDescriptor();
+  initSecurityDescriptors();
 
   unsigned char udp_payload[BUFSIZE+1] = {0};
   unsigned int udp_payload_size = 0;
@@ -62,7 +54,7 @@ int main(int argc, char** argv)
   }
 
   /* Init predef addr of AS */
-  updateAddrDescriptor(PREDEF_AS_ADDR, AS_PORT, AS_IP);
+  updatePredefAddrWithIpAndPort(PREDEF_AS_ADDR, AS_IP, AS_PORT);
 
   struct sockaddr_in si_remote;
   socklen_t addrlen = ADDR_SIZE;

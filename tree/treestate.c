@@ -1,7 +1,7 @@
 /*-
  * treestate.c - A state manager for the tree data structure with static memeory allocation
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 /*!
  * @addtogroup    tree_state
@@ -14,42 +14,43 @@
  */
 #include "treestate.h"
 
-#ifdef USE_STATE
-
-STATE_TYPE expected_states[STATE_TABLE_LEN][STATE_VECTOR_LEN] = {0};
+TREE_STATE_TYPE expected_states[TREE_STATE_TABLE_LEN][TREE_STATE_VECTOR_LEN] = {0};
 
 int incExpectedState(unsigned int state_row, unsigned int state_col, unsigned int inc_pre_state)
 {
-  if(state_row < STATE_TABLE_LEN  && state_col < STATE_VECTOR_LEN){
-    if(expected_states[state_row][state_col]+1 < STATE_UPPER_BOUNDARY){
+  if(state_row >= TREE_STATE_TABLE_LEN || state_col >= TREE_STATE_VECTOR_LEN){
+    return FAIL;
+  }
+  for(int i =  state_col; i>=0; i--){
+    if(expected_states[state_row][i]+1 < TREE_STATE_UPPER_BOUNDARY){
       /*!
        * If the to increased state +1 is still in upper boundary
        */
-      expected_states[state_row][state_col]++;
+      expected_states[state_row][i]++;
       return SUCC;
-    }else{
-      if(!inc_pre_state || 0 == state_col){
+    }else if(!inc_pre_state){
       /*!
-       * If increase the previous column state is not wished or
-       * if the state is already in the first column
+       * If increase the previous column state is not wished
        */
-        expected_states[state_row][state_col] = STATE_UPPER_BOUNDARY;
+        expected_states[state_row][i] = TREE_STATE_UPPER_BOUNDARY;
         return FAIL;
-      } else if(SUCC == incExpectedState(state_row, state_col-1, inc_pre_state)){
-        /*!
-         * the previous column state is successfully increased,
-         * the to increased state can be increased from zero in the future
-         */
-        expected_states[state_row][state_col] = 0;
-        return SUCC;
-      } else{
-        expected_states[state_row][state_col] = STATE_UPPER_BOUNDARY;
-      }
+    }else if( 0 == i){
+      /*!
+       * If the state is already in the first column
+       */
+        for(int ii = 0; ii<= state_col; ii++){
+          expected_states[state_row][ii] = TREE_STATE_UPPER_BOUNDARY;
+        }
+        return FAIL;
+    } else {
+      /*!
+       * Increase the previous column state and set this column to zero
+       */
+      expected_states[state_row][i] = 0;
     }
   }
   return FAIL;
 }
-#endif
 /*!
  * @}
  */ 

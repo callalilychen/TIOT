@@ -28,13 +28,17 @@ LDFLAGS += -lssl -lcrypto
 DEBUGGER_FLAGS = $(TARGET)
 
 PROJECT_PATH = .
-PROJECT_SRC  = $(wildcard *.c) $(wildcard ../crypto/*.c) $(wildcard ../logic/*.c)
+PROJECT_SRC  = $(wildcard *.c) $(wildcard ../crypto/*.c) $(wildcard ../logic/*.c) $(wildcard ../tree/*.c) $(wildcard ../handler/*.c) $(wildcard ../application/*.c) $(wildcard ../descriptor/*.c)
 PROJECT_OBJS = $(PROJECT_SRC:.c=.o)
 PROJECT_SOBJ = $(PROJECT_SRC:.c=.s)
 C_FLAGS     +=  --std=c99
 C_FLAGS			+= -I.
 C_FLAGS			+= -I../crypto
 C_FLAGS			+= -I../logic
+C_FLAGS			+= -I../tree
+C_FLAGS			+= -I../handler
+C_FLAGS			+= -I../application
+C_FLAGS			+= -I../descriptor
 
 TARGET       = build/$(PROJECT)
 

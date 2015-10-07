@@ -1,7 +1,7 @@
 /*-
  * applicationlayerhandler.c - Application layer handler 
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 
 /*!
@@ -13,7 +13,7 @@
  *
  * \author      Wenwen Chen 
  */
-#include "applicationlayer.h"
+#include "applicationlayerhandler.h"
 #include "applicationhandler.h"
 
 

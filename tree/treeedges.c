@@ -1,7 +1,7 @@
 /*-
  * treeedges.c - Tree structure for edges 
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 
 /*!

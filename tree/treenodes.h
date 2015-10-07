@@ -1,7 +1,7 @@
 /*-
  * treenodes.h - Tree structure for nodes
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 /*!
  * \addtogroup    tree_structure
@@ -53,11 +53,11 @@ extern "C" {
    *        Tree root is the first node of path_nodes
    *
    * \param   value  The new tree root value
-   *          size   Size of the value in byte 
+   * \param   size   Size of the value in byte 
    *
    * \return         Nonce
    */
-  inline void (__attribute__((always_inline))setRoot)(unsigned char * value, unsigned int size)
+  inline void __attribute__((always_inline))setRoot(unsigned char * value, unsigned int size)
   {
     if(size > NODE_SIZE){
       sha_construction.func(value, size, path_nodes->block);
@@ -73,12 +73,12 @@ extern "C" {
    * \brief Set value to a cached tree node
    *
    * \param   index  The index of the to be set cached node in cached_nodes
-   *          value  The new cached root value
-   *          size   Size of the value in byte 
+   * \param   value  The new cached root value
+   * \param   size   Size of the value in byte 
    *
    * \return         Nonce
    */
-  inline void (__attribute__((always_inline))setCachedNode)(unsigned int index, unsigned char * value, unsigned int size)
+  inline void __attribute__((always_inline))setCachedNode(unsigned int index, unsigned char * value, unsigned int size)
   {
     if(index < CACHED_NODES_LEN)
     {
@@ -100,7 +100,7 @@ extern "C" {
    *
    * \return        Pointer to the tree root 
    */
-  inline tree_node *(__attribute__((always_inline))getRoot)(void){
+  inline tree_node *__attribute__((always_inline))getRoot(void){
     return path_nodes;
   }
 
@@ -113,7 +113,7 @@ extern "C" {
    *
    * \return         Pinter to the tree path or NULL, if depth is greater then TREE_HEIGTH 
    */
-  inline tree_node * (__attribute__((always_inline))getPathFromRoot)(uint8_t depth){
+  inline tree_node * __attribute__((always_inline))getPathFromRoot(uint8_t depth){
     if(depth > TREE_HEIGTH){
       return NULL;
     }
@@ -130,11 +130,11 @@ extern "C" {
    *        Except the tree 
    *
    * \param   depth  The depth of the last tree node in the path
-   *          index  The index of the to be set cached node in cached_nodes
+   * \param   index  The index of the to be set cached node in cached_nodes
    *
    * \return         Pinter to the tree path or NULL, if depth is greater then TREE_HEIGTH 
    */
-  inline tree_node* (__attribute__((always_inline))getPathFromRootThenCachedNodes)(unsigned int depth, unsigned int index){
+  inline tree_node* __attribute__((always_inline))getPathFromRootThenCachedNodes(unsigned int depth, unsigned int index){
     if(depth > TREE_HEIGTH){
       return NULL;
     }
@@ -154,11 +154,11 @@ extern "C" {
    *        Except the tree 
    *
    * \param   depth  The depth of the last tree node in the path
-   *          index  The index of the to be set cached node in cached_nodes
+   * \param   index  The index of the to be set cached node in cached_nodes
    *
    * \return         Pinter to the tree path or NULL, if depth is greater then TREE_HEIGTH 
    */
-  inline tree_node * (__attribute__((always_inline))getPathFromCachedNodes)(unsigned int depth, unsigned int index){
+  inline tree_node * __attribute__((always_inline))getPathFromCachedNodes(unsigned int depth, unsigned int index){
     if(depth > TREE_HEIGTH){
       return NULL;
     }
@@ -171,6 +171,48 @@ extern "C" {
       path_nodes[i].size = 0;
     }
     return path_nodes;  
+  }
+  
+  /*!
+   * \brief Copy from tree node p_src to tree node p_dest 
+   *
+   * \param   p_dest Pointer to the destination tree node
+   * \param   p_src  Pointer to the source tree node
+   *
+   * \return         Pinter to the destination tree node 
+   */
+  inline tree_node * __attribute__((always_inline))copyTreeNode(tree_node * p_dest, tree_node * p_src){
+    if(p_src!=NULL && p_dest!=NULL){
+      memcpy(p_dest->block, p_src->block, p_src->size);
+    }
+    return p_dest;
+  }
+
+  /*!
+   * \brief Compare two tree nodes 
+   *
+   * \param   p1 Pointer to the tree node 1
+   * \param   p2 Pointer to the tree node 2
+   *
+   * \return  0, if tree node p1 is equal to tree node p2
+   *          >0, if tree node p1 block is greater then p2 block
+   *          <0, if tree node p1 block is smaller than p2 block
+   */
+  inline int __attribute__((always_inline))compareTreeNode(tree_node * p1, tree_node * p2){
+    if(p1 == p2){
+      return 0;
+    }
+    if(NULL==p1){
+      return -1; 
+    } 
+    if(NULL==p2){
+      return 1;
+    }
+    int size_diff = p1->size - p2->size;
+    if(0!=size_diff){
+      return size_diff;
+    }
+    return memcmp(p1->block, p2->block, p1->size);
   }
 #endif
 

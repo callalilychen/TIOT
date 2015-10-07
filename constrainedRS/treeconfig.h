@@ -20,18 +20,12 @@ extern "C" {
 #define SSCAN(...) sscan(__VA_ARGS__)  
 #define SPRINT(...) 
 
+#define SUCC 0
+#define FAIL -1
+
 #define RIGHT_TYPE uint32_t
 
-#define MAX_SECURITY_LAYER_VERSION 0xff
-#define DEFAULT_VERSION 0
-
-#define NO_DESCRIPTOR 0xffff
-#define DESCRIPTOR_ACTIVE 1
-#define DESCRIPTOR_INACTIVE 0
-
-#define SECURITY_DESCRIPTORS_LEN 3
-#define MAX_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN - 1 
-#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN-1
+#define DEFAULT_PROTOCOL_TYPE 0
 
 #define IP_TYPE IPv4
 #define IPv4 uint32_t 
@@ -44,10 +38,14 @@ extern "C" {
 #define ADDR_SEND_TYPE SlSockAddr_t
 #define ADDR_LEN_TYPE SlSocklen_t
 #define SENDTO_FUNC sl_SendTo
-#define ADDR_DESCRIPTORS_LEN 4 
-#define MAX_ADDR_DESCRIPTOR ADDR_DESCRIPTORS_LEN - 2 
-#define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN-2
-#define PREDEF_RS_ADDR ADDR_DESCRIPTORS_LEN-1
+
+#define ADDR_DESCRIPTORS_LEN 3 
+#define ADDR_PREDEF_LEN 1
+#define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN
+
+#define SECURITY_DESCRIPTORS_LEN 3
+#define SECURITY_PREDEF_LEN 1 
+#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
 
 #define NODE_SIZE HASH_SIZE
 #define HASH_FUNC sha_construction.func
@@ -78,13 +76,13 @@ extern "C" {
  *        A state-vector contains multiple states
  *
  * */
-#define USE_STATE          /*!< Macro flag to indicate, whether a state table will be used for state management */
-#define STATE_TABLE_LEN 0xff     /*!< Number of state vectors in the table (Number of table rows) */
-#define STATE_VECTOR_LEN 2  /*!< Number of states in each state vector (Number of table columns) */
+#define USE_TREE_STATE          /*!< Macro flag to indicate, whether a state table will be used for state management */
+#define TREE_STATE_TABLE_LEN 0xff     /*!< Number of state vectors in the table (Number of table rows) */
+#define TREE_STATE_VECTOR_LEN 2  /*!< Number of states in each state vector (Number of table columns) */
 
-#define STATE_SIZE 2          /*!< Size of state in Bytes*/
-#define STATE_TYPE uint16_t   /*!< Type of each state */
-#define STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than the STATE_UPPER_BOUNDARY */
+#define TREE_STATE_SIZE 2          /*!< Size of state in Bytes*/
+#define TREE_STATE_TYPE uint16_t   /*!< Type of each state */
+#define TREE_STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than the TREE_STATE_UPPER_BOUNDARY */
 
 
 /*!
@@ -93,8 +91,8 @@ extern "C" {
  *        The bitmap can be used with the state table together to indicate, whether a state can be updated 
  * */
 //#define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
-//#ifdef USE_STATE
-//#define BIT_MAP_LEN STATE_TABLE_LEN                      /*!< Number of to used bit map*/
+//#ifdef USE_TREE_STATE
+//#define BIT_MAP_LEN TREE_STATE_TABLE_LEN                      /*!< Number of to used bit map*/
 //#endif
 
 

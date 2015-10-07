@@ -1,7 +1,7 @@
 /*-
  * treenodes.c - Tree structure for nodes
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 
 /*!

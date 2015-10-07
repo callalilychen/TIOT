@@ -1,7 +1,7 @@
 /*-
  * securityhandler.h - Security handler 
  *
- * Copyright 2005 Wenwen Chen
+ * Copyright 2015 Wenwen Chen
 */
 
 /*!
@@ -20,10 +20,6 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
-/*!
- * \brief Macro for when no right is required 
- */
-#define NO_RIGHT 0x0
 
   /*!
    * \brief Check, whether hasRight is approved according to hasRight
@@ -36,6 +32,11 @@ extern "C" {
   inline unsigned int (__attribute__((always_inline))checkRight)(RIGHT_TYPE hasRight, RIGHT_TYPE requiredRight){
     return requiredRight == NO_RIGHT || hasRight ^ requiredRight;
   }
+
+#ifdef ADMIN_PASSWORD_HASH
+  RIGHT_TYPE askForAdminRight(void);
+#endif
+
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

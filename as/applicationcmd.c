@@ -1,9 +1,98 @@
+/*-
+ * applicationcmd.h - Command appliction for authorization server 
+ *
+ * Copyright 2015 Wenwen Chen
+*/
+
+/*!
+ * \addtogroup    as_application 
+ * \{
+ *
+ * \file
+ * \brief       Header definitions for the authorization server command applications 
+ *
+ * \author      Wenwen Chen 
+ */
 #include "applicationcmd.h"
 #include "securitydescriptor.h"
-#include "securitylayer.h"
+#include "addr_descriptor.h"
+#include "securitylayerhandler.h"
 #include "tree.h"
+//#include "treestate.h"
 #include "bitmap.h"
 
+const application updateaddrapplication = {
+  .name = "addr:",
+  .name_size = 5,
+  .required_right = NO_RIGHT,
+  .func = handleUpdateAddr
+};
+
+  unsigned int handleUpdateAddr(unsigned char* req, unsigned int req_size, application_session * p_session){
+    // XXX This application is only for ui, therefore, output is directly printed on the standard output via PRINT.
+    unsigned int descriptor_id;
+    char ip[16] = {0};
+    unsigned int port;
+    if(SSCAN((const char*)req, "%u:%s:%u", &descriptor_id, &ip, &port)==3){
+      if(SUCC == updateAddrWithIpAndPort(descriptor_id, ip, port)){
+        PRINT("[SUCCESS] update address:\n");
+        printAddrDescriptor(descriptor_id);
+        return 0;
+      }
+      if(descriptor_id < ADDR_DESCRIPTORS_LEN + ADDR_PREDEF_LEN){
+        if(ADMIN_RIGHT == askForAdminRight()){
+          if(SUCC == updatePredefAddrWithIpAndPort(descriptor_id, ip, port)){
+            PRINT("[SUCCESS] update address as admin:\n");
+            printAddrDescriptor(descriptor_id);
+            return 0;
+          }
+        }else{
+          PRINT("[FAIL] no right to change predefined addresses!:\n");
+          
+        }
+      }  
+    }
+    PRINT("[USAGE] addr:<id>:<ip>:<port>\n\tip: xxx.xxx.xxx.xxx\n");
+    return 0;
+  }
+
+const application addaddrapplication = {
+  .name = "addaddr:",
+  .name_size = 8,
+  .required_right = NO_RIGHT,
+  .func = handleAddAddr
+};
+
+  unsigned int handleAddAddr(unsigned char* req, unsigned int req_size, application_session * p_session){
+    // XXX This application is only for ui, therefore, output is directly printed on the standard output via PRINT.
+    char ip[16] = {0};
+    unsigned int port;
+    if(SSCAN((const char*)req, "%s:%u", &ip, &port)==2){
+      unsigned int descriptor_id = getLeastActiveAddrDescriptor();
+      if(SUCC == updateAddrWithIpAndPort(descriptor_id, ip, port)){
+        PRINT("[SUCCESS] add address:\n");
+        printAddrDescriptor(descriptor_id);
+      }
+      return 0;
+    }
+    PRINT("[USAGE] addaddr:<ip>:<port>\n\tip: xxx.xxx.xxx.xxx\n");
+    return 0;
+  }
+
+const application lsaddrapplication = {
+  .name = "lsaddr",
+  .name_size = 6,
+  .required_right = NO_RIGHT,
+  .func = handleLsAddr
+};
+
+  unsigned int handleLsAddr(unsigned char* req, unsigned int req_size, application_session * p_session){
+    // XXX This application is only for ui, therefore, output is directly printed on the standard output via PRINT.
+    printAllAddrDescriptors();
+    return 0;
+  }
+
+//TODO add set root cmd
 const application keyapplication = {
   .name = "key:",
   .name_size = 4,
@@ -20,35 +109,33 @@ const application keyapplication = {
       /* Use the first active secret */
       unsigned int secret_index = getFirstSetBit();
       if(NO_BIT != secret_index){
-        STATE_TYPE perm_index = getExpectedState(secret_index,0);
-        
-        // add security layer descriptor
-        if(p_session->next_layer_descriptor == NO_DESCRIPTOR){
-          p_session->next_layer_descriptor = createSecurityDescriptor();
-        }
+        TREE_STATE_TYPE perm_index = getExpectedState(secret_index,0);
         
         setPermIndex(p_session->next_layer_descriptor, perm_index);
         setSecretIndex(p_session->next_layer_descriptor, secret_index);
 
         /* Calculate key */
-        unsigned int level = 3;
-        tree_edge * edges = getEdges(level - 1);
+        unsigned int depth = 2;
+        tree_edge * edges = getEdges(depth);
         edges[0].func = edgeFunc;
         edges[0].params = getPermCode(p_session->next_layer_descriptor, &(edges[0].params_size));
 
         edges[1].func = edgeFunc;
         edges[1].params = (unsigned char *)(&key_index);
-        edges[1].params_size = STATE_SIZE;
-        tree_node * key_node = NULL;
+        edges[1].params_size = TREE_STATE_SIZE;
+        tree_node * p_key_node = NULL;
 
         if(p_session->addr_descriptor < ADDR_DESCRIPTORS_LEN){
-          key_node = fillNodes(getPathFromCachedNodes(level, p_session->addr_descriptor), edges, level, 1);
+          p_key_node = fillNodes(getPathFromCachedNodes(depth, p_session->addr_descriptor), edges, depth+1, 1);
         }else{
-          key_node = fillNodes(getPathFromRoot(level), edges, level, 1);
+          p_key_node = fillNodes(getPathFromRoot(depth), edges, depth+1, 1);
         }
         // add security layer descriptor
-        updateKey(p_session->next_layer_descriptor, key_node); 
-
+        if(SUCC != updateSecurityWithKey(p_session->next_layer_descriptor, p_key_node)){
+          // TODO fix
+          //p_session->next_layer_descriptor = addSecurityDescriptor(p_key_node, NO_RIGHT, DEFAULT_PROTOCOL_TYPE);
+        }
+        
         setKeyIndex(p_session->next_layer_descriptor, key_index);
         // FIXME necessary? or error msg
         if(p_session->addr_descriptor == NO_DESCRIPTOR){
@@ -69,77 +156,6 @@ const application keyapplication = {
     return p_session->message_size;
   }
 
-const application revapplication = {
-  .name = "rev:",
-  .name_size = 4,
-  .required_right = NO_RIGHT,
-  .func = handleRevocation
-};
-
-  unsigned int handleRevocation(unsigned char* req, unsigned int req_size, application_session * p_session){
-    if(req_size < 0 || p_session == NULL){
-      return 0;
-    }
-    unsigned int secret_index;
-    if(SSCAN((const char*)req, "%u", &secret_index)==1){
-      // add security layer descriptor
-      p_session->next_layer_descriptor = PREDEF_NO_SECURITY_DESCRIPTOR;
-      if(SUCC == setBit(secret_index)){
-        SPRINT((char *)(p_session->message), "Rev %d. S", secret_index);
-      }else{
-        SPRINT((char *)(p_session->message), "Error to Rev %d. S!", secret_index);
-      }
-      p_session->message_size = strlen((const char *)(p_session->message));
-      return p_session->message_size;
-    }
-    return 0;
-  }
-
-const application permreqapplication = {
-  .name = "perm:",
-  .name_size = 5,
-  .required_right = NO_RIGHT,
-  .func = handlePermReq
-};
-
-  unsigned int handlePermReq(unsigned char* req, unsigned int req_size, application_session * p_session){
-    if(req_size < 0 || p_session == NULL){
-      return 0;
-    }
-    unsigned int perm;
-    if(SSCAN((const char*)req, "%u", &perm)==1){
-      //TODO handle perm
-      /* add security layer descriptor */
-      p_session->next_layer_descriptor = PREDEF_NO_SECURITY_DESCRIPTOR;
-      /* Use the first active secret */
-      unsigned int secret_index = getFirstNotSetBit();
-      if(NO_BIT != secret_index){
-        STATE_TYPE perm_index = getExpectedState(secret_index,0);
-        incExpectedState(secret_index, 0, 0);
-        setBit(secret_index);
-        setPermIndex(p_session->next_layer_descriptor, perm_index);
-        setSecretIndex(p_session->next_layer_descriptor, secret_index);
-        memcpy(p_session->message, "permcode:", 9);  
-        p_session->message_size = 9+generatePermCode(p_session->next_layer_descriptor, p_session->message+9, MAX_APPLICATION_MESSAGE_SIZE-9);
-        /* Calculate Secret */
-        unsigned int level = 2;
-        tree_edge * edges = getEdges(level - 1);
-        edges[0].func = edgeFunc;
-        edges[0].params = getPermCode(p_session->next_layer_descriptor, &(edges[0].params_size));
-        tree_node * key_node = NULL;
-
-        key_node = fillNodes(getPathFromRoot(level), edges, level, 1);
-        p_session->message[(p_session->message_size)++] = ':';
-        memcpy(p_session->message+p_session->message_size, &(key_node->block) , key_node->size);  
-        p_session->message_size += key_node->size;
-
-      } else{
-        char * error_msg = "[ERROR] No inactive Secret";
-        memcpy(p_session->message, error_msg, strlen(error_msg));  
-        p_session->message_size = strlen(error_msg);
-      }
-
-      return p_session->message_size;
-    }
-    return 0;
-  }
+/*!
+ * \}
+ */

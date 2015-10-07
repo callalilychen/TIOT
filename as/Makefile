@@ -28,7 +28,8 @@ LDFLAGS += -lssl -lcrypto -pthread
 DEBUGGER_FLAGS = $(TARGET)
 
 PROJECT_PATH = .
-PROJECT_SRC  = $(wildcard *.c) $(wildcard ../crypto/*.c) $(wildcard ../logic/*.c) $(wildcard ../stringOP/*.c) $(wildcard ../tree/*.c) $(wildcard ../handler/*.c) $(wildcard ../application/*.c)
+PROJECT_SRC  = $(wildcard *.c) $(wildcard ../crypto/*.c) $(wildcard ../logic/*.c) $(wildcard ../stringOP/*.c) $(wildcard ../tree/*.c) $(wildcard ../handler/*.c) $(wildcard ../application/*.c) $(wildcard ../descriptor/*.c) $(wildcard ../protocol/*.c)
+
 PROJECT_OBJS = $(PROJECT_SRC:.c=.o)
 PROJECT_SOBJ = $(PROJECT_SRC:.c=.s)
 C_FLAGS     +=  --std=c99
@@ -39,6 +40,8 @@ C_FLAGS			+= -I../stringOP
 C_FLAGS			+= -I../tree
 C_FLAGS			+= -I../handler
 C_FLAGS			+= -I../application
+C_FLAGS			+= -I../descriptor
+C_FLAGS			+= -I../protocol
 
 
 TARGET       = build/$(PROJECT)
@@ -57,7 +60,7 @@ build: elf
 	$(CC) -c $(C_FLAGS) $< -o $@
 
 elf: $(PROJECT_OBJS)
-	$(CC) $(C_FLAGS) $(PROJECT_OBJS) -o $(TARGET) $(LDFLAGS) 
+	$(CC) $(C_FLAGS) $(PROJECT_OBJS) $(LDFLAGS) -o $(TARGET) 
 
 # analyze compiled program size:
 size:

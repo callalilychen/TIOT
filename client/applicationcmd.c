@@ -29,9 +29,9 @@ const application keyapplication = {
       {
         if(p_session->addr_descriptor < ADDR_DESCRIPTORS_LEN) 
         {
-          p_session->next_layer_descriptor = addSecurityDescriptor(DEFAULT_VERSION,fillNodes(getPathFromCachedNodes(2, p_session->addr_descriptor), edges, 2, 1));
+          p_session->next_layer_descriptor = addSecurityDescriptor(DEFAULT_VERSION,fillNodes(getPathFromCachedNodes(1, p_session->addr_descriptor), edges, 2, 1));
         }else{
-          p_session->next_layer_descriptor = addSecurityDescriptor(DEFAULT_VERSION,fillNodes(getPathFromRoot(2), edges, 2, 1));
+          p_session->next_layer_descriptor = addSecurityDescriptor(DEFAULT_VERSION,fillNodes(getPathFromRoot(1), edges, 2, 1));
         }
         setKeyIndex(p_session->next_layer_descriptor, key_index);
       }

@@ -48,10 +48,6 @@ _i16 Buf_Read(void)
   Buf_Flush(1);
   _i16 Status = sl_RecvFrom(SockID, recvBuf, BUF_SIZE, 0, &diUdpSockAddr, (SlSocklen_t*)&AddrSize);
   if(Status > 0){
-    PRINT("received message: %s ", recvBuf);
-    printIPv4("from", sl_Htonl((((SlSockAddrIn_t*)&diUdpSockAddr)->sin_addr).s_addr));
-    PRINT(":%u\n", sl_Htons(((SlSockAddrIn_t*)&diUdpSockAddr)->sin_port));
-
     handleUdpPackage(recvBuf, Status, (ADDR_TYPE *)(&diUdpSockAddr));
     sendUdpPackage(SockID, sendBuf, BUF_SIZE);
   }

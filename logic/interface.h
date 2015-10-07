@@ -9,12 +9,7 @@ extern "C" {
 #endif
 
 
-//TODO somewhere else
-#define SUCC 0
-#define FAIL -1
-
-#define H2N(x, y, size) if(size == 2) x = sl_Hons(y);\
-                        else if(size == 4) x = sl_Htonl(y);
+//TODO rename
 
   typedef struct hash_function_construction{
     unsigned char *(*func) (const unsigned char *d, size_t n, unsigned char *md);

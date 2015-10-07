@@ -12,8 +12,9 @@
 #include "packagehandler.h"
 
 #define BUFSIZE 512
-#define PORT 9001
+#define PORT 9002
 #define RS_PORT 5001  
+//#define RS_IP "192.168.1.38"
 #define RS_IP "127.0.0.1"
 
 static pthread_mutex_t lock;
@@ -22,14 +23,6 @@ unsigned char send_buf[BUFSIZE+1] = {0};
 
 socklen_t addrlen = sizeof(ADDR_TYPE);
 
-static void printBlock(char* name, unsigned char* block, size_t block_len){
-  PRINT("%s:\n", name);
-  for (int i=0; i< block_len; i++){
-    PRINT("%x|", block[i]);
-  }
-  PRINT("\n");
-}
-
 static void * recvUdpThread(void* p_fd){
   char buf[BUFSIZE];
   struct sockaddr_in si_remote;
@@ -37,11 +30,11 @@ static void * recvUdpThread(void* p_fd){
     int recvlen = recvfrom(*(int*)p_fd, buf, BUFSIZE, 0, (struct sockaddr *)&si_remote, &addrlen);
     if(recvlen > 0 ){
       printBlock("recv", (unsigned char *)buf, recvlen);
-  pthread_mutex_lock(&lock);
+      pthread_mutex_lock(&lock);
       handleUdpPackage((unsigned char*)buf, recvlen, (ADDR_TYPE *)&si_remote);
       sendUdpPackage(* (int *)p_fd, send_buf, BUFSIZE);
 
-  pthread_mutex_unlock(&lock);
+      pthread_mutex_unlock(&lock);
     }
   }
   return NULL;
@@ -54,19 +47,20 @@ static void * cmdThread(void* p_fd){
   while(1){
     SCAN("%s",str);
     PRINT("%s (%lu)\n",str, strlen(str));
-  pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock);
     handleCmdPackage((unsigned char *)str, strlen(str));
     sendUdpPackage(* (int *)p_fd, send_buf, BUFSIZE);
     pthread_mutex_unlock(&lock);
   }
   return NULL;
 }
+
 #endif
 int main(int argc, char** argv)
 { 
-  resetAllExpectedStates();
+  //resetAllExpectedStates();
   initApplicationSession();
-  initSecurityDescriptor();
+  initSecurityDescriptors();
 
   const char root[5] = "test";
   setRoot((unsigned char *)root, 4);
@@ -78,7 +72,7 @@ int main(int argc, char** argv)
     perror("Can not create socket!\n");
     return 0;
   }
-  
+
   si_me.sin_family = ADDR_FAMILY;
   si_me.sin_addr.s_addr = htonl(INADDR_ANY);
   si_me.sin_port = htons(PORT);
@@ -89,10 +83,7 @@ int main(int argc, char** argv)
   }
 
   /* Init predef addr of RS */
-  addr_descriptors[PREDEF_RS_ADDR].addr.sin_family = AF_INET;
-  addr_descriptors[PREDEF_RS_ADDR].addr.sin_port = htons(RS_PORT);
-  inet_aton(RS_IP, &(addr_descriptors[PREDEF_RS_ADDR].addr.sin_addr.s_addr));
-  addr_descriptors[PREDEF_RS_ADDR].state = DESCRIPTOR_ACTIVE;
+  updatePredefAddrWithIpAndPort(PREDEF_RS_ADDR, RS_IP, RS_PORT);
 
   pthread_mutex_init (&lock, NULL);
   /* UDP Thread to handle received UDP messages */
@@ -110,7 +101,7 @@ int main(int argc, char** argv)
     return 0;
   }
 #endif
-  
+
   pthread_join (udp_thread, NULL);
 #if(UI_APPLICATION_COUNT>0)
   pthread_join (cmd_thread, NULL);
