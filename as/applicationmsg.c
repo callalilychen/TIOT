@@ -33,8 +33,6 @@ const application revapplication = {
     }
     unsigned int secret_index;
     if(SSCAN((const char*)req, "%u", &secret_index)==1){
-      // add security layer descriptor
-      p_session->next_layer_descriptor = PREDEF_NO_SECURITY_DESCRIPTOR;
       if(SUCC == setBit(secret_index)){
         SPRINT((char *)(p_session->message), "Rev %d. S", secret_index);
       }else{
@@ -59,24 +57,22 @@ const application permreqapplication = {
     }
     unsigned int perm;
     if(SSCAN((const char*)req, "%u", &perm)==1){
-      /* add security layer descriptor */
-      p_session->next_layer_descriptor = PREDEF_NO_SECURITY_DESCRIPTOR;
       /* Use the first active secret */
       unsigned int secret_index = getFirstNotSetBit();
       if(NO_BIT != secret_index){
         TREE_STATE_TYPE perm_index = getExpectedState(secret_index,0);
         incExpectedState(secret_index, 0, 0);
         setBit(secret_index);
-        setPermIndex(p_session->next_layer_descriptor, perm_index);
-        setPerm(p_session->next_layer_descriptor, (RIGHT_TYPE)perm);
-        setSecretIndex(p_session->next_layer_descriptor, secret_index);
+        setPermIndex(p_session->security_descriptor_id, perm_index);
+        setPerm(p_session->security_descriptor_id, (RIGHT_TYPE)perm);
+        setSecretIndex(p_session->security_descriptor_id, secret_index);
         memcpy(p_session->message, "permcode:", 9);  
-        p_session->message_size = 9+generatePermCode(p_session->next_layer_descriptor, p_session->message+9, MAX_APPLICATION_MESSAGE_SIZE-9);
+        p_session->message_size = 9+generatePermCode(p_session->security_descriptor_id, p_session->message+9, MAX_APPLICATION_MESSAGE_SIZE-9);
         /* Calculate Secret */
         unsigned int level = 2;
         tree_edge * edges = getEdges(level - 1);
         edges[0].func = edgeFunc;
-        edges[0].params = getPermCode(p_session->next_layer_descriptor, &(edges[0].params_size));
+        edges[0].params = getPermCode(p_session->security_descriptor_id, &(edges[0].params_size));
         tree_node * p_key_node = NULL;
 
         p_key_node = fillNodes(getPathFromRoot(level), edges, level, 1);

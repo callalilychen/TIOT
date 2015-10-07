@@ -58,9 +58,8 @@ static void * cmdThread(void* p_fd){
 #endif
 int main(int argc, char** argv)
 { 
-  //resetAllExpectedStates();
-  initApplicationSession();
-  initSecurityDescriptors();
+  resetAllExpectedStates();
+  resetApplicationSession();
 
   const char root[5] = "test";
   setRoot((unsigned char *)root, 4);

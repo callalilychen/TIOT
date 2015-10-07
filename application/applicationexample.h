@@ -30,27 +30,23 @@ extern "C" {
   unsigned int handleAckReq(unsigned char* , unsigned int, application_session *);
   unsigned int handleRep(unsigned char* , unsigned int, application_session *);
 
-  inline unsigned int (__attribute__((always_inline))generateTest)(unsigned int next_layer_descriptor, unsigned int addr_descriptor){
-    //TODO default session?
-    unsigned char* res = addApplicationSession(4, next_layer_descriptor, addr_descriptor);
-    if(res==NULL){
+  inline unsigned int (__attribute__((always_inline))generateTest)(unsigned int next_layer_descriptor_id, unsigned int addr_descriptor_id){
+    application_session *p_session = getApplicationSession(createApplicationSession(next_layer_descriptor_id, addr_descriptor_id));
+    if(p_session==NULL){
       return 0;
     }
-    res[0] = 'T';
-    res[1] = 'E';
-    res[2] = 'S';
-    res[3] = 'T';
+    memcpy(p_session->message, "TEST", 4);
+    p_session->message_size = 4;
     return 4;
   }
 
-  inline unsigned int (__attribute__((always_inline))generateAckReq)(unsigned int next_layer_descriptor, unsigned int addr_descriptor){
-    unsigned char* res = addApplicationSession(3, next_layer_descriptor, addr_descriptor);
-    if(res==NULL){
+  inline unsigned int (__attribute__((always_inline))generateAckReq)(unsigned int next_layer_descriptor_id, unsigned int addr_descriptor_id){
+    application_session *p_session = getApplicationSession(createApplicationSession(next_layer_descriptor_id, addr_descriptor_id));
+    if(p_session==NULL){
       return 0;
     }
-    res[0] = 'A';
-    res[1] = 'C';
-    res[2] = 'K';
+    memcpy(p_session->message, "ACK", 3);
+    p_session->message_size = 3;
     return 3;
   }
 

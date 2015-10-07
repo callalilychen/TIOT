@@ -41,6 +41,7 @@ RIGHT_TYPE askForAdminRight(void){
       }
     }
   }
+  return NO_RIGHT;
 }
 #endif
   /*!

@@ -111,35 +111,35 @@ const application keyapplication = {
       if(NO_BIT != secret_index){
         TREE_STATE_TYPE perm_index = getExpectedState(secret_index,0);
         
-        setPermIndex(p_session->next_layer_descriptor, perm_index);
-        setSecretIndex(p_session->next_layer_descriptor, secret_index);
+        setPermIndex(p_session->security_descriptor_id, perm_index);
+        setSecretIndex(p_session->security_descriptor_id, secret_index);
 
         /* Calculate key */
         unsigned int depth = 2;
         tree_edge * edges = getEdges(depth);
         edges[0].func = edgeFunc;
-        edges[0].params = getPermCode(p_session->next_layer_descriptor, &(edges[0].params_size));
+        edges[0].params = getPermCode(p_session->security_descriptor_id, &(edges[0].params_size));
 
         edges[1].func = edgeFunc;
         edges[1].params = (unsigned char *)(&key_index);
         edges[1].params_size = TREE_STATE_SIZE;
         tree_node * p_key_node = NULL;
 
-        if(p_session->addr_descriptor < ADDR_DESCRIPTORS_LEN){
-          p_key_node = fillNodes(getPathFromCachedNodes(depth, p_session->addr_descriptor), edges, depth+1, 1);
+        if(p_session->addr_descriptor_id < ADDR_DESCRIPTORS_LEN){
+          p_key_node = fillNodes(getPathFromCachedNodes(depth, p_session->addr_descriptor_id), edges, depth+1, 1);
         }else{
           p_key_node = fillNodes(getPathFromRoot(depth), edges, depth+1, 1);
         }
         // add security layer descriptor
-        if(SUCC != updateSecurityWithKey(p_session->next_layer_descriptor, p_key_node)){
+        if(SUCC != updateSecurityWithKey(p_session->security_descriptor_id, p_key_node)){
           // TODO fix
-          //p_session->next_layer_descriptor = addSecurityDescriptor(p_key_node, NO_RIGHT, DEFAULT_PROTOCOL_TYPE);
+          //p_session->security_descriptor_id = addSecurityDescriptor(p_key_node, NO_RIGHT, DEFAULT_PROTOCOL_TYPE);
         }
         
-        setKeyIndex(p_session->next_layer_descriptor, key_index);
+        setKeyIndex(p_session->security_descriptor_id, key_index);
         // FIXME necessary? or error msg
-        if(p_session->addr_descriptor == NO_DESCRIPTOR){
-          p_session->addr_descriptor = PREDEF_RS_ADDR;
+        if(p_session->addr_descriptor_id == NO_DESCRIPTOR){
+          p_session->addr_descriptor_id = PREDEF_RS_ADDR;
         }
         memcpy(p_session->message, &"test", 4);  
         p_session->message_size = 4;

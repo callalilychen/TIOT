@@ -24,8 +24,7 @@
 int main(int argc, char** argv)
 { 
   resetAllExpectedStates();
-  initApplicationSession();
-  initSecurityDescriptors();
+  resetApplicationSession();
 
   unsigned char udp_payload[BUFSIZE+1] = {0};
   unsigned int udp_payload_size = 0;

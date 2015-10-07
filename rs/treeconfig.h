@@ -45,6 +45,12 @@ extern "C" {
  */
 #define FAIL -1
 
+#define DONE_MESSAGE "[DONE]"
+#define DONE_MESSAGE_SIZE 6
+
+#define ERROR_MESSAGE "[ERROR]"
+#define ERROR_MESSAGE_SIZE 7
+
 #define RIGHT_TYPE uint8_t
 /*!
  * \brief Macro for when no right is required 
@@ -71,9 +77,9 @@ extern "C" {
 #define ADDR_PREDEF_LEN 1
 #define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN
 
-#define SECURITY_DESCRIPTORS_LEN 3
-#define SECURITY_PREDEF_LEN 1 
-#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
+#define SECURITY_DESCRIPTORS_LEN 1
+#define SECURITY_PREDEF_LEN 0 
+//#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
 
 #define NODE_SIZE HASH_SIZE
 #define HASH_FUNC sha_construction.func

@@ -21,6 +21,11 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
+  /*! 
+   * \brief Structure for defination an application
+   *
+   * \note The name of each application should be unique
+   */
   typedef struct application{
     unsigned char name[MAX_APPLICATION_NAME_SIZE];
     unsigned int name_size;
@@ -28,8 +33,22 @@ extern "C" {
     unsigned int (*func)(unsigned char*, unsigned int, application_session *);
   }application;
 
+  /*! 
+   * \brief List of supported application, which can be required using a message
+   *
+   *        The id of applications in the list is the index of each application
+   *
+   * \note The name of each application should be unique
+   */
   extern const application * msg_applications[MSG_APPLICATION_COUNT];
 #if(UI_APPLICATION_COUNT>0)
+  /*! 
+   * \brief List of supported application, which can be required via user interface
+   *
+   *        The id of applications in the list is MSG_APPLICATION_COUNT + the index of each application
+   *
+   * \note  In order to make the application id unique, the type of applications is also used to construct a application id
+   */
   extern const application * ui_applications[UI_APPLICATION_COUNT];
   
   enum{msg_application = 0, ui_application};
@@ -61,8 +80,11 @@ extern "C" {
     for(int i = 0; i < applications_len; i++){
       if(req_size >= applications[i]->name_size && memcmp(applications[i]->name, req, applications[i]->name_size)==0){
         application_session *p_session = getApplicationSession(session_id);
-        unsigned int hasRight = checkRight(p_session -> has_right, applications[i]->required_right);
+        unsigned int hasRight = checkRight(getDescriptorRight(p_session -> security_descriptor_id), applications[i]->required_right);
 #if(UI_APPLICATION_COUNT>0)
+        if(application_type == ui_application){
+          i+= MSG_APPLICATION_COUNT;
+        }
 #ifdef ADMIN_PASSWORD_HASH 
         if(!hasRight && application_type == ui_application){
           hasRight = (ADMIN_RIGHT == askForAdminRight());

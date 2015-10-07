@@ -39,7 +39,7 @@ extern "C" {
     memcpy(send_buf+send_buf_size, application_layer_msg, application_layer_msg_size);
     send_buf_size += (application_layer_msg_size + generateSecurityLayerMAC(security_descriptor, send_buf+send_buf_size, application_layer_msg_size, max_send_buf-send_buf_size));
     printBlock("send", send_buf, send_buf_size);
-    ADDR_SEND_TYPE * p_addr = (ADDR_SEND_TYPE *)getAddr(getApplicationSession(application_session)->addr_descriptor);
+    ADDR_SEND_TYPE * p_addr = (ADDR_SEND_TYPE *)getAddr(getApplicationSession(application_session)->addr_descriptor_id);
     if(NULL != p_addr){
       printIPv4("to",HTONL((((ADDR_TYPE*)p_addr)->sin_addr).s_addr));
       SENDTO_FUNC(fd, send_buf, send_buf_size, 0, p_addr, (ADDR_LEN_TYPE)ADDR_SIZE);

@@ -69,17 +69,17 @@ extern "C" {
    */
   extern descriptor_security descriptor_securitys[SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN];
 
-  /*!
-   * \brief Update security protocol for PREDEF_NO_SECURITY_DESCRIPTOR 
-   *
-   * \return      None 
-   */
-  inline void (__attribute__((always_inline))initSecurityDescriptors)(){
-    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].key.size = 0;
-    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].right = NO_RIGHT;
-    //FIXME really DEFAULT_PRTOCOL_TYPE
-    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].protocol_type = DEFAULT_PROTOCOL_TYPE;
-  }
+//  /*!
+//   * \brief Update security protocol for PREDEF_NO_SECURITY_DESCRIPTOR 
+//   *
+//   * \return      None 
+//   */
+//  inline void (__attribute__((always_inline))initSecurityDescriptors)(){
+//    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].key.size = 0;
+//    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].right = NO_RIGHT;
+//    //FIXME really DEFAULT_PRTOCOL_TYPE
+//    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].protocol_type = DEFAULT_PROTOCOL_TYPE;
+//  }
   /*!
    * \brief Get key node for the given descriptor id
    *
@@ -102,7 +102,7 @@ extern "C" {
    * \return      The right, which is stored at the descriptor of id,
    *              or NULL, if id is out of range
    */
-  inline RIGHT_TYPE (__attribute__((always_inline))getDescriptorRight)(unsigned int id, tree_node * p_key){
+  inline RIGHT_TYPE (__attribute__((always_inline))getDescriptorRight)(unsigned int id){
     if(id >= SECURITY_DESCRIPTORS_LEN && id < SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
       return descriptor_securitys[id].right;
     }

@@ -37,69 +37,97 @@ extern "C" {
 #if NO_APPLICATION < MSG_APPLICATION_COUNT || NO_APPLICATION < UI_APPLICATION_COUNT
 #error "NO_APPLICATION should be not smaller then MSG_APPLICATION_COUNT and UI_APPLICATION_COUNT, change NO_APPLICATION in applicationsession.h"
 #endif
+
+  /*!
+   * \brief Session information for handlers to handle an application
+   */
   typedef struct application_session{
-    unsigned int application_id;
-    RIGHT_TYPE has_right;
-    // TODO rename
-    unsigned int next_layer_descriptor;
-    unsigned int addr_descriptor;
-    unsigned char message[MAX_APPLICATION_MESSAGE_SIZE];
-    unsigned int message_size;
+    unsigned int application_id; /*!< Id of required application*/
+    unsigned int security_descriptor_id;  /*!< Descriptor id for security issues*/
+    unsigned int addr_descriptor_id;  /*!< Descriptor id for source address, who requests the application*/
+    unsigned char message[MAX_APPLICATION_MESSAGE_SIZE]; /*!< Response message */
+    unsigned int message_size; /*!< Message size */
   }application_session;
 
+  /*!
+   * \brief Static memory allocation for storage of application sessions
+   */
   extern application_session application_sessions[APPLICATION_SESSIONS_LEN];
 
-  inline void(__attribute__((always_inline))initApplicationSession)(void){
+  /*!
+   * \brief Reset all application sessions
+   *
+   * \return None
+   */
+  inline void __attribute__((always_inline))resetApplicationSession(void){
     for(int i=0; i<APPLICATION_SESSIONS_LEN; i++){
       application_sessions[i].application_id = NO_APPLICATION;
-      application_sessions[i].has_right = NO_RIGHT;
-      application_sessions[i].next_layer_descriptor = NO_DESCRIPTOR;
+      application_sessions[i].security_descriptor_id = NO_DESCRIPTOR;
+      application_sessions[i].addr_descriptor_id = NO_DESCRIPTOR;
+      application_sessions[i].message_size = 0;
     }
   }
 
-  inline unsigned int(__attribute__((always_inline))createApplicationSession)(unsigned int next_layer_descriptor, unsigned int addr_descriptor){
+  /*!
+   * \brief Create an application session and assign its security_descriptor_id and addr_descriptor_id
+   *
+   * \param security_descriptor_id    The given descriptor id for security issues
+   * \param addr_descriptor_id        The given descriptor id for source address
+   *
+   * \return                          Session id of the new application session or NO_SESSION, if all reserved place for application sessions is full
+   */
+  inline unsigned int __attribute__((always_inline))createApplicationSession(unsigned int security_descriptor_id, unsigned int addr_descriptor_id){
     for(int i=0; i<APPLICATION_SESSIONS_LEN; i++){
       if(application_sessions[i].application_id==NO_APPLICATION){
-        application_sessions[i].next_layer_descriptor = next_layer_descriptor;
-        application_sessions[i].addr_descriptor = addr_descriptor;
+        application_sessions[i].security_descriptor_id = security_descriptor_id;
+        application_sessions[i].addr_descriptor_id = addr_descriptor_id;
+        application_sessions[i].message_size = 0;
         return i;
       }
     }
-
     return NO_SESSION;
   }
 
-  inline application_session *  (__attribute__((always_inline))getApplicationSession)(unsigned int session_index){
-    if(session_index < APPLICATION_SESSIONS_LEN){
-      return application_sessions+session_index;
+  /*!
+   * \brief Get a pointer to the application session of the given id 
+   *
+   * \param session_id    The given session id
+   *
+   * \return              Session id of the new application session or NULL, if the given id is out of range
+   */
+  inline application_session * __attribute__((always_inline))getApplicationSession(unsigned int session_id){
+    if(session_id < APPLICATION_SESSIONS_LEN){
+      return application_sessions+session_id;
     }
     return NULL;
   }
-
-  inline void(__attribute__((always_inline))updateApplicationSession_Application)(unsigned int session_id, unsigned int application_id){
+  
+  /*!
+   * \brief Update the application of the application session of the given session id
+   *
+   * \param session_id    The given session id
+   *
+   * \return              None
+   */
+  inline void __attribute__((always_inline))updateApplicationSession_Application (unsigned int session_id, unsigned int application_id){
     if(session_id < APPLICATION_SESSIONS_LEN){
       application_sessions[session_id].application_id = application_id;
     }
   }
 
-  inline unsigned char* (__attribute__((always_inline))addApplicationSession)(unsigned int message_size, unsigned int next_layer_descriptor, unsigned int addr_descriptor){
-    if(message_size > MAX_APPLICATION_MESSAGE_SIZE){
-      return NULL;
-    }
-    unsigned int session_id = createApplicationSession(next_layer_descriptor, addr_descriptor);
-    if(NO_SESSION != session_id){
-      getApplicationSession(session_id)->message_size = message_size;
-      return getApplicationSession(session_id)->message;
-    }
-    return NULL;
-  }
-
-  inline void  (__attribute__((always_inline))clearApplicationSession)(unsigned int session_index){
-    if(session_index < APPLICATION_SESSIONS_LEN){
-      application_sessions[session_index].message_size = 0;
-      application_sessions[session_index].application_id = NO_APPLICATION;
-      application_sessions[session_index].next_layer_descriptor = NO_DESCRIPTOR;
-      application_sessions[session_index].addr_descriptor = NO_DESCRIPTOR;
+  /*!
+   * \brief Reset the application session of the given id
+   *
+   * \param session_id    The given session id
+   *
+   * \return              None
+   */
+  inline void  __attribute__((always_inline))clearApplicationSession(unsigned int session_id){
+    if(session_id < APPLICATION_SESSIONS_LEN){
+      application_sessions[session_id].application_id = NO_APPLICATION;
+      application_sessions[session_id].security_descriptor_id = NO_DESCRIPTOR;
+      application_sessions[session_id].addr_descriptor_id = NO_DESCRIPTOR;
+      application_sessions[session_id].message_size = 0;
     }
   }
 
