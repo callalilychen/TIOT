@@ -184,6 +184,7 @@ extern "C" {
   inline tree_node * __attribute__((always_inline))copyTreeNode(tree_node * p_dest, tree_node * p_src){
     if(p_src!=NULL && p_dest!=NULL){
       memcpy(p_dest->block, p_src->block, p_src->size);
+      p_dest->size = p_src->size;
     }
     return p_dest;
   }

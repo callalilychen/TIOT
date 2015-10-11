@@ -27,6 +27,10 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
+#define NO_TREE_STATE TREE_STATE_UPPER_BOUNDARY
+#if NO_TREE_STATE < TREE_STATE_TABLE_LEN || NO_TREE_STATE < TREE_STATE_VECTOR_LEN
+#error "NO_TREE_STATE should be not smaller then TREE_STATE_TABLE_LEN and TREE_STATE_VECTOR_LEN, change NO_BIT in treestate.h"
+#endif
 
   /*!
    * \brief State table with to expected state

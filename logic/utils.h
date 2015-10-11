@@ -62,7 +62,7 @@ inline uint8_t * (__attribute__((always_inline))optimizedXOR)(uint8_t * a, uint8
 }
 
 inline void (__attribute__((always_inline))printIPv4)(char* name, uint32_t ip){
-  PRINT(name);
+  PRINT("%s: ", name);
   for(int i = 24; i > 0; i-=8){
     uint8_t t = (uint8_t)(ip >> i);
     PRINT("%d.", t);
@@ -72,7 +72,7 @@ inline void (__attribute__((always_inline))printIPv4)(char* name, uint32_t ip){
 }
 
 inline void (__attribute__((always_inline))printBlock)(char* name, unsigned char* block, size_t block_len){
-  PRINT("%s:\n", name);
+  PRINT("%s: ", name);
   for (int i=0; i< block_len; i++){
     PRINT("%x|", block[i]);
   }

@@ -32,7 +32,8 @@
  * \return          0 
  */
 unsigned int handleMsg(unsigned char* req, unsigned int req_size, application_session * p_session){
-  PRINT("[%s", req);
+  req[req_size] = '\0';
+  PRINT("[%s (%u)\n", req, req_size);
   return 0;
 }
 
@@ -80,7 +81,7 @@ unsigned int handleRevocation(unsigned char* req, unsigned int req_size, applica
 const application revapplication = {
   .name = "rev:",
   .name_size = 4,
-  .usage = "%u\tSecret id",
+  .usage = "%u\t<id>\tRevoke a secret",
   .required_right = NO_RIGHT,
   .func = handleRevocation
 };

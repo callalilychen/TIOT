@@ -17,9 +17,9 @@
  +--------------------+-----+--------------------+
  |    Descriptor 0    | ... |    Descriptor n    |
  +--------------------+-----+--------------------+--------------------+-----+ \
- |       Key 0        | ... |       Key n        | Key_Predefined 0   | ... |  |
+ |  Protocol Type 0   | ... |   Protocol Type n  |  Type_Predefined 0 | ... |  |
  +--------------------+-----+--------------------+--------------------+-----+  |- Descriptor Security
- |     Right 0        | ... |      Right n       | Right_Predefined 0 | ... |  |
+ |       Key 0        | ... |       Key n        | Key_Predefined 0   | ... |  |
  +--------------------+-----+--------------------+--------------------+-----+ /
  \endverbatim
 
@@ -45,9 +45,8 @@ extern "C" {
    * \brief Security type for descriptor 
    */
   typedef struct descriptor_security{
-    tree_node key;  /*!<Key nodes*/
-    RIGHT_TYPE right; /*!<Right informations*/
     uint8_t protocol_type;  /*!<Protocol type for the security layer*/
+    tree_node key;  /*!<Key nodes*/
   }descriptor_security;
 
   /*!
@@ -69,17 +68,36 @@ extern "C" {
    */
   extern descriptor_security descriptor_securitys[SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN];
 
-//  /*!
-//   * \brief Update security protocol for PREDEF_NO_SECURITY_DESCRIPTOR 
-//   *
-//   * \return      None 
-//   */
-//  inline void (__attribute__((always_inline))initSecurityDescriptors)(){
-//    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].key.size = 0;
-//    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].right = NO_RIGHT;
-//    //FIXME really DEFAULT_PRTOCOL_TYPE
-//    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].protocol_type = DEFAULT_PROTOCOL_TYPE;
-//  }
+  //  /*!
+  //   * \brief Update security protocol for PREDEF_NO_SECURITY_DESCRIPTOR 
+  //   *
+  //   * \return      None 
+  //   */
+  //  inline void __attribute__((always_inline))initSecurityDescriptors(){
+  //    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].key.size = 0;
+  //    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].right = NO_RIGHT;
+  //    //FIXME really DEFAULT_PRTOCOL_TYPE
+  //    descriptor_securitys[PREDEF_NO_SECURITY_DESCRIPTOR].protocol_type = DEFAULT_PROTOCOL_TYPE;
+  //  }
+  //
+
+  /*!
+   * \brief Check if the security descriptor of the given id
+   *
+   *  \param id       Identifier of the security descriptor to be checked
+   *
+   * \return          1 if it is active,
+   *                  otherwise 0
+   */
+  inline int __attribute__((always_inline)) isActiveSecurityDescriptor(unsigned int id){
+    if(id < SECURITY_DESCRIPTORS_LEN)
+      return DESCRIPTOR_INACTIVE != security_descriptors[id] ;
+    if(id < SECURITY_DESCRIPTORS_LEN + SECURITY_PREDEF_LEN){
+      return 1;
+    }
+    return 0;
+  }  
+
   /*!
    * \brief Get key node for the given descriptor id
    *
@@ -88,25 +106,11 @@ extern "C" {
    * \return      The pointer to the key node, which is stored at the descriptor of id,
    *              or NULL, if id is out of range
    */
-  inline tree_node * (__attribute__((always_inline))getDescriptorKey)(unsigned int id){
-    if(id < SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
+  inline tree_node * __attribute__((always_inline))getDescriptorKey(unsigned int id){
+    if(isActiveSecurityDescriptor(id)){
       return &(descriptor_securitys[id].key);
     }
     return NULL;
-  }
-  /*!
-   * \brief Get right for the given descriptor id
-   *
-   * \param id    Identifier of the required security storage
-   *
-   * \return      The right, which is stored at the descriptor of id,
-   *              or NULL, if id is out of range
-   */
-  inline RIGHT_TYPE (__attribute__((always_inline))getDescriptorRight)(unsigned int id){
-    if(id >= SECURITY_DESCRIPTORS_LEN && id < SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
-      return descriptor_securitys[id].right;
-    }
-    return NO_RIGHT;
   }
 
   /*!
@@ -117,45 +121,28 @@ extern "C" {
    * \return      The protocol type, which is stored at the descriptor of id,
    *              or NULL, if id is out of range
    */
-    inline uint8_t (__attribute__((always_inline))getDescriptorProtocolType)(unsigned int id){
-      if(id >= SECURITY_DESCRIPTORS_LEN && id < SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
-        return descriptor_securitys[id].protocol_type;
-      }
-      return NO_SECURITY_PROTOCOL_TYPE; 
-    } 
-
-    /*!
-     * \brief Update key node for the given descriptor id
-     *
-     * \param id    Identifier of the required security storage
-     *        right New right
-     *
-     * \return      On success SUCC is returned, otherwise FAIL.
-     */
-  inline int (__attribute__((always_inline))updateSecurityWithKey)(unsigned int id, tree_node * p_key){
-    if(id < SECURITY_DESCRIPTORS_LEN){
-      if(p_key != NULL){
-        copyTreeNode(&(descriptor_securitys[id].key), p_key);
-        descriptor_securitys[id].key.size = p_key -> size;
-        activeDescriptor(security_descriptors + id);
-        return SUCC;
-      }
+  inline uint8_t __attribute__((always_inline))getDescriptorProtocolType(unsigned int id){
+    if(isActiveSecurityDescriptor(id) ){
+      return descriptor_securitys[id].protocol_type;
     }
-    return FAIL;
-  }
+    return NO_SECURITY_PROTOCOL_TYPE; 
+  } 
+
   /*!
-   * \brief Update right for the given descriptor id
+   * \brief Update key node for the given descriptor id
    *
    * \param id    Identifier of the required security storage
    *        right New right
    *
    * \return      On success SUCC is returned, otherwise FAIL.
    */
-  inline int(__attribute__((always_inline))updateSecurityWithRight)(unsigned int id, tree_node * p_key, RIGHT_TYPE right){
+  inline int __attribute__((always_inline))updateSecurityWithKey(unsigned int id, tree_node * p_key){
     if(id < SECURITY_DESCRIPTORS_LEN){
-      descriptor_securitys[id].right = right;
-      activeDescriptor(security_descriptors + id);
-      return SUCC;
+      if(p_key != NULL){
+        copyTreeNode(&(descriptor_securitys[id].key), p_key);
+        activeDescriptor(security_descriptors + id);
+        return SUCC;
+      }
     }
     return FAIL;
   }
@@ -168,8 +155,8 @@ extern "C" {
    *
    * \return      On success SUCC is returned, otherwise FAIL.
    */
-  inline int (__attribute__((always_inline))updateSecurityWithPrototypeType)(unsigned int id, uint8_t type){
-    if(id < SECURITY_DESCRIPTORS_LEN){
+  inline int __attribute__((always_inline))updateSecurityWithProtocolType(unsigned int id, uint8_t type){
+    if(id < SECURITY_DESCRIPTORS_LEN && type < SECURITY_LAYER_IMPLEMENTATIONS_LEN){
       descriptor_securitys[id].protocol_type = type;
       activeDescriptor(security_descriptors + id);
       return SUCC;
@@ -185,28 +172,13 @@ extern "C" {
    *
    * \return      On success SUCC is returned, otherwise FAIL.
    */
-    inline int (__attribute__((always_inline))updatePredefSecurityWithKey)(unsigned int id, tree_node * p_key){
-      if(id >= SECURITY_DESCRIPTORS_LEN && id < SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
-        if(p_key != NULL){
-          copyTreeNode(&(descriptor_securitys[id].key), p_key);
-          descriptor_securitys[id].key.size = p_key -> size;
-          return SUCC;
-        }
-        return FAIL;
-      }
-    }
-  /*!
-   * \brief Update predefined right for the given descriptor id
-   *
-   * \param id    Identifier of the required security storage
-   *        right New right
-   *
-   * \return      On success SUCC is returned, otherwise FAIL.
-   */
-  inline int(__attribute__((always_inline))updatePredefSecurityWithRight)(unsigned int id, tree_node * p_key, RIGHT_TYPE right){
+  inline int __attribute__((always_inline))updatePredefSecurityWithKey(unsigned int id, tree_node * p_key){
     if(id >= SECURITY_DESCRIPTORS_LEN && id < SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
-      descriptor_securitys[id].right = right;
-      return SUCC;
+      if(p_key != NULL){
+        copyTreeNode(&(descriptor_securitys[id].key), p_key);
+        descriptor_securitys[id].key.size = p_key -> size;
+        return SUCC;
+      }
     }
     return FAIL;
   }
@@ -219,24 +191,24 @@ extern "C" {
    *
    * \return      On success SUCC is returned, otherwise FAIL.
    */
-    inline int (__attribute__((always_inline))updatePredefSecurityWithPrototypeType)(unsigned int id, uint8_t type){
-      if(id >= SECURITY_DESCRIPTORS_LEN && id < SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
-        descriptor_securitys[id].protocol_type = type;
-        return SUCC;
-      }
-      return FAIL;
+  inline int __attribute__((always_inline))updatePredefSecurityWithProtocolType(unsigned int id, uint8_t type){
+    if(id >= SECURITY_DESCRIPTORS_LEN && id < SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN && type < SECURITY_LAYER_IMPLEMENTATIONS_LEN){
+      descriptor_securitys[id].protocol_type = type;
+      return SUCC;
     }
+    return FAIL;
+  }
 
-    /*!
-     * \brief Update security information for the given id
-     *
-     * \param id         Identifier of the required address storage
-     *        p_sec      Pointer to a new security information
-     *        addr_size  Length of the new address   
-     *
-     * \return      On success SUCC is returned, otherwise FAIL.
-     */
-  int updateSecurityDescriptor(unsigned int id, void * p_sec, unsigned int sec_siz);
+  /*!
+   * \brief Update security information for the given id
+   *
+   * \param id         Identifier of the required address storage
+   *        p_sec      Pointer to a new security information
+   *        addr_size  Length of the new address   
+   *
+   * \return      On success SUCC is returned, otherwise FAIL.
+   */
+    int updateSecurityDescriptor(unsigned int id, void * p_sec, unsigned int sec_size);
 
   /*!
    * \brief Update predefined security information for the given id
@@ -247,7 +219,7 @@ extern "C" {
    *
    * \return      On success SUCC is returned, otherwise FAIL.
    */
-  int updatePredefSecurityDescriptor(unsigned int id, void * p_sec, unsigned int sec_siz);
+  int updatePredefSecurityDescriptor(unsigned int id, void * p_sec, unsigned int sec_size);
 
   /*!
    * \brief Check if a given security information is already stored at the given descriptor id
@@ -259,14 +231,14 @@ extern "C" {
    * \return          1 if the given security information is equal to the data of the given id,
    *                  otherwise 0.
    */
-          int checkSecurity(unsigned int id, void * p_sec, unsigned int sec_size);
+  int checkSecurity(unsigned int id, void * p_sec, unsigned int sec_size);
 
   /*!
    * \brief Get the least active security descriptor 
    *
    * \return          The descriptor id for the least active security descriptor
    */
-  inline unsigned int (__attribute__((always_inline))getLeastActiveSecurityDescriptor)(void){
+  inline unsigned int __attribute__((always_inline))getLeastActiveSecurityDescriptor(void){
     return getLeastActiveDescriptor(security_descriptors, SECURITY_DESCRIPTORS_LEN);
   }
 
@@ -281,7 +253,7 @@ extern "C" {
    *
    * \return      None
    */
-  inline unsigned int(__attribute__((always_inline))addSecurityDescriptor)(descriptor_security * p_sec){
+  inline unsigned int __attribute__((always_inline))addSecurityDescriptor(descriptor_security * p_sec){
     return addNewDescriptor(security_descriptors, SECURITY_DESCRIPTORS_LEN, SECURITY_PREDEF_LEN, p_sec, DESCRIPTOR_SECURITY_SIZE, checkSecurity, updateSecurityDescriptor);
   }
 
@@ -292,12 +264,28 @@ extern "C" {
    *
    * \return          None
    */
-    inline void (__attribute__((always_inline))deactiveSecurityDescriptor)(unsigned int id){
-      if(id < SECURITY_DESCRIPTORS_LEN)
-        deactiveDescriptor(security_descriptors + id);
-    } 
+      inline void __attribute__((always_inline))deactiveSecurityDescriptor(unsigned int id){
+        if(id < SECURITY_DESCRIPTORS_LEN)
+          deactiveDescriptor(security_descriptors + id);
+      } 
 
+  /*!
+   * \brief Print security descriptor header
+   * 
+   * \return None
+   */
+  inline void __attribute__((always_inline))printSecurityDescriptorHeader(){
+    PRINT("Index\tProtocol Type\tSecurity Index\tPermission Index\tPermission\tKey Index\n");
+  }    
 
+  /*!
+   * \brief Print security descriptor of the given id
+   * 
+   * \param id        Identifier of the security descritptor to be printed 
+   *
+   * \return None
+   */
+  void printSecurityDescriptor(unsigned int id);
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

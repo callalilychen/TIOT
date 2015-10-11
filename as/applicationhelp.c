@@ -15,6 +15,9 @@
  */
 #include "applicationhelp.h"
 #include "applicationexample.h"
+#include "applicationrsstate.h"
+#include "applicationredled.h"
+#include "applicationgreenled.h"
 /*!
  * \brief Handle help request for user interface
  *
@@ -69,38 +72,6 @@ const application msghelpapplication = {
   .func = &handleMsgHelp
 };
 
-/*!
- * \todo
- * TODO
- */
-const static application rs_revapplication = {
-  .name = "rev:",
-  .name_size = 4,
-  .usage = "%u\tsecret id",
-  .required_right = ADMIN_RIGHT,
-  .func = NULL
-};
-const static application rs_ledonapplication = {
-  .name = "lon:",
-  .name_size = 4,
-  .usage = "%u\tled nummer",
-  .required_right = 7,
-  .func = NULL
-};
-const static application rs_ledoffapplication = {
-  .name = "loff:",
-  .name_size = 5,
-  .usage = "%u\tled nummer",
-  .required_right = 3,
-  .func = NULL
-};
-const static application rs_ledapplication = {
-  .name = "led:",
-  .name_size = 4,
-  .usage = "%u\tled nummer",
-  .required_right = 1,
-  .func = NULL
-};
 
 /*!
  * \brief Clone of RS message application register 
@@ -108,10 +79,13 @@ const static application rs_ledapplication = {
 const static application *rs_msg_applications[RS_MSG_APPLICATION_COUNT] = {
   &exampleapplication, 
   &ackapplication, 
-  &rs_revapplication,
-  &rs_ledonapplication,
-  &rs_ledoffapplication,
-  &rs_ledapplication
+  &rsrevapplication,
+  &redledonapplication,
+  &redledoffapplication,
+  &redledapplication,
+  &greenledonapplication,
+  &greenledoffapplication,
+  &greenledapplication
 };
 
 /*!

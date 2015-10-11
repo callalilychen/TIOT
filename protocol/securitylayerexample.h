@@ -59,15 +59,15 @@ extern "C" {
 #endif
 
 #define SECURITY_LAYER_TYPE_EXAMPLE 0
-#define SECURITY_LAYER_HEADER_LEN_EXAMPLE 4
-#define SECURITY_LAYER_PERMCODE_LEN_EXAMPLE 4
+#define SECURITY_LAYER_HEADER_LEN_EXAMPLE 5
+#define SECURITY_LAYER_PERMCODE_LEN_EXAMPLE 3
 #define MAC_LEN_EXAMPLE 20
 
 #pragma pack(1)
   typedef struct permCodeExample{
     uint8_t secret_index;
     uint8_t perm_index;
-    uint8_t perm;
+    uint8_t perm;/*!<Right informations*/
   }permCodeExample;
 
   typedef struct securityHeaderExample{
@@ -88,10 +88,10 @@ extern "C" {
   RIGHT_TYPE getPermExample(unsigned int security_descriptor);
   TREE_STATE_TYPE getKeyIndexExample(unsigned int security_descriptor);
 
-  void setSecretIndexExample(unsigned int security_descriptor, TREE_STATE_TYPE index);
-  void setPermIndexExample(unsigned int security_descriptor, TREE_STATE_TYPE index);
-  void setPermExample(unsigned int security_descriptor, RIGHT_TYPE index);
-  void setKeyIndexExample(unsigned int security_descriptor, TREE_STATE_TYPE index);
+  unsigned int setSecretIndexExample(unsigned int security_descriptor, TREE_STATE_TYPE index);
+  unsigned int setPermIndexExample(unsigned int security_descriptor, TREE_STATE_TYPE index);
+  unsigned int setPermExample(unsigned int security_descriptor, RIGHT_TYPE index);
+  unsigned int setKeyIndexExample(unsigned int security_descriptor, TREE_STATE_TYPE index);
   unsigned int setPermCodeExample(unsigned int security_descriptor, unsigned char* code, unsigned int code_size);
 
 #ifdef  __cplusplus

@@ -17,6 +17,7 @@
 #define __APPLICATION_HANDLER_H__
 #include <string.h>
 #include "applicationsession.h" 
+#include "securitylayerhandler.h"
 #include "interface.h"
 #ifdef  __cplusplus
 extern "C" {
@@ -94,7 +95,7 @@ extern "C" {
     for(int i = 0; i < applications_len; i++){
       if(req_size >= applications[i]->name_size && memcmp(applications[i]->name, req, applications[i]->name_size)==0){
         application_session *p_session = getApplicationSession(session_id);
-        unsigned int hasRight = checkRight(getDescriptorRight(p_session -> security_descriptor_id), applications[i]->required_right);
+        unsigned int hasRight = checkRight(getPerm(p_session -> security_descriptor_id), applications[i]->required_right);
 #if(UI_APPLICATION_COUNT>0)
 #ifdef ADMIN_PASSWORD_HASH 
         if(!hasRight && application_type == ui_application){
@@ -102,17 +103,23 @@ extern "C" {
         }
 #endif
 #endif
-        if (hasRight && (p_session->message_size = applications[i]->func(req+applications[i]->name_size, req_size-applications[i]->name_size, p_session))>0){
+        if(!hasRight){
+          memcpy(p_session->message, "[ERROR] No Right!", 17);
+          p_session->message[17] = '\0';
+          p_session->message_size = strlen((const char*)(p_session->message));
+          PRINT("%s\n", p_session->message);
+        } else if ((p_session->message_size = applications[i]->func(req+applications[i]->name_size, req_size-applications[i]->name_size, p_session))>0){
 #if(UI_APPLICATION_COUNT>0)
         if(application_type == ui_application){
           i+= MSG_APPLICATION_COUNT;
         }
 #endif
-          updateApplicationSession_Application(session_id, i);
-          return p_session->message_size;
+        }else{
+          clearApplicationSession(session_id);
+          return 0;
         }
-        clearApplicationSession(session_id);
-        return 0;
+        updateApplicationSession_Application(session_id, i);
+        return p_session->message_size;
       } 
     }
     return 0;
@@ -128,6 +135,20 @@ extern "C" {
    * \return Application header size
    */
   unsigned int generateApplicationHeader(unsigned char* buf, unsigned int max_buf_size,  int type);
+  
+  /*! 
+   * \brief Write application status response to the given application_session 
+   *
+   * \param p_application Pointer to the application
+   * \param p_session     Pointer to the application session
+   * \param type          Type of the header type
+   * \param status       Status information
+   * \param status_size  Size of the information
+   *
+   * \return application response size
+   */
+unsigned int generateApplicationStatusResponse(const application* p_application, application_session * p_session, int type, unsigned char * status, unsigned int status_size);
+  
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

@@ -53,6 +53,24 @@ extern "C" {
 
 
   /*!
+   * \brief Check if the addr descriptor of the given id
+   *
+   *  \param id       Identifier of the address descriptor to be checked
+   *
+   * \return          1 if it is active,
+   *                  otherwise 0
+   */
+    inline int __attribute__((always_inline)) isActiveAddrDescriptor(unsigned int id){
+      if(id < ADDR_DESCRIPTORS_LEN)
+        return DESCRIPTOR_INACTIVE != addr_descriptors[id] ;
+      if(id < ADDR_DESCRIPTORS_LEN + ADDR_PREDEF_LEN){
+        return 1;
+      }
+      return 0;
+    }  
+
+
+  /*!
    * \brief Get address according to the given id
    *
    * \param id    Identifier of the required address
@@ -60,7 +78,7 @@ extern "C" {
    * \return      The pointer to the address
    */
   inline ADDR_TYPE * __attribute__((always_inline)) getAddr(unsigned int id){
-    if(id < ADDR_DESCRIPTORS_LEN){
+    if(isActiveAddrDescriptor(id)){
       return descriptor_addrs + id;
     }
     return NULL;
@@ -124,7 +142,7 @@ extern "C" {
     if(id < ADDR_DESCRIPTORS_LEN){
       descriptor_addrs[id].sin_family = ADDR_FAMILY;
       descriptor_addrs[id].sin_port = HTONS(port);
-      ASSIGN_IP(descriptor_addrs[id].sin_addr, ip);
+      ASSIGN_IP(descriptor_addrs[id].sin_addr.s_addr, ip);
       activeDescriptor(addr_descriptors+id);
       return SUCC;
     }
@@ -165,7 +183,7 @@ extern "C" {
   }
 
   /*!
-   * \brief Deative the addr descriptor at the given id
+   * \brief Deative the addr descriptor of the given id
    *
    *  \param id        Identifier of the address descriptor to be deactived
    *
@@ -183,40 +201,8 @@ extern "C" {
    *
    * \return          None
    */
-  inline void __attribute__((always_inline)) printAddrDescriptor(unsigned int id){
-    if(id >= ADDR_DESCRIPTORS_LEN + ADDR_PREDEF_LEN){
-      PRINT("[ERROR] The given descriptor id %u is out of range!\n", id);
-      return;
-    }
-      PRINT("%5u", id);
-    if(id < ADDR_DESCRIPTORS_LEN && DESCRIPTOR_INACTIVE == addr_descriptors[id]){
-      PRINT(" inactive\n");
-    }
-    printIPv4(" ", HTONL(descriptor_addrs[id].sin_addr.s_addr));
-    PRINT(":%u\n", HTONS(descriptor_addrs[id].sin_port));
-  }
+  void printAddrDescriptor(unsigned int id);
 
-  /*!
-   * \brief Print all the address data
-   *
-   * \return           None
-   */
-  inline void __attribute__((always_inline)) printAllAddrDescriptors(){
-    for(int id = 0; id < ADDR_DESCRIPTORS_LEN; id++){
-      PRINT("%5u", id);
-      if(addr_descriptors[id]!=DESCRIPTOR_INACTIVE){
-        printIPv4(" ", HTONL(descriptor_addrs[id].sin_addr.s_addr));
-        PRINT(":%u\n", HTONS(descriptor_addrs[id].sin_port));
-      } else {
-        PRINT(" inactive\n");
-      }
-    }
-    for(int id=ADDR_DESCRIPTORS_LEN; id< ADDR_DESCRIPTORS_LEN + ADDR_PREDEF_LEN; id++){
-      PRINT("%5u", id);
-      printIPv4(" ", HTONL(descriptor_addrs[id].sin_addr.s_addr));
-      PRINT(":%u\n", HTONS(descriptor_addrs[id].sin_port));
-    }
-  }
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

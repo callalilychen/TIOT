@@ -85,7 +85,7 @@ static int puth(int (*printC)(char),unsigned n) {
 	printC(hex[n & 15]);
   return 1;
 }
- void handleFormatString(char *format, ...)
+ void print(char *format, ...)
 {
 	char c;
 	int i;

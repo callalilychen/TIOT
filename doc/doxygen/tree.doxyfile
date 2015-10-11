@@ -774,9 +774,10 @@ INPUT                  =  ../../logic \
                           ../../crypto \
                           ../../stringOP \
                           ../../constrainedRS \
+                          ../../rsapplication \
                           ../../rs \
                           ../../as \
-                          ../../client \
+#                          ../../client \
                           src
 #                          ../../simplelink \
 

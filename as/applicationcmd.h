@@ -25,7 +25,6 @@ extern "C" {
   /*!
    * \brief Application defination for 
    */
-  extern const application keyapplication;
 
 #ifdef  __cplusplus
 }

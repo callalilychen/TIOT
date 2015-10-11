@@ -18,13 +18,14 @@
 #include "applicationcmd.h"
 #include "applicationaddr.h"
 #include "applicationmsg.h"
+#include "applicationsecurity.h"
+#include "applicationsend.h"
 #include "applicationhelp.h"
 
 const application *msg_applications[MSG_APPLICATION_COUNT] = {
   &exampleapplication, 
   &ackapplication, 
   &msgapplication,
-  &keyapplication, 
   &revapplication, 
   &permreqapplication
 };
@@ -32,11 +33,20 @@ const application *msg_applications[MSG_APPLICATION_COUNT] = {
 #if(UI_APPLICATION_COUNT>0)
 const application *ui_applications[UI_APPLICATION_COUNT] = {
   &exampleapplication, 
+  &revapplication,
   &lsaddrapplication,
   &addaddrapplication,
-  &updateaddrapplication,
-  &keyapplication, 
-  &revapplication,
+  &editaddrapplication,
+  &selectaddrapplication,
+  &lssecapplication,
+  &addsecapplication,
+  &editprotocoltypeapplication,
+  &editsecretindexapplication,
+  &editpermapplication,
+  &editkeyapplication,
+  &selectsecapplication,
+  &sendtoapplication,
+  &securesendtoapplication,
   &rshelpapplication,
   &msghelpapplication,
   &uihelpapplication

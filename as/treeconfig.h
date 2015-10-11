@@ -5,6 +5,10 @@
  */
 /*!
  * \defgroup    config_as Configuration for an authorization server
+ * \brief    All parties share the same data declaration, only the length of data are here to configure.
+ *
+ * \note         Perhaps too static!
+ *
  * \{
  *
  * \file
@@ -19,11 +23,11 @@
 /* Include files                                                             */
 /*****************************************************************************/
 #include "interface.h"
+#include "scanString.h"
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "scanString.h"
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -77,8 +81,6 @@ extern "C" {
 #define ADMIN_RIGHT 0xff
 #define ADMIN_PASSWORD_HASH "t"
 
-#define DEFAULT_PROTOCOL_TYPE 0
-
 #define IP_TYPE IPv4
 #define IPv4 char* 
 #define HTONS htons
@@ -95,9 +97,10 @@ extern "C" {
 #define ADDR_PREDEF_LEN 1
 #define PREDEF_RS_ADDR ADDR_DESCRIPTORS_LEN
 
-#define SECURITY_DESCRIPTORS_LEN 3
-#define SECURITY_PREDEF_LEN 0 
-//#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
+#define SECURITY_DESCRIPTORS_LEN 4
+#define SECURITY_PREDEF_LEN 0
+//#define PREDEF_CMD_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
+#define SECURITY_LAYER_IMPLEMENTATIONS_LEN 1
 
 #define NODE_SIZE HASH_SIZE
 #define HASH_FUNC sha_construction.func
@@ -105,10 +108,10 @@ extern "C" {
 #define APPLICATION_SESSIONS_LEN 2
 #define MAX_APPLICATION_MESSAGE_SIZE 200  
 
-#define RS_MSG_APPLICATION_COUNT 6
-#define MSG_APPLICATION_COUNT 6
-#define UI_APPLICATION_COUNT 9
-#define MAX_APPLICATION_NAME_SIZE 10
+#define RS_MSG_APPLICATION_COUNT 9
+#define MSG_APPLICATION_COUNT 5
+#define UI_APPLICATION_COUNT 18
+#define MAX_APPLICATION_NAME_SIZE 20
 #define MAX_APPLICATION_USAGE_SIZE 100
 
 /*!
@@ -145,6 +148,17 @@ extern "C" {
  * */
 #define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
 #define BIT_MAP_LEN TREE_STATE_TABLE_LEN                      /*!< Number of to used bit map*/
+
+#define LED_IS_ON 1
+#define LED_IS_OFF 0
+#define RED_LED_ON printf("RED LED is on!")
+#define RED_LED_OFF printf("RED LED if off!")
+#define RED_LED_STATUS LED_IS_ON
+
+#define GREEN_LED_ON printf("GREEN LED is on!\n")
+#define GREEN_LED_OFF printf("GREEN LED if off!\n")
+#define GREEN_LED_STATUS LED_IS_ON
+
 
 
 #ifdef  __cplusplus

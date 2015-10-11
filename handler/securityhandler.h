@@ -30,7 +30,7 @@ extern "C" {
    * \return              1 if approved, otherwise 0
    */
   inline unsigned int (__attribute__((always_inline))checkRight)(RIGHT_TYPE hasRight, RIGHT_TYPE requiredRight){
-    return requiredRight == NO_RIGHT || hasRight ^ requiredRight;
+    return requiredRight == NO_RIGHT || (requiredRight == (hasRight & requiredRight));
   }
 
 #ifdef ADMIN_PASSWORD_HASH

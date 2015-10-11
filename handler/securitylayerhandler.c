@@ -82,59 +82,62 @@ static inline int verifyMAC(tree_node * key, unsigned char * msg, unsigned int *
   unsigned int size = 0;
   *p_msg_size -= mac_size;
   hmac(&sha_construction, key->block, key->size, msg, *p_msg_size, tmpMAC, &size);
-  printBlock("key", key->block, key->size);
-  printBlock("msg", msg, *p_msg_size);
-  printBlock("getMac", msg+*p_msg_size, mac_size);
-  printBlock("sollMac", tmpMAC, size);
+  //PRINT("=======Verify MAC===========\n");
+  //printBlock("key", key->block, key->size);
+  //printBlock("msg", msg, *p_msg_size);
+  //printBlock("getMac", msg+*p_msg_size, mac_size);
+  //printBlock("sollMac", tmpMAC, size);
+  //PRINT("============================\n");
 
   return 0==memcmp(tmpMAC, msg+*p_msg_size, (unsigned int)mac_size);
 }
 
 /*!
- *\return security descriptor id (index)
+ *\return security descriptor_id id (index)
  */
 unsigned int handleSecurityLayer(unsigned char *msg, unsigned int * p_msg_size, unsigned int *p_header_size){
   tmpDescriptorSecurity.protocol_type = SECURITY_LAYER_PROTOCOL_TYPE_BITS(msg[0]);
 
+  *p_header_size = 0;
   if(tmpDescriptorSecurity.protocol_type>SECURITY_LAYER_IMPLEMENTATIONS_LEN){
-    *p_header_size = 1;
-    *p_msg_size--;
     return NO_DESCRIPTOR;
   }
   const securityLayerImplementation * implementation = implementations[tmpDescriptorSecurity.protocol_type];
   if(NULL == implementation){
-    *p_header_size = 1;
-    *p_msg_size--;
     return NO_DESCRIPTOR;
   }
-  unsigned int descriptor = getLeastActiveSecurityDescriptor(); 
-  if(0 == (*p_header_size = implementation->parseHeader(descriptor, msg, p_msg_size))){
+  unsigned int descriptor_id = getLeastActiveSecurityDescriptor(); 
+  if(0 == (*p_header_size = implementation->parseHeader(descriptor_id, msg, p_msg_size))){
     return NO_DESCRIPTOR;
   }
 
   unsigned int perm_code_size = 0;
-  unsigned char* perm_code = implementation->getPermCode(descriptor, &perm_code_size);
-  TREE_STATE_TYPE perm_index = implementation->getPermIndex(descriptor);
-  TREE_STATE_TYPE secret_index = implementation->getSecretIndex(descriptor);
-  TREE_STATE_TYPE indexes [2] = {perm_index,  implementation->getKeyIndex(descriptor)};
+  unsigned char* perm_code = implementation->getPermCode(descriptor_id, &perm_code_size);
+  TREE_STATE_TYPE perm_index = implementation->getPermIndex(descriptor_id);
+  TREE_STATE_TYPE secret_index = implementation->getSecretIndex(descriptor_id);
+  TREE_STATE_TYPE indexes [2] = {perm_index,  implementation->getKeyIndex(descriptor_id)};
   unsigned int forceUpdate = (getExpectedState(secret_index, 0) != perm_index);
+  //TODO not correct
+#ifdef SECURITY_LAYER_UPDATE_STATE
   if(SUCC == updateExpectedStateVector(secret_index, indexes, 1)){
+#endif
     tree_node * p_curr_key = getKeyNode(secret_index, perm_code, perm_code_size, indexes[1], forceUpdate);
     if(verifyMAC(p_curr_key, msg+*p_header_size, p_msg_size, implementation->MACsize)){
-      // TODO optimization, use descriptor security as last tree node
+      // TODO optimization, use descriptor_id security as last tree node
       copyTreeNode(&(tmpDescriptorSecurity.key), p_curr_key);
-      tmpDescriptorSecurity.right = NO_RIGHT;
-      if(SUCC == updateSecurityDescriptor(descriptor, &tmpDescriptorSecurity, DESCRIPTOR_SECURITY_SIZE)){
-        return descriptor;
+      if(SUCC == updateSecurityDescriptor(descriptor_id, &tmpDescriptorSecurity, DESCRIPTOR_SECURITY_SIZE)){
+        return descriptor_id;
       } else{
-      PRINT("[ERROR] Failed to update security descriptor!\n"); 
+      PRINT("[ERROR] Failed to update security descriptor_id!\n"); 
       }
     }else{
       PRINT("[ERROR] Failed to verify MAC!\n"); 
     }
+#ifdef SECURITY_LAYER_UPDATE_STATE
   }else{
     PRINT("[ERROR] Failed to update state!\n");
   }
+#endif
 
   return NO_DESCRIPTOR;
 }

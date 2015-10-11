@@ -29,7 +29,6 @@ static void * recvUdpThread(void* p_fd){
   while(1){
     int recvlen = recvfrom(*(int*)p_fd, buf, BUFSIZE, 0, (struct sockaddr *)&si_remote, &addrlen);
     if(recvlen > 0 ){
-      printBlock("recv", (unsigned char *)buf, recvlen);
       pthread_mutex_lock(&lock);
       handleUdpPackage((unsigned char*)buf, recvlen, (ADDR_TYPE *)&si_remote);
       sendUdpPackage(* (int *)p_fd, main_buf, BUFSIZE);

@@ -36,24 +36,21 @@ extern "C" {
       unsigned int addr_descriptor_id = NO_SESSION;
       unsigned char * application_message = useApplicationSession(i, &application_message_size, &security_descriptor_id, &addr_descriptor_id);
       if(application_message!=NULL){
-        if(NO_DESCRIPTOR != addr_descriptor_id){
+          ADDR_SEND_TYPE * p_addr = (ADDR_SEND_TYPE *)getAddr(addr_descriptor_id);
+        if(NULL != p_addr){
           send_buf_size = generateSecurityLayerHeader(security_descriptor_id, send_buf, max_send_buf);
           unsigned int application_layer_msg_size = generateApplicationLayer(application_message, application_message_size, send_buf+send_buf_size, max_send_buf - send_buf_size);
           send_buf_size += (application_layer_msg_size + generateSecurityLayerMAC(security_descriptor_id, send_buf+send_buf_size, application_layer_msg_size, max_send_buf-send_buf_size));
           printBlock("send", send_buf, send_buf_size);
-          ADDR_SEND_TYPE * p_addr = (ADDR_SEND_TYPE *)getAddr(addr_descriptor_id);
-          if(NULL != p_addr){
-            printIPv4("to",HTONL((((ADDR_TYPE*)p_addr)->sin_addr).s_addr));
-            SENDTO_FUNC(fd, send_buf, send_buf_size, 0, p_addr, (ADDR_LEN_TYPE)ADDR_SIZE);
-          }else{
-            send_buf[send_buf_size] = 0;
-            PRINT("NO Addr for \"%s\"\n", send_buf);
-          }
-        } else {
-          PRINT("%s\n", (const char*)application_message);
+          
+          printIPv4("to ",HTONL((((ADDR_TYPE*)p_addr)->sin_addr).s_addr));
+          PRINT(":%u\n", HTONS(((ADDR_TYPE*)p_addr)->sin_port));
+          SENDTO_FUNC(fd, send_buf, send_buf_size, 0, p_addr, (ADDR_LEN_TYPE)ADDR_SIZE);
+        }else{
+          send_buf[send_buf_size] = 0;
+          PRINT("%s %s\n", INFO_MESSAGE, (const char*)application_message);
         }
         clearApplicationSession(i); 
-        deactiveSecurityDescriptor(security_descriptor_id); 
       }
     } 
   }
@@ -78,19 +75,18 @@ extern "C" {
   //
   inline  void __attribute__((always_inline))handleUdpPackage(unsigned char* udp_payload, unsigned int udp_payload_size, ADDR_TYPE *p_addr){
     unsigned int header_size = 0;
+    udp_payload[udp_payload_size] = '\0';
+    printBlock("received message", udp_payload, udp_payload_size);
+    printIPv4("from ",HTONL(((p_addr)->sin_addr).s_addr));
+    PRINT(":%u\n", HTONS(p_addr->sin_port));
     unsigned int security_descriptor_id = handleSecurityLayer(udp_payload, &udp_payload_size, &header_size);
-    if(udp_payload_size > 0){
-      unsigned int addr_descriptor_id = addAddrDescriptor(p_addr, ADDR_SIZE);
-      printBlock("received message: ", udp_payload, udp_payload_size);
-      printIPv4("from",HTONL(((p_addr)->sin_addr).s_addr));
-      PRINT(":%u\n", HTONS(p_addr->sin_port));
+    unsigned int addr_descriptor_id = addAddrDescriptor(p_addr, ADDR_SIZE);
 
-      if(NO_DESCRIPTOR == addr_descriptor_id){
-        PRINT("[ERROR] Failed to add the addr descritptor!\n");
-      }else if(NO_SESSION == handleApplicationLayer(udp_payload+header_size, udp_payload_size, security_descriptor_id, addr_descriptor_id)){
-        udp_payload[udp_payload_size+header_size] = 0;
-        PRINT("[WARN] No application for \"%s\"!\n", (const char *)(udp_payload+header_size));
-      }
+    if(NO_DESCRIPTOR == addr_descriptor_id){
+      PRINT("%s Failed to add the addr descritptor!\n", ERROR_MESSAGE);
+    }else if(NO_SESSION == handleApplicationLayer(udp_payload+header_size, udp_payload_size, security_descriptor_id, addr_descriptor_id)){
+      udp_payload[udp_payload_size+header_size] = 0;
+      PRINT("[WARN] No application for \"%s\"!\n", (const char *)(udp_payload+header_size));
     }
   }
 

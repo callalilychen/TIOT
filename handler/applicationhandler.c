@@ -19,7 +19,7 @@ unsigned int generateApplicationHeader(unsigned char* buf, unsigned int max_buf_
   switch(type){
     case SUCC:
       if(max_buf_size > SUCC_MESSAGE_SIZE){
-        memcpy(buf, SUCC_MESSAGE, DONE_MESSAGE_SIZE);
+        memcpy(buf, SUCC_MESSAGE, SUCC_MESSAGE_SIZE);
         buf[SUCC_MESSAGE_SIZE] = ' ';
         return SUCC_MESSAGE_SIZE+1;
       }
@@ -48,6 +48,19 @@ unsigned int generateApplicationHeader(unsigned char* buf, unsigned int max_buf_
       break;
   }
   return 0;
+}
+
+unsigned int generateApplicationStatusResponse(const application* p_application, application_session * p_session, int type, unsigned char * status, unsigned int status_size){
+  p_session->message_size = generateApplicationHeader(p_session->message, MAX_APPLICATION_MESSAGE_SIZE - p_application->name_size - status_size,  type);
+    if(p_session->message_size > 0){
+      memcpy(p_session->message + p_session->message_size, p_application->name, p_application->name_size);
+      p_session->message_size +=  p_application->name_size;
+      memcpy(p_session->message + p_session->message_size, status, status_size);
+      p_session->message_size +=  status_size;
+      p_session->message[p_session->message_size] = '\0';
+  }
+  PRINT("Response (%u): %s\n", p_session->message_size, p_session->message);
+  return p_session->message_size;
 }
 /*!
  * \}

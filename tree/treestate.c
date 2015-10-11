@@ -13,7 +13,6 @@
  * @author      Wenwen Chen 
  */
 #include "treestate.h"
-
 TREE_STATE_TYPE expected_states[TREE_STATE_TABLE_LEN][TREE_STATE_VECTOR_LEN] = {0};
 
 int incExpectedState(unsigned int state_row, unsigned int state_col, unsigned int inc_pre_state)
@@ -27,6 +26,11 @@ int incExpectedState(unsigned int state_row, unsigned int state_col, unsigned in
        * If the to increased state +1 is still in upper boundary
        */
       expected_states[state_row][i]++;
+      PRINT("%s New state: ", INFO_MESSAGE);
+      for(int j = 0; j < TREE_STATE_VECTOR_LEN; j++){
+        PRINT("%x\t", expected_states[state_row][j]);
+      }
+      PRINT("\n");
       return SUCC;
     }else if(!inc_pre_state){
       /*!

@@ -33,7 +33,11 @@ extern "C" {
   /*!
    * \brief Application defination to update an address descriptor
    */
-  extern const application updateaddrapplication;
+  extern const application editaddrapplication;
+  /*!
+   * \brief Application defination to select an address descriptor as currently used address descriptor
+   */
+  extern const application selectaddrapplication;
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

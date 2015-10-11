@@ -27,13 +27,16 @@
  */
 unsigned int handleTest(unsigned char* req, unsigned int req_size, application_session * p_session){
   memcpy(p_session->message, &"[OK]", 4);
+  p_session->message[4] = '\0';
   return 4;
 }
 
 const application exampleapplication = {
   .name = "test",
   .name_size = 4,
+#if(MAX_APPLICATION_USAGE_SIZE>0)
   .usage = "\t\tTest request, [OK] will be responed",
+#endif
   .required_right = NO_RIGHT,
   .func = handleTest
 };
@@ -49,13 +52,16 @@ const application exampleapplication = {
  */
 unsigned int handleAckReq(unsigned char* req, unsigned int req_size, application_session * p_session){
   memcpy(p_session->message, &"[ACK]", 5);
+  p_session->message[5] = '\0';
   return 5;
 }
 
 const application ackapplication = {
   .name = "ack",
   .name_size = 3,
+#if(MAX_APPLICATION_USAGE_SIZE>0)
   .usage = "\t\tAck request, [ACK] will be responsed",
+#endif
   .required_right = NO_RIGHT,
   .func = handleAckReq
 };

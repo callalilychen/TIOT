@@ -33,13 +33,13 @@
   unsigned int addNewDescriptor(descriptor *p_descriptors, unsigned int descriptors_len, unsigned int predefined_data_len,  void * p_data, unsigned int len, 
       int (*checkFunc)(unsigned int, void *, unsigned int), int (*updateFunc)(unsigned int, void *, unsigned int)){
     unsigned int leastActiveDescriptorId=0; /*!<Store the id of the descriptor, which is the most inactive. That means, the descriptor value is the smallest*/
-    uint8_t leastActiveDescriptorValue = DESCRIPTOR_MAX_COUNTER;
+    uint8_t leastActiveDescriptorValue = p_descriptors[0];
     int i = 0;
     for(; i< descriptors_len;i++){
       if(DESCRIPTOR_INACTIVE != p_descriptors[i]){
         if(checkFunc(i, p_data, len)){
           p_descriptors[i] = DESCRIPTOR_MAX_COUNTER;
-          return DESCRIPTOR_MAX_COUNTER;
+          return i;
         }
         p_descriptors[i]--;
       }

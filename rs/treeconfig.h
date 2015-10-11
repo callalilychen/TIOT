@@ -5,6 +5,10 @@
  */
 /*!
  * \defgroup    config_rs Configuration for an resource server
+ * \brief       All parties share the same data declaration, only the length of data are here to configure.
+ *
+ * \note         Perhaps too static!
+ *
  * \{
  *
  * \file
@@ -35,7 +39,8 @@ extern "C" {
 #define SCAN(...) scanf(__VA_ARGS__)
 #define SSCAN(...) sscan(__VA_ARGS__)
 #define SPRINT(...) sprint(__VA_ARGS__)
-
+//TODO
+#define SECURITY_LAYER_UPDATE_STATE
 /*!
  * \brief Macro to indicate, whether an operation is successful
  */
@@ -75,8 +80,6 @@ extern "C" {
 #define NO_RIGHT 0x0
 #define ADMIN_RIGHT 0xff
 
-#define DEFAULT_PROTOCOL_TYPE 0
-
 #define IP_TYPE IPv4
 #define IPv4 char* 
 #define HTONS htons
@@ -97,6 +100,7 @@ extern "C" {
 #define SECURITY_DESCRIPTORS_LEN 1
 #define SECURITY_PREDEF_LEN 0 
 //#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
+#define SECURITY_LAYER_IMPLEMENTATIONS_LEN 1
 
 #define NODE_SIZE HASH_SIZE
 #define HASH_FUNC sha_construction.func
@@ -104,7 +108,7 @@ extern "C" {
 #define APPLICATION_SESSIONS_LEN 2
 #define MAX_APPLICATION_MESSAGE_SIZE 200  
 
-#define MSG_APPLICATION_COUNT 6
+#define MSG_APPLICATION_COUNT 9
 #define UI_APPLICATION_COUNT 0 
 #define MAX_APPLICATION_NAME_SIZE 5
 #define MAX_APPLICATION_USAGE_SIZE 0
@@ -145,11 +149,16 @@ extern "C" {
 //#define BIT_MAP_LEN TREE_STATE_TABLE_LEN                      /*!< Number of to used bit map*/
 
 #define LED_IS_ON 1
-#define LED_IS_OFF -1
-#define NO_LED 0
-#define LED_ON(x) DONE 
-#define LED_OFF(x) DONE
-#define LED(x) LED_IS_ON
+#define LED_IS_OFF 0
+#define RED_LED_ON printf("RED LED is on!\n")
+#define RED_LED_OFF printf("RED LED if off!\n")
+#define RED_LED_STATUS LED_IS_ON
+
+#define GREEN_LED_ON printf("GREEN LED is on!\n")
+#define GREEN_LED_OFF printf("GREEN LED if off!\n")
+#define GREEN_LED_STATUS LED_IS_ON
+
+
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

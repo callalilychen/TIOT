@@ -5,10 +5,10 @@
 #include "sl_common.h"
 #include "button.h"
 #include "wdt.h"
-#include "printString.h"
 #include "connection.h"
 #include "udp.h"
 #include "handler.h"
+#include "board.h"
 
 #define APPLICATION_VERSION "1.2.0"
 #define AS_PORT 9001
@@ -42,6 +42,7 @@ int main(int argc, char** argv)
   initClk();
   CLI_Configure();
   print("LOS1\n\r");
+  initLEDs();
 
   displayBanner();
   /*
@@ -132,8 +133,7 @@ int main(int argc, char** argv)
     CLI_Write(" Failed to read data from the UDP socket \n\r");
 
   resetAllExpectedStates();
-  initApplicationSession();
-  initSecurityDescriptor();
+  resetApplicationSession();
 
   // TODO config root 
   const char root[5] = "test";

@@ -28,7 +28,7 @@ LDFLAGS += -lssl -lcrypto -pthread
 DEBUGGER_FLAGS = $(TARGET)
 
 PROJECT_PATH = .
-PROJECT_SRC  = $(wildcard *.c) $(wildcard ../crypto/*.c) $(wildcard ../logic/*.c) $(wildcard ../stringOP/*.c) $(wildcard ../tree/*.c) $(wildcard ../handler/*.c) $(wildcard ../application/*.c) $(wildcard ../descriptor/*.c) $(wildcard ../protocol/*.c)
+PROJECT_SRC  = $(wildcard *.c) $(wildcard ../crypto/*.c) $(wildcard ../logic/*.c) $(wildcard ../stringOP/*.c) $(wildcard ../tree/*.c) $(wildcard ../handler/*.c) $(wildcard ../application/*.c) $(wildcard ../descriptor/*.c) $(wildcard ../protocol/*.c) $(wildcard ../rsapplication/*.c)
 
 PROJECT_OBJS = $(PROJECT_SRC:.c=.o)
 PROJECT_SOBJ = $(PROJECT_SRC:.c=.s)
@@ -42,6 +42,7 @@ C_FLAGS			+= -I../handler
 C_FLAGS			+= -I../application
 C_FLAGS			+= -I../descriptor
 C_FLAGS			+= -I../protocol
+C_FLAGS			+= -I../rsapplication
 
 
 TARGET       = build/$(PROJECT)
