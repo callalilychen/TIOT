@@ -72,9 +72,9 @@ unsigned int handleAddAddr(unsigned char* req, unsigned int req_size, applicatio
     unsigned int descriptor_id = getLeastActiveAddrDescriptor();
     if(descriptor_id==test.addr_descriptor_id){
       pthread_mutex_lock(&(test.lock));
-      if(test.send_counter!=0){
+      if(TEST_RUNNING == test.status){
         pthread_mutex_unlock(&(test.lock));
-        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        PRINT("A running test is using this descriptor, please enter 'ts' to terminate it at frist!\n");
         return 0;
       }
       pthread_mutex_unlock(&(test.lock));
@@ -116,9 +116,9 @@ unsigned int handleEditAddr(unsigned char* req, unsigned int req_size, applicati
   if(SSCAN((const char*)req, "%u:%s:%u", &descriptor_id, &ip, &port)==3){
     if(descriptor_id==test.addr_descriptor_id){
       pthread_mutex_lock(&(test.lock));
-      if(test.send_counter!=0){
+      if(TEST_RUNNING == test.status){
         pthread_mutex_unlock(&(test.lock));
-        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        PRINT("A running test is using this descriptor, please enter 'ts' to terminate it at frist!\n");
         return 0;
       }
       pthread_mutex_unlock(&(test.lock));

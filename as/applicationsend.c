@@ -52,7 +52,7 @@ unsigned int handleSend(unsigned char* req, unsigned int req_size, application_s
     pthread_mutex_lock(&(test.lock));
     if(TEST_RUNNING == test.status){
       pthread_mutex_unlock(&(test.lock));
-      PRINT("A test is running, please enter 'tstop' to terminate it at frist!\n");
+      PRINT("A test is running, please enter 'ts' to terminate it at frist!\n");
       return 0;
     }
     pthread_mutex_unlock(&(test.lock));
@@ -100,7 +100,7 @@ unsigned int handleSecureSend(unsigned char* req, unsigned int req_size, applica
     pthread_mutex_lock(&(test.lock));
     if(TEST_RUNNING == test.status){
       pthread_mutex_unlock(&(test.lock));
-      PRINT("A test is running, please enter 'tstop' to terminate it at frist!\n");
+      PRINT("A test is running, please enter 'ts' to terminate it at frist!\n");
       return 0;
     }
     pthread_mutex_unlock(&(test.lock));
@@ -228,7 +228,7 @@ static unsigned int testSendCMD(unsigned char *req, unsigned int req_size, unsig
   pthread_mutex_lock(&(test.lock));
   if(TEST_RUNNING == test.status){
     pthread_mutex_unlock(&(test.lock));
-    PRINT("Another test is running, please enter 'tstop' to terminate it at frist!\n");
+    PRINT("Another test is running, please enter 'ts' to terminate it at frist!\n");
   }else if(!isActiveAddrDescriptor(selected_addr_id)){
     pthread_mutex_unlock(&(test.lock));
     PRINT("%s Address descriptor %u does not exist or is not active\n", ERROR_MESSAGE, selected_addr_id);
@@ -378,7 +378,7 @@ unsigned int handleTestConfig(unsigned char* req, unsigned int req_size, applica
   pthread_mutex_lock(&(test.lock));
   if(TEST_RUNNING == test.status){
     pthread_mutex_unlock(&(test.lock));
-    PRINT("A test is running, please enter 'tstop' to terminate it at frist!\n");
+    PRINT("A test is running, please enter 'ts' to terminate it at frist!\n");
   }else{
     unsigned char unit[3] = {0};
     unsigned int interval;
@@ -425,8 +425,8 @@ unsigned int handleTestConfig(unsigned char* req, unsigned int req_size, applica
  */
 unsigned int handleTestStop(unsigned char* req, unsigned int req_size, application_session * p_session);
 const application teststopapplication = {
-  .name = "tstop",
-  .name_size = 5,
+  .name = "ts",
+  .name_size = 2,
   .usage = "\t\tTerminate the current test",
   .required_right = NO_RIGHT,
   .func = handleTestStop

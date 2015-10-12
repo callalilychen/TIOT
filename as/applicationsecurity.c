@@ -80,9 +80,9 @@ unsigned int handleAddSec(unsigned char* req, unsigned int req_size, application
       unsigned int descriptor_id = getLeastActiveSecurityDescriptor();
       if(descriptor_id==test.security_descriptor_id){
         pthread_mutex_lock(&(test.lock));
-        if(test.send_counter!=0){
+        if(TEST_RUNNING == test.status){
           pthread_mutex_unlock(&(test.lock));
-          PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+          PRINT("A running test is using this descriptor, please enter 'ts' to terminate it at frist!\n");
           return 0;
         }
         pthread_mutex_unlock(&(test.lock));
@@ -132,9 +132,9 @@ unsigned int handleEditSecurityLayerProtocolType(unsigned char* req, unsigned in
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &type)==2){
     if(descriptor_id==test.security_descriptor_id){
       pthread_mutex_lock(&(test.lock));
-      if(test.send_counter!=0){
+      if(TEST_RUNNING == test.status){
         pthread_mutex_unlock(&(test.lock));
-        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        PRINT("A running test is using this descriptor, please enter 'ts' to terminate it at frist!\n");
         return 0;
       }
       pthread_mutex_unlock(&(test.lock));
@@ -185,9 +185,9 @@ unsigned int handleEditSecretIndex(unsigned char* req, unsigned int req_size, ap
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &secret_index)==2){
     if(descriptor_id==test.security_descriptor_id){
       pthread_mutex_lock(&(test.lock));
-      if(test.send_counter!=0){
+      if(TEST_RUNNING == test.status){
         pthread_mutex_unlock(&(test.lock));
-        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        PRINT("A running test is using this descriptor, please enter 'ts' to terminate it at frist!\n");
         return 0;
       }
       pthread_mutex_unlock(&(test.lock));
@@ -246,9 +246,9 @@ unsigned int handleEditPermission(unsigned char* req, unsigned int req_size, app
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &perm)==2){
     if(descriptor_id==test.security_descriptor_id){
       pthread_mutex_lock(&(test.lock));
-      if(test.send_counter!=0){
+      if(TEST_RUNNING == test.status){
         pthread_mutex_unlock(&(test.lock));
-        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        PRINT("A running test is using this descriptor, please enter 'ts' to terminate it at frist!\n");
         return 0;
       }
       pthread_mutex_unlock(&(test.lock));
@@ -302,9 +302,9 @@ unsigned int handleEditKey(unsigned char* req, unsigned int req_size, applicatio
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &key_index)==1){
     if(descriptor_id==test.security_descriptor_id){
       pthread_mutex_lock(&(test.lock));
-      if(test.send_counter!=0){
+      if(TEST_RUNNING == test.status){
         pthread_mutex_unlock(&(test.lock));
-        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        PRINT("A running test is using this descriptor, please enter 'ts' to terminate it at frist!\n");
         return 0;
       }
       pthread_mutex_unlock(&(test.lock));
