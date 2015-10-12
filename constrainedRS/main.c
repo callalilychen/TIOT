@@ -128,8 +128,7 @@ int main(int argc, char** argv)
   LocalAddr.sin_port = sl_Htons(PORT_NUM);
   LocalAddr.sin_addr.s_addr = 0;
 
-  _i16 SockID = 0;
-  while((SockID = openBsdUdpSocket((SlSockAddr_t *)&LocalAddr, sizeof(SlSockAddrIn_t)))<0)
+  while(openBsdUdpSocket((SlSockAddr_t *)&LocalAddr, sizeof(SlSockAddrIn_t))<0)
     CLI_Write(" Failed to read data from the UDP socket \n\r");
 
   resetAllExpectedStates();

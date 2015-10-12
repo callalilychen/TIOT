@@ -21,12 +21,6 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
-
-  /*!
-   * \brief Application defination for messages, which begin with '['
-   */
-  extern const application msgapplication;
-
   /*!
    * \brief Application defination of revocation
    */

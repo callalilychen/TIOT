@@ -37,8 +37,7 @@ int main(int argc, char** argv)
 
   // Create a UDP socket and listen on a port
   struct sockaddr_in si_me;
-  int fd;
-  if((fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP))==-1){
+  if((udp_socket_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP))==-1){
     perror("Can not create socket\n");
     return 0;
   }
@@ -47,7 +46,7 @@ int main(int argc, char** argv)
   si_me.sin_addr.s_addr = htonl(INADDR_ANY);
   si_me.sin_port = htons(PORT);
   
-  if(bind(fd, (struct sockaddr*)&si_me, sizeof(si_me))<0){
+  if(bind(udp_socket_fd, (struct sockaddr*)&si_me, sizeof(si_me))<0){
     perror("bind failed");
     return 0;
   }
@@ -58,10 +57,10 @@ int main(int argc, char** argv)
   struct sockaddr_in si_remote;
   socklen_t addrlen = ADDR_SIZE;
   while(1){
-    udp_payload_size = recvfrom(fd, udp_payload, BUFSIZE, 0, (struct sockaddr *)&si_remote, &addrlen);
+    udp_payload_size = recvfrom(udp_socket_fd, udp_payload, BUFSIZE, 0, (struct sockaddr *)&si_remote, &addrlen);
     if(udp_payload_size>0){
       handleUdpPackage(udp_payload, udp_payload_size, (ADDR_TYPE *)(&si_remote));
     }
-    sendUdpPackage(fd, send_buf, BUFSIZE);
+    sendUdpPackage(send_buf, BUFSIZE);
   }
 }

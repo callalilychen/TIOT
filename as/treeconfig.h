@@ -31,12 +31,13 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
+#define BUFSIZE 512
 /*!
  * \brief Macro for print function
  */
 #define PRINT(...) printf(__VA_ARGS__)
 #define SCAN(...) scanf(__VA_ARGS__)
-#define SSCAN(...) sscan(__VA_ARGS__)
+#define SSCAN(...) sscanf(__VA_ARGS__)
 #define SPRINT(...) sprintf(__VA_ARGS__)
 
 /*!
@@ -99,7 +100,7 @@ extern "C" {
 
 #define SECURITY_DESCRIPTORS_LEN 4
 #define SECURITY_PREDEF_LEN 0
-//#define PREDEF_CMD_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
+#define PREDEF_TEST_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
 #define SECURITY_LAYER_IMPLEMENTATIONS_LEN 1
 
 #define NODE_SIZE HASH_SIZE
@@ -110,9 +111,9 @@ extern "C" {
 
 #define RS_MSG_APPLICATION_COUNT 9
 #define MSG_APPLICATION_COUNT 5
-#define UI_APPLICATION_COUNT 18
+#define UI_APPLICATION_COUNT 23
 #define MAX_APPLICATION_NAME_SIZE 20
-#define MAX_APPLICATION_USAGE_SIZE 100
+#define MAX_APPLICATION_USAGE_SIZE 200
 
 /*!
  * \brief Configuration of tree

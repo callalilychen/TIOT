@@ -104,7 +104,7 @@ unsigned int handleRedLED(unsigned char* req, unsigned int req_size, application
   }else{
     status_string = " is on";
   }
-  return generateApplicationStatusResponse(&redledapplication, p_session, SUCC, status_string, strlen(status_string));
+  return generateApplicationStatusResponse(&redledapplication, p_session, SUCC, (unsigned char *)status_string, strlen(status_string));
 }
 
 

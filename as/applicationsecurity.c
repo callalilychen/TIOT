@@ -77,18 +77,28 @@ unsigned int handleAddSec(unsigned char* req, unsigned int req_size, application
     /* Update the first active secret */
     unsigned int secret_index = getFirstNotSetBit();
     if(NO_BIT != secret_index){
-      p_session->security_descriptor_id = getLeastActiveSecurityDescriptor();
-      updateSecurityWithProtocolType(p_session->security_descriptor_id, type);
+      unsigned int descriptor_id = getLeastActiveSecurityDescriptor();
+      if(descriptor_id==test.security_descriptor_id){
+        pthread_mutex_lock(&(test.lock));
+        if(test.send_counter!=0){
+          pthread_mutex_unlock(&(test.lock));
+          PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+          return 0;
+        }
+        pthread_mutex_unlock(&(test.lock));
+      }
+      p_session->security_descriptor_id =descriptor_id;
+      updateSecurityWithProtocolType(descriptor_id, type);
       TREE_STATE_TYPE perm_index = getExpectedState(secret_index,0);
       incExpectedState(secret_index, 0, 0);
       setBit(secret_index);
-      setSecretIndex(p_session->security_descriptor_id, secret_index);
-      setPermIndex(p_session->security_descriptor_id, perm_index);
-      setPerm(p_session->security_descriptor_id, perm);
-      setKeyIndex(p_session->security_descriptor_id, 0);
+      setSecretIndex(descriptor_id, secret_index);
+      setPermIndex(descriptor_id, perm_index);
+      setPerm(descriptor_id, perm);
+      setKeyIndex(descriptor_id, 0);
       PRINT("New Security descriptor:\n");
       printSecurityDescriptorHeader();
-      printSecurityDescriptor(p_session->security_descriptor_id);
+      printSecurityDescriptor(descriptor_id);
     } else{
       PRINT("%s No inactive Secret\n", ERROR_MESSAGE);
     }
@@ -120,6 +130,15 @@ unsigned int handleEditSecurityLayerProtocolType(unsigned char* req, unsigned in
   unsigned int descriptor_id;
   uint8_t type;
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &type)==2){
+    if(descriptor_id==test.security_descriptor_id){
+      pthread_mutex_lock(&(test.lock));
+      if(test.send_counter!=0){
+        pthread_mutex_unlock(&(test.lock));
+        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        return 0;
+      }
+      pthread_mutex_unlock(&(test.lock));
+    }
     if(descriptor_id < SECURITY_DESCRIPTORS_LEN + SECURITY_PREDEF_LEN){
       if(SUCC != updateSecurityWithProtocolType(descriptor_id, type)){
         if(ADMIN_RIGHT == askForAdminRight()){
@@ -164,6 +183,15 @@ unsigned int handleEditSecretIndex(unsigned char* req, unsigned int req_size, ap
   unsigned int descriptor_id;
   TREE_STATE_TYPE secret_index;
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &secret_index)==2){
+    if(descriptor_id==test.security_descriptor_id){
+      pthread_mutex_lock(&(test.lock));
+      if(test.send_counter!=0){
+        pthread_mutex_unlock(&(test.lock));
+        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        return 0;
+      }
+      pthread_mutex_unlock(&(test.lock));
+    }
     if(descriptor_id >= SECURITY_DESCRIPTORS_LEN + SECURITY_PREDEF_LEN){
       PRINT("%s Descriptor id %u is out of range!:\n", ERROR_MESSAGE, descriptor_id);
       return 0;
@@ -203,19 +231,28 @@ unsigned int handleEditSecretIndex(unsigned char* req, unsigned int req_size, ap
  *
  * \return          Response message size
  */
-      unsigned int handleEditPermission(unsigned char* req, unsigned int req_size, application_session * p_session);
-      const application editpermapplication = {
-        .name = "pedit:",
-        .name_size = 6,
-        .usage = "%u:%u\t<id>:<perm>\tEdit the permission right of a security descriptor",
-        .required_right = NO_RIGHT,
-        .func = handleEditPermission
-      };
+unsigned int handleEditPermission(unsigned char* req, unsigned int req_size, application_session * p_session);
+const application editpermapplication = {
+  .name = "pedit:",
+  .name_size = 6,
+  .usage = "%u:%u\t<id>:<perm>\tEdit the permission right of a security descriptor",
+  .required_right = NO_RIGHT,
+  .func = handleEditPermission
+};
 unsigned int handleEditPermission(unsigned char* req, unsigned int req_size, application_session * p_session){
   // XXX This application is only for ui, therefore, output is directly printed on the standard output via PRINT.
   unsigned int descriptor_id;
   RIGHT_TYPE perm;
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &perm)==2){
+    if(descriptor_id==test.security_descriptor_id){
+      pthread_mutex_lock(&(test.lock));
+      if(test.send_counter!=0){
+        pthread_mutex_unlock(&(test.lock));
+        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        return 0;
+      }
+      pthread_mutex_unlock(&(test.lock));
+    }
     if(descriptor_id >= SECURITY_DESCRIPTORS_LEN + SECURITY_PREDEF_LEN){
       PRINT("%s Descriptor id %u is out of range!:\n", ERROR_MESSAGE, descriptor_id);
       return 0;
@@ -250,19 +287,28 @@ unsigned int handleEditPermission(unsigned char* req, unsigned int req_size, app
  *
  * \return          Response message size
  */
-      unsigned int handleEditKey(unsigned char* req, unsigned int req_size, application_session * p_session);
-      const application editkeyapplication = {
-        .name = "kedit:",
-        .name_size = 6,
-        .usage = "%u:%u\t<id>:<index>\tEdit the key index of a security descriptor",
-        .required_right = NO_RIGHT,
-        .func = handleEditKey
-      };
+unsigned int handleEditKey(unsigned char* req, unsigned int req_size, application_session * p_session);
+const application editkeyapplication = {
+  .name = "kedit:",
+  .name_size = 6,
+  .usage = "%u:%u\t<id>:<index>\tEdit the key index of a security descriptor",
+  .required_right = NO_RIGHT,
+  .func = handleEditKey
+};
 unsigned int handleEditKey(unsigned char* req, unsigned int req_size, application_session * p_session){
   // XXX This application is only for ui, therefore, output is directly printed on the standard output via PRINT.
   TREE_STATE_TYPE key_index;
   unsigned int descriptor_id;
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &key_index)==1){
+    if(descriptor_id==test.security_descriptor_id){
+      pthread_mutex_lock(&(test.lock));
+      if(test.send_counter!=0){
+        pthread_mutex_unlock(&(test.lock));
+        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        return 0;
+      }
+      pthread_mutex_unlock(&(test.lock));
+    }
     if(descriptor_id >= SECURITY_DESCRIPTORS_LEN + SECURITY_PREDEF_LEN){
       PRINT("%s Descriptor id %u is out of range!:\n", ERROR_MESSAGE, descriptor_id);
       return 0;
@@ -294,15 +340,15 @@ unsigned int handleEditKey(unsigned char* req, unsigned int req_size, applicatio
  *
  * \return          Response message size
  */
-        unsigned int handleSelectSecurity(unsigned char* req, unsigned int req_size, application_session * p_session);
+unsigned int handleSelectSecurity(unsigned char* req, unsigned int req_size, application_session * p_session);
 
-        const application selectsecapplication = {
-          .name = "ssel:",
-          .name_size = 5,
-          .usage = "%u\t<id>\tSelect an security descriptor",
-          .required_right = NO_RIGHT,
-          .func = handleSelectSecurity
-        };
+const application selectsecapplication = {
+  .name = "ssel:",
+  .name_size = 5,
+  .usage = "%u\t<id>\tSelect an security descriptor",
+  .required_right = NO_RIGHT,
+  .func = handleSelectSecurity
+};
 unsigned int handleSelectSecurity(unsigned char* req, unsigned int req_size, application_session * p_session){
   // XXX This application is only for ui, therefore, output is directly printed on the standard output via PRINT.
   unsigned int id;

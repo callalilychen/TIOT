@@ -70,6 +70,15 @@ unsigned int handleAddAddr(unsigned char* req, unsigned int req_size, applicatio
   unsigned int port;
   if(SSCAN((const char*)req, "%s:%u", &ip, &port)==2){
     unsigned int descriptor_id = getLeastActiveAddrDescriptor();
+    if(descriptor_id==test.addr_descriptor_id){
+      pthread_mutex_lock(&(test.lock));
+      if(test.send_counter!=0){
+        pthread_mutex_unlock(&(test.lock));
+        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        return 0;
+      }
+      pthread_mutex_unlock(&(test.lock));
+    }
     if(SUCC == updateAddrWithIpAndPort(descriptor_id, ip, port)){
       PRINT("%s add address:\n", SUCC_MESSAGE);
       printAddrDescriptor(descriptor_id);
@@ -105,6 +114,15 @@ unsigned int handleEditAddr(unsigned char* req, unsigned int req_size, applicati
   char ip[16] = {0};
   unsigned int port;
   if(SSCAN((const char*)req, "%u:%s:%u", &descriptor_id, &ip, &port)==3){
+    if(descriptor_id==test.addr_descriptor_id){
+      pthread_mutex_lock(&(test.lock));
+      if(test.send_counter!=0){
+        pthread_mutex_unlock(&(test.lock));
+        PRINT("A running test is using this descriptor, please enter 'tstop' to terminate it at frist!\n");
+        return 0;
+      }
+      pthread_mutex_unlock(&(test.lock));
+    }
     if(SUCC == updateAddrWithIpAndPort(descriptor_id, ip, port)){
       PRINT("%s Update address:\n", SUCC_MESSAGE);
       printAddrDescriptor(descriptor_id);

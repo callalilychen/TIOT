@@ -32,7 +32,7 @@ PROJECT_SRC  = $(wildcard *.c) $(wildcard ../crypto/*.c) $(wildcard ../logic/*.c
 
 PROJECT_OBJS = $(PROJECT_SRC:.c=.o)
 PROJECT_SOBJ = $(PROJECT_SRC:.c=.s)
-C_FLAGS     +=  --std=c99
+C_FLAGS     +=  --std=gnu99
 C_FLAGS			+= -I.
 C_FLAGS			+= -I../crypto
 C_FLAGS			+= -I../logic

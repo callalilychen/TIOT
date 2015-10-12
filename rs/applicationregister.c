@@ -31,6 +31,9 @@ const application *msg_applications[MSG_APPLICATION_COUNT] = {
   &greenledapplication
 };
 
+void initApplication(void){
+  // do nothing
+}
 /*!
  * \}
  */

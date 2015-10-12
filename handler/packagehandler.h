@@ -1,5 +1,5 @@
 /*-
- * applicationlayer.c - UDP package handler 
+ * packagehandler.h - UDP package handler 
  *
  * Copyright 2015 Wenwen Chen
  */
@@ -27,8 +27,8 @@ extern "C" {
 #endif
 
 #define ADDR_SIZE sizeof(ADDR_TYPE)
-
-  inline void __attribute__((always_inline))sendUdpPackage(int fd, unsigned char* send_buf, unsigned int max_send_buf){
+extern int udp_socket_fd; 
+  inline void __attribute__((always_inline))sendUdpPackage(unsigned char* send_buf, unsigned int max_send_buf){
     for(int i = 0; i < APPLICATION_SESSIONS_LEN; i++){
       unsigned int send_buf_size = 0;
       unsigned int application_message_size = 0;
@@ -45,7 +45,7 @@ extern "C" {
           
           printIPv4("to ",HTONL((((ADDR_TYPE*)p_addr)->sin_addr).s_addr));
           PRINT(":%u\n", HTONS(((ADDR_TYPE*)p_addr)->sin_port));
-          SENDTO_FUNC(fd, send_buf, send_buf_size, 0, p_addr, (ADDR_LEN_TYPE)ADDR_SIZE);
+          SENDTO_FUNC(udp_socket_fd, send_buf, send_buf_size, 0, p_addr, (ADDR_LEN_TYPE)ADDR_SIZE);
         }else{
           send_buf[send_buf_size] = 0;
           PRINT("%s %s\n", INFO_MESSAGE, (const char*)application_message);

@@ -21,32 +21,6 @@
 #include "bitmap.h"
 
 /*!
- * \brief Handle message, which begins with '['
- *
- *        Such messages will be just printed
- *
- * \param req       Rest of request message after application name
- * \param req_size  Size of this message
- * \param p_session Pointer to the corresponding application session
- *
- * \return          0 
- */
-unsigned int handleMsg(unsigned char* req, unsigned int req_size, application_session * p_session){
-  req[req_size] = '\0';
-  PRINT("[%s (%u)\n", req, req_size);
-  return 0;
-}
-
-const application msgapplication = {
-  .name = "[",
-  .name_size = 1,
-  .usage = "\t\tAll messages, which begins with '[' will just be printed",
-  .required_right = NO_RIGHT,
-  .func = handleMsg
-};
-
-
-/*!
  * \brief Handle revocation message
  *
  * \param req       Rest of request message after application name

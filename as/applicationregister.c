@@ -45,13 +45,22 @@ const application *ui_applications[UI_APPLICATION_COUNT] = {
   &editpermapplication,
   &editkeyapplication,
   &selectsecapplication,
-  &sendtoapplication,
-  &securesendtoapplication,
+  &sendapplication,
+  &securesendapplication,
+  &testsendapplication,
+  &testsecuresendapplication,
+  &testconfigapplication,
+  &testsettingapplication,
+  &teststopapplication,
   &rshelpapplication,
   &msghelpapplication,
   &uihelpapplication
 };
 #endif
+
+void initApplication(void){
+  pthread_mutex_init(&(test.lock), NULL);
+}
 /*!
  * \}
  */
