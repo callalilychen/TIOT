@@ -86,13 +86,14 @@ extern int udp_socket_fd;
       PRINT("%s Failed to add the addr descritptor!\n", ERROR_MESSAGE);
     }else if(NO_SESSION == handleApplicationLayer(udp_payload+header_size, udp_payload_size, security_descriptor_id, addr_descriptor_id)){
       udp_payload[udp_payload_size+header_size] = 0;
-      PRINT("[WARN] No application for \"%s\"!\n", (const char *)(udp_payload+header_size));
+      //PRINT("[WARN] No application for \"%s\"!\n", (const char *)(udp_payload+header_size));
     }
   }
 
 #if(UI_APPLICATION_COUNT>0)
   inline  void __attribute__((always_inline))handleCmdPackage(unsigned char* str, unsigned int str_size){
     if(str_size > 0){
+      str[str_size] = '\0';
       unsigned int session_id = createApplicationSession(NO_DESCRIPTOR, NO_DESCRIPTOR);
       if(NO_SESSION != session_id){
         handleApplication(str, str_size, session_id, ui_application);

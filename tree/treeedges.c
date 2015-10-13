@@ -28,8 +28,8 @@ void edgeFunc(tree_node *p_parent_node, tree_edge *p_edge, tree_node *p_node)
       memcpy(p_node->block + size, p_edge->params, (size_t)(p_edge->params_size));
       size+=(p_edge->params_size);
     }
+    memcpy(p_node->block + size, p_edge->params,(size_t)(p_parent_node->size - size));
   }
-  memcpy(p_node->block + size, p_edge->params,(size_t)(p_parent_node->size - size));
   optimizedXOR(p_node->block, p_parent_node->block, (size_t)(p_parent_node->size), p_node->block);
   HASH_FUNC(p_node->block, (size_t)(p_parent_node->size), p_node->block);
   p_node->size = NODE_SIZE; 

@@ -55,11 +55,6 @@ extern "C" {
 #define DESCRIPTOR_SECURITY_SIZE sizeof(descriptor_security)
 
   /*!
-   * \brief The index of the reserved temporary descriptor_security
-   */
-#define TMP_DESCRIPTOR_SECURITY_INDEX SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN
-
-  /*!
    * \brief Macro indicate the type for security protocol is not defined or does not exist
    */
 #define NO_SECURITY_PROTOCOL_TYPE 0xff 
@@ -274,9 +269,8 @@ extern "C" {
    * 
    * \return None
    */
-  inline void __attribute__((always_inline))printSecurityDescriptorHeader(){
-    PRINT("Index\tProtocol Type\tSecurity Index\tPermission Index\tPermission\tKey Index\n");
-  }    
+  void printSecurityDescriptorHeader();
+
 
   /*!
    * \brief Print security descriptor of the given id
@@ -286,6 +280,16 @@ extern "C" {
    * \return None
    */
   void printSecurityDescriptor(unsigned int id);
+  
+  /*!
+   * \brief Copy the destination security descriptor to the source security descriptor
+   * 
+   * \param dest_id        Identifier of the destination security descritptor 
+   * \param src_id         Identifier of the source security descritptor 
+   *
+   * \return      On success SUCC is returned, otherwise FAIL.
+   */
+  int copySecurityDescriptor(unsigned int dest_id, unsigned int src_id);
 #ifdef  __cplusplus
 }
 #endif /* __cplusplus */

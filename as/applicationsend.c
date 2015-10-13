@@ -108,16 +108,14 @@ unsigned int handleSecureSend(unsigned char* req, unsigned int req_size, applica
   p_session->addr_descriptor_id = selected_addr_id;
   p_session->security_descriptor_id = selected_security_id;
 
-  TREE_STATE_TYPE key_id = getKeyIndex(p_session->security_descriptor_id);
-  setKeyIndex(p_session->security_descriptor_id, key_id+1);
+  TREE_STATE_TYPE key_id = getKeyIndex(p_session->security_descriptor_id)+1;
+  setKeyIndex(p_session->security_descriptor_id, key_id);
   key_id = getKeyIndex(p_session->security_descriptor_id);
   /* Calculate key */
   unsigned int depth = 2;
-  tree_edge * edges = getEdges(depth);
-  edges[0].func = edgeFunc;
+  tree_edge * edges = getEdgesWithFunction(depth, edgeFunc);
   edges[0].params = getPermCode(p_session->security_descriptor_id, &(edges[0].params_size));
 
-  edges[1].func = edgeFunc;
   edges[1].params = (unsigned char *)(&key_id);
   edges[1].params_size = TREE_STATE_SIZE;
   tree_node * p_key_node = NULL;
@@ -158,11 +156,12 @@ const application msgapplication = {
 };
 
 unsigned int handleMsg(unsigned char* req, unsigned int req_size, application_session * p_session){
-  pthread_mutex_lock(&(test.lock));
   if(TEST_RUNNING==test.status && p_session->addr_descriptor_id == test.addr_descriptor_id){
+    PRINT("%s Test %u is received\n", INFO_MESSAGE, test.recv_counter);
+    pthread_mutex_lock(&(test.lock));
     test.recv_counter++;
+    pthread_mutex_unlock(&(test.lock));
   }
-  pthread_mutex_unlock(&(test.lock));
   req[req_size] = '\0';
   PRINT("[%s (%u)\n", req, req_size);
   return 0;
@@ -179,6 +178,12 @@ unsigned int handleMsg(unsigned char* req, unsigned int req_size, application_se
 void* testsend(void *nothing){
   unsigned int buf_index = 0;
   ADDR_SEND_TYPE * p_addr = (ADDR_SEND_TYPE *)getAddr(test.addr_descriptor_id);
+  unsigned int header_size = getSecurityLayerHeaderSize(test.security_descriptor_id);
+  unsigned int mac_size = getSecurityLayerMACSize(test.security_descriptor_id);
+  if(p_addr == NULL){
+    PRINT("%s No addr is defined for selected address descriptor %u\n", ERROR_MESSAGE, test.addr_descriptor_id);
+    return NULL;
+  }
   int sleep_flag = (test.interval.tv_sec>0 || test.interval.tv_nsec>0);
   while(1){
     pthread_mutex_lock(&(test.lock));
@@ -194,11 +199,38 @@ void* testsend(void *nothing){
       }
       buf_index++;
     }
+    if(NO_DESCRIPTOR != test.security_descriptor_id){
+      TREE_STATE_TYPE key_id = getKeyIndex(test.security_descriptor_id)+1;
+      setKeyIndex(test.security_descriptor_id, key_id);
+      if(key_id > getKeyIndex(test.security_descriptor_id)){
+        key_id = getKeyIndex(test.security_descriptor_id);
+        TREE_STATE_TYPE perm_index = getPermIndex(test.security_descriptor_id)+1;
+        setPermIndex(test.security_descriptor_id, perm_index);
+        if(perm_index > getPermIndex(test.security_descriptor_id)){
+          setSecretIndex(test.security_descriptor_id, getSecretIndex(test.security_descriptor_id)+1);
+        }
+      }
+      /* Calculate key */
+      unsigned int depth = 2;
+      tree_edge * edges = getEdgesWithFunction(depth, edgeFunc);
+      edges[0].params = getPermCode(test.security_descriptor_id, &(edges[0].params_size));
+
+      edges[1].params = (unsigned char *)(&key_id);
+      edges[1].params_size = TREE_STATE_SIZE;
+      tree_node * p_key_node = NULL;
+
+      p_key_node = fillNodes(getPathFromRoot(depth), edges, depth+1, 1);
+      printBlock("Key", p_key_node->block, p_key_node->size);
+
+      updatePredefSecurityWithKey(test.security_descriptor_id, p_key_node);
+      generateSecurityLayerHeader(test.security_descriptor_id, test.buf[buf_index], BUFSIZE);
+      generateSecurityLayerMAC(test.security_descriptor_id, test.buf[buf_index]+header_size, test.buf_size[buf_index]-header_size-mac_size, BUFSIZE-header_size);
+    }
     SENDTO_FUNC(udp_socket_fd, test.buf[buf_index], test.buf_size[buf_index], 0, p_addr, (ADDR_LEN_TYPE)ADDR_SIZE);
     buf_index++;
     test.send_counter ++;
     
-    PRINT("Test %u is sent!\n",test.send_counter);
+    PRINT("%s Test %u is sent!\n",INFO_MESSAGE, test.send_counter);
     if(test.times!=0 && test.times <= test.send_counter){
       break;
     }
@@ -209,8 +241,9 @@ void* testsend(void *nothing){
   }
   float quoto = test.recv_counter/test.send_counter;
   PRINT("=====TEST RESULT=====\n");
-  PRINT("%s Send %u packages, receive %u packages. %.1f%% package loss!\n",  test.recv_counter,test.send_counter,INFO_MESSAGE, 100*(1-quoto));
+  PRINT("%s Send %u packages, receive %u packages. %.1f%% package loss!\n", INFO_MESSAGE, test.recv_counter,test.send_counter, 100*(1-quoto));
   PRINT("=====================\n");
+  test.status = TEST_IDLE;
   pthread_mutex_unlock(&(test.lock));
   return NULL;
 }
@@ -233,23 +266,42 @@ static unsigned int testSendCMD(unsigned char *req, unsigned int req_size, unsig
     pthread_mutex_unlock(&(test.lock));
     PRINT("%s Address descriptor %u does not exist or is not active\n", ERROR_MESSAGE, selected_addr_id);
   }else{
-    int input_number = SSCAN((const char*)req, "%s,%s,%s,%s", test.buf[0], test.buf[1], test.buf[2], test.buf[3]);
-    pthread_mutex_unlock(&(test.lock));
-    PRINT("GET Variable %d\n", input_number);
-    if(input_number > 0){
-      pthread_mutex_lock(&(test.lock));
-      for(int i = 0; i < MAX_TEST_MESSAGE; i++){
-        test.buf_size[i] = strlen((const char*)(test.buf[i]));
+    if(secure_flag){
+      copySecurityDescriptor(PREDEF_TEST_SECURITY_DESCRIPTOR, selected_security_id);
+      test.security_descriptor_id = PREDEF_TEST_SECURITY_DESCRIPTOR;
+    }else{
+      test.security_descriptor_id = NO_DESCRIPTOR;
+    }
+    /*!
+      * Separate req to different messages
+      *
+      * \note sscanf((const char*)req, "%s,%s,%s,%s", test.buf[0]+header_size, test.buf[1]+header_size, test.buf[2]+header_size, test.buf[3]+header_size) does not work
+      */
+    unsigned int header_size = getSecurityLayerHeaderSize(test.security_descriptor_id);
+    unsigned int mac_size = getSecurityLayerMACSize(test.security_descriptor_id);
+    unsigned int curr_buf_index = 0;
+    unsigned int curr_buf_size = 0;
+    unsigned int total_buf_size = 0;
+    for(int i = 0; i < req_size; i++){
+      if(req[i] == ','){
+        test.buf_size[curr_buf_index] = header_size+curr_buf_size+mac_size;
+        total_buf_size += curr_buf_size;
+        curr_buf_index ++;
+        if(curr_buf_index >= MAX_TEST_MESSAGE){
+          break;
+        }
+        curr_buf_size = 0;
+      }else{ 
+        *(test.buf[curr_buf_index]+header_size+curr_buf_size) = req[i];
+        curr_buf_size ++;
       }
+    }
+    test.buf_size[curr_buf_index] = header_size + curr_buf_size + mac_size;
+    total_buf_size += curr_buf_size;
+    if(total_buf_size > 0){
       test.recv_counter=0;
       test.send_counter=0;
       test.addr_descriptor_id = selected_addr_id;
-      if(secure_flag){
-        updatePredefSecurityWithProtocolType(PREDEF_TEST_SECURITY_DESCRIPTOR, getDescriptorProtocolType(selected_security_id));
-        test.security_descriptor_id = PREDEF_TEST_SECURITY_DESCRIPTOR;
-      }else{
-        test.security_descriptor_id = NO_DESCRIPTOR;
-      }
       test.status = TEST_RUNNING;
       pthread_mutex_unlock(&(test.lock));
       pthread_create(&(test.thread), NULL, testsend, NULL);
@@ -257,9 +309,10 @@ static unsigned int testSendCMD(unsigned char *req, unsigned int req_size, unsig
       if(test.times > 0){
         PRINT(" %u times", test.times);
       }
-      PRINT(":\nMessage 1: %s\nMessage 2: %s\nMessage 3: %s\nMessage 4: %s\n", test.buf[0], test.buf[1], test.buf[2], test.buf[3]);
+      PRINT(":\nMessage 1: %s\nMessage 2: %s\nMessage 3: %s\nMessage 4: %s\n", test.buf[0]+header_size, test.buf[1]+header_size, test.buf[2]+header_size, test.buf[3]+header_size);
       //FIXME message_sizes[1] = generateApplicationLayer(message2, strlen(message2), tmp_buf+message_sizes[0], BUFSIZE);
     }else{
+      pthread_mutex_unlock(&(test.lock));
       if(secure_flag){
         PRINT("%s %s%s\n", USAGE_MESSAGE, testsecuresendapplication.name, testsecuresendapplication.usage);
       }else{
@@ -381,11 +434,11 @@ unsigned int handleTestConfig(unsigned char* req, unsigned int req_size, applica
     PRINT("A test is running, please enter 'ts' to terminate it at frist!\n");
   }else{
     unsigned char unit[3] = {0};
-    unsigned int interval;
+    unsigned int interval=0;
     int input_number = SSCAN((const char*)req, "%u:%u%s", &(test.times), &interval, unit);
     PRINT("Input %d, %s\n", input_number, unit);
     pthread_mutex_unlock(&(test.lock));
-    if(input_number == 3){
+    if(input_number >0){
       pthread_mutex_lock(&(test.lock));
       if(unit[0] == 'n'){
         test.interval.tv_sec = 0;

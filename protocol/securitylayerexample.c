@@ -16,10 +16,10 @@
 #include "securitylayerexample.h"
 #include <string.h>
 
-static securityHeaderExample currHeaders[SECURITY_DESCRIPTORS_LEN] = {0};
+static securityHeaderExample currHeaders[SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN] = {0};
 
 unsigned int parseHeaderExample(unsigned int security_descriptor, unsigned char * msg, unsigned int *p_msg_size){
-  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN || msg[0]>>6 != SECURITY_LAYER_TYPE_EXAMPLE || *p_msg_size < SECURITY_LAYER_HEADER_LEN_EXAMPLE + MAC_LEN_EXAMPLE){
+  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN || msg[0]>>6 != SECURITY_LAYER_TYPE_EXAMPLE || *p_msg_size < SECURITY_LAYER_HEADER_LEN_EXAMPLE + MAC_LEN_EXAMPLE){
     return 0;
   }
   * p_msg_size -= SECURITY_LAYER_HEADER_LEN_EXAMPLE;
@@ -28,7 +28,7 @@ unsigned int parseHeaderExample(unsigned int security_descriptor, unsigned char 
 }
 
 unsigned int generateHeaderExample(unsigned int security_descriptor, unsigned char* msg, unsigned int msg_size){
-  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN || msg_size < SECURITY_LAYER_HEADER_LEN_EXAMPLE){
+  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN || msg_size < SECURITY_LAYER_HEADER_LEN_EXAMPLE){
     return 0;
   }
   memcpy(msg, currHeaders+security_descriptor, SECURITY_LAYER_HEADER_LEN_EXAMPLE);
@@ -36,7 +36,7 @@ unsigned int generateHeaderExample(unsigned int security_descriptor, unsigned ch
 }
 
 unsigned int generatePermCodeExample(unsigned int security_descriptor, unsigned char* msg, unsigned int msg_size){
-  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN || msg_size < SECURITY_LAYER_PERMCODE_LEN_EXAMPLE){
+  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN || msg_size < SECURITY_LAYER_PERMCODE_LEN_EXAMPLE){
     return 0;
   }
   memcpy(msg, &(currHeaders[security_descriptor].perm_code), SECURITY_LAYER_PERMCODE_LEN_EXAMPLE);
@@ -44,7 +44,7 @@ unsigned int generatePermCodeExample(unsigned int security_descriptor, unsigned 
 }
 
 void * getHeaderExample(unsigned int security_descriptor, unsigned int *size){
-  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return NULL;
   }
   if(size != NULL)
@@ -53,7 +53,7 @@ void * getHeaderExample(unsigned int security_descriptor, unsigned int *size){
 } 
 
 void * getPermCodeExample(unsigned int security_descriptor, unsigned int * size){
-  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return NULL;
   }
   if(size != NULL)
@@ -62,35 +62,35 @@ void * getPermCodeExample(unsigned int security_descriptor, unsigned int * size)
 }
 
 TREE_STATE_TYPE getSecretIndexExample(unsigned int security_descriptor){
-  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return NO_TREE_STATE;
   }
   return (TREE_STATE_TYPE)((currHeaders[security_descriptor].perm_code).secret_index);
 }
 
 TREE_STATE_TYPE getPermIndexExample(unsigned int security_descriptor){
-  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return NO_TREE_STATE;
   }
   return (TREE_STATE_TYPE)((currHeaders[security_descriptor].perm_code).perm_index);
 }
 
 RIGHT_TYPE getPermExample(unsigned int security_descriptor){
-  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return NO_RIGHT;
   }
   return (TREE_STATE_TYPE)((currHeaders[security_descriptor].perm_code).perm);
 }
 
 TREE_STATE_TYPE getKeyIndexExample(unsigned int security_descriptor){
-  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return NO_TREE_STATE;
   }
   return (TREE_STATE_TYPE)(currHeaders[security_descriptor].key_index);
 }
 
 unsigned int setSecretIndexExample(unsigned int security_descriptor, TREE_STATE_TYPE index){
-  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return 0;
   }
   (currHeaders[security_descriptor].perm_code).secret_index = (uint8_t)index;
@@ -98,7 +98,7 @@ unsigned int setSecretIndexExample(unsigned int security_descriptor, TREE_STATE_
 }
 
 unsigned int setPermIndexExample(unsigned int security_descriptor, TREE_STATE_TYPE index){
-  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return 0;
   }
   (currHeaders[security_descriptor].perm_code).perm_index = (uint8_t)index;
@@ -106,7 +106,7 @@ unsigned int setPermIndexExample(unsigned int security_descriptor, TREE_STATE_TY
 }
 
 unsigned int setPermExample(unsigned int security_descriptor, RIGHT_TYPE perm_right){
-  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return 0;
   }
   (currHeaders[security_descriptor].perm_code).perm = (uint8_t)perm_right;
@@ -114,7 +114,7 @@ unsigned int setPermExample(unsigned int security_descriptor, RIGHT_TYPE perm_ri
 }
 
 unsigned int setKeyIndexExample(unsigned int security_descriptor, TREE_STATE_TYPE index){
-  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return 0;
   }
   currHeaders[security_descriptor].key_index = (uint8_t)index;
@@ -122,7 +122,7 @@ unsigned int setKeyIndexExample(unsigned int security_descriptor, TREE_STATE_TYP
 }
 
 unsigned int setPermCodeExample(unsigned int security_descriptor, unsigned char *code, unsigned int code_size){
-  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN){
+  if(security_descriptor >= SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN){
     return 0;
   }
   unsigned int size = sizeof(permCodeExample);

@@ -776,6 +776,7 @@ INPUT                  =  ../../logic \
                           ../../constrainedRS \
                           ../../rsapplication \
                           ../../rs \
+                          ../../msp430f5529lp \
                           ../../as \
 #                          ../../client \
                           src

@@ -48,6 +48,7 @@ extern "C" {
     unsigned int (*setKeyIndex)(unsigned int security_descriptor_id, TREE_STATE_TYPE index);
     unsigned int (*setPermCode)(unsigned int security_descriptor_id, unsigned char* msg, unsigned int msg_size);
 
+    unsigned int HeaderSize;
     unsigned int MACsize;
   }securityLayerImplementation;
 
@@ -84,11 +85,11 @@ extern "C" {
       return 0;
     }
     hmac(&sha_construction, currKeyNode->block, currKeyNode->size, payload, payload_size, tmpMAC, &mac_size);
- // PRINT("=======Generate MAC===========\n");
- // printBlock("key", currKeyNode->block, currKeyNode->size);
- // printBlock("msg", payload, payload_size);
- // printBlock("Mac", tmpMAC, mac_size);
- // PRINT("============================\n");
+  PRINT("=======Generate MAC %u========\n", security_descriptor_id);
+  printBlock("key", currKeyNode->block, currKeyNode->size);
+  printBlock("msg", payload, payload_size);
+  printBlock("Mac", tmpMAC, mac_size);
+  PRINT("============================\n");
     mac_size = implementations[currType]->MACsize;
     memcpy(payload+payload_size, tmpMAC, mac_size);
     return mac_size;
@@ -126,6 +127,23 @@ extern "C" {
     return 0;
   }
 
+  inline unsigned int __attribute__((always_inline))getSecurityLayerHeaderSize(unsigned int security_descriptor_id){
+    uint8_t currType = getDescriptorProtocolType(security_descriptor_id);
+    if(currType<SECURITY_LAYER_IMPLEMENTATIONS_LEN){
+      return implementations[currType]->HeaderSize;
+    }
+    return 0;
+    
+  }
+
+  inline unsigned int __attribute__((always_inline))getSecurityLayerMACSize(unsigned int security_descriptor_id){
+    uint8_t currType = getDescriptorProtocolType(security_descriptor_id);
+    if(currType<SECURITY_LAYER_IMPLEMENTATIONS_LEN){
+      return implementations[currType]->MACsize;
+    }
+    return 0;
+    
+  }
 
   inline RIGHT_TYPE __attribute__((always_inline))getPerm(unsigned int security_descriptor_id){
     uint8_t currType = getDescriptorProtocolType(security_descriptor_id);
@@ -165,6 +183,27 @@ extern "C" {
       return implementations[currType]->getPermCode(security_descriptor_id, size);
     }
     return NULL;
+  }
+  inline void __attribute__((always_inline))printSecurityDescriptorSecurityLayerHeader(){
+    PRINT("Security Index\tPermission Index\tPermission\tKey Index");
+  }
+  
+  inline void __attribute__((always_inline)) printSecurityDescriptorSecurityLayer(unsigned int id){
+    PRINT("%u\t\t%u\t\t\t%u\t\t%u", 
+        getSecretIndex(id),
+        getPermIndex(id),
+        getPerm(id),
+        getKeyIndex(id));
+  }
+
+  inline int __attribute__((always_inline))copySecurityDescriptorSecurityLayer(unsigned int dest_id, unsigned int src_id){
+    if(setSecretIndex(dest_id, getSecretIndex(src_id))+
+    setPermIndex(dest_id, getPermIndex(src_id))+
+    setPerm(dest_id, getPerm(src_id))+
+    setKeyIndex(dest_id, getKeyIndex(src_id))>0){
+      return SUCC;
+    }
+    return FAIL;
   }
 #ifdef  __cplusplus
 }

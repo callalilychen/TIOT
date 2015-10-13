@@ -13,7 +13,7 @@
 
 #define PORT 9002
 #define RS_PORT 5001  
-//#define RS_IP "192.168.1.38"
+#define CONSTRAINED_RS_IP "192.168.1.39"
 #define RS_IP "127.0.0.1"
 
 static pthread_mutex_t lock;
@@ -80,6 +80,7 @@ int main(int argc, char** argv)
   }
 
   /* Init predef addr of RS */
+  updateAddrWithIpAndPort(0, CONSTRAINED_RS_IP, RS_PORT);
   updatePredefAddrWithIpAndPort(PREDEF_RS_ADDR, RS_IP, RS_PORT);
 
   pthread_mutex_init (&lock, NULL);

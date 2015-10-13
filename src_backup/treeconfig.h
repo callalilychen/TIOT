@@ -1,18 +1,18 @@
-/*_
- * treeconfig.h - Configuration for an authorization server
+/*
+ * treeconfig.h - Configuration for constrained resource server
  *
- * Copyright 2015 Wenwen Chen
- */
+*/
 /*!
- * \defgroup    config_as Configuration for an authorization server
- * \brief    All parties share the same data declaration, only the length of data are here to configure.
+ * \defgroup    config_rs Configuration for an resource server
+ *    
+ * \brief All parties share the same data declaration, only the length of data are here to configure.
  *
  * \note         Perhaps too static!
  *
  * \{
  *
  * \file
- * \brief        Configuration for an authorization server
+ * \brief       Configuration for an resource server
  *
  * \author      Wenwen Chen 
  */
@@ -23,25 +23,21 @@
 /* Include files                                                             */
 /*****************************************************************************/
 #include "interface.h"
+#include "simplelink.h"
+#include "board.h"
+#include "printString.h"
 #include "scanString.h"
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#define BUFSIZE 512
+#define PRINT(...) print(__VA_ARGS__)
+#define SPRINT(...) sprint(__VA_ARGS__)
+#define SCAN(...)  
+#define SSCAN(...) sscan(__VA_ARGS__)  
+//TODO
+#define SECURITY_LAYER_UPDATE_STATE
 /*!
- * \brief Macro for print function
- */
-#define PRINT(...) printf(__VA_ARGS__)
-#define SCAN(...) scanf(__VA_ARGS__)
-#define SSCAN(...) sscanf(__VA_ARGS__)
-#define SPRINT(...) sprintf(__VA_ARGS__)
-
-/*!
- * \brief Macro to indicate, whether an operation is successful 
+ * \brief Macro to indicate, whether an operation is successful
  */
 #define SUCC 0
 /*!
@@ -72,55 +68,51 @@ extern "C" {
 
 #define INFO_MESSAGE "[INFO]"
 #define INFO_MESSAGE_SIZE 6
-
-
 #define RIGHT_TYPE uint8_t
 /*!
  * \brief Macro for when no right is required 
  */
 #define NO_RIGHT 0x0
 #define ADMIN_RIGHT 0xff
-#define ADMIN_PASSWORD_HASH "t"
 
 #define IP_TYPE IPv4
-#define IPv4 char* 
-#define HTONS htons
-#define HTONL htonl
-#define ASSIGN_IP(addr, ip) inet_aton(ip, &addr)
+#define IPv4 uint32_t 
+#define HTONS sl_Htons
+#define HTONL sl_Htonl
+#define ASSIGN_IP(addr, ip) addr = HTONL(ip)
 
-#define ADDR_FAMILY AF_INET
-#define ADDR_TYPE struct sockaddr_in
-#define ADDR_SEND_TYPE struct sockaddr
-#define ADDR_LEN_TYPE socklen_t
-#define SENDTO_FUNC sendto
+#define ADDR_FAMILY SL_AF_INET
+#define ADDR_TYPE SlSockAddrIn_t
+#define ADDR_SEND_TYPE SlSockAddr_t
+#define ADDR_LEN_TYPE SlSocklen_t
+#define SENDTO_FUNC sl_SendTo
 
-#define ADDR_DESCRIPTORS_LEN 4 
+#define ADDR_DESCRIPTORS_LEN 1 
 #define ADDR_PREDEF_LEN 1
-#define PREDEF_RS_ADDR ADDR_DESCRIPTORS_LEN
+#define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN
 
-#define SECURITY_DESCRIPTORS_LEN 3
-#define SECURITY_PREDEF_LEN 1
-#define PREDEF_TEST_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
+#define SECURITY_DESCRIPTORS_LEN 1
+#define SECURITY_PREDEF_LEN 0 
+//#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
 #define SECURITY_LAYER_IMPLEMENTATIONS_LEN 1
 
 #define NODE_SIZE HASH_SIZE
 #define HASH_FUNC sha_construction.func
 
 #define APPLICATION_SESSIONS_LEN 2
-#define MAX_APPLICATION_MESSAGE_SIZE 200  
+#define MAX_APPLICATION_MESSAGE_SIZE 50 
 
-#define RS_MSG_APPLICATION_COUNT 9
-#define MSG_APPLICATION_COUNT 5
-#define UI_APPLICATION_COUNT 23
-#define MAX_APPLICATION_NAME_SIZE 20
-#define MAX_APPLICATION_USAGE_SIZE 200
+#define MSG_APPLICATION_COUNT 9
+#define UI_APPLICATION_COUNT 0 
+#define MAX_APPLICATION_NAME_SIZE 5
+#define MAX_APPLICATION_USAGE_SIZE 0
 
 /*!
  * \brief Configuration of tree
  *
  *        0. level -> root
  *        1. level -> secrets
- *        2. level -> key // FIXME AS can also behavior as C
+ *        2. level -> key 
  *
  * */
 #define TREE_HEIGTH 2
@@ -134,12 +126,12 @@ extern "C" {
  *        A state-vector contains multiple states
  *
  * */
-#define TREE_STATE_TABLE_LEN 0xff     /*!< Number of state vectors in the table (Number of table rows) */
+#define TREE_STATE_TABLE_LEN 0xf     /*!< Number of state vectors in the table (Number of table rows) */
 #define TREE_STATE_VECTOR_LEN 2  /*!< Number of states in each state vector (Number of table columns) */
 
 #define TREE_STATE_SIZE 2          /*!< Size of state in Bytes*/
 #define TREE_STATE_TYPE uint16_t   /*!< Type of each state */
-#define TREE_STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than the TREE_STATE_UPPER_BOUNDARY */
+#define TREE_STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than the STATE_UPPER_BOUNDARY */
 
 
 /*!
@@ -147,19 +139,18 @@ extern "C" {
  *
  *        The bitmap can be used with the state table together to indicate, whether a state can be updated 
  * */
-#define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
-#define BIT_MAP_LEN TREE_STATE_TABLE_LEN                      /*!< Number of to used bit map*/
+//#define USE_BIT_MAP                       /*!< Macro flag to indicate, whether a bit map will be used for state management */
+//#define BIT_MAP_LEN TREE_STATE_TABLE_LEN                      /*!< Number of to used bit map*/
 
 #define LED_IS_ON 1
 #define LED_IS_OFF 0
-#define RED_LED_ON printf("RED LED is on!")
-#define RED_LED_OFF printf("RED LED if off!")
-#define RED_LED_STATUS LED_IS_ON
+#define RED_LED_ON turnLedOn(LED1)
+#define RED_LED_OFF turnLedOff(LED1)
+#define RED_LED_STATUS GetLEDStatus()&1
 
-#define GREEN_LED_ON printf("GREEN LED is on!\n")
-#define GREEN_LED_OFF printf("GREEN LED if off!\n")
-#define GREEN_LED_STATUS LED_IS_ON
-
+#define GREEN_LED_ON turnLedOn(LED2)
+#define GREEN_LED_OFF turnLedOff(LED2)
+#define GREEN_LED_STATUS GetLEDStatus()&2
 
 
 #ifdef  __cplusplus
@@ -167,4 +158,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 #endif /* __TREE_CONFIG_H__ */
-
+/*!
+ * \}
+ */

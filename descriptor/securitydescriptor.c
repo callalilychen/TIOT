@@ -52,21 +52,32 @@ int checkSecurity(unsigned int id, void * p_sec, unsigned int sec_size){
   return 1;
 }
 
+void printSecurityDescriptorHeader(){
+  PRINT("Index\tProtocol Type\t");
+  printSecurityDescriptorSecurityLayerHeader();
+  PRINT("\n");
+}    
 
 void printSecurityDescriptor(unsigned int id){
   PRINT("%2u\t", id);
   if(id < SECURITY_DESCRIPTORS_LEN && DESCRIPTOR_INACTIVE == security_descriptors[id]){
     PRINT("inactive\n");
   }else if(id < SECURITY_DESCRIPTORS_LEN + SECURITY_PREDEF_LEN){
-    PRINT("%u\t\t%u\t\t%u\t\t\t%u\t\t%u\n", 
-        descriptor_securitys[id].protocol_type, 
-        getSecretIndex(id),
-        getPermIndex(id),
-        getPerm(id),
-        getKeyIndex(id));
+    PRINT("%u\t\t", descriptor_securitys[id].protocol_type);
+    printSecurityDescriptorSecurityLayer(id);
+    PRINT("\n"); 
   }else{
     PRINT("%s\n", ERROR_MESSAGE);
   }
+}
+
+int copySecurityDescriptor(unsigned int dest_id, unsigned int src_id){
+  if(SUCC!=updateSecurityWithProtocolType(dest_id, getDescriptorProtocolType(src_id))){
+    if(SUCC!=updatePredefSecurityWithProtocolType(dest_id, getDescriptorProtocolType(src_id))){
+      return FAIL;
+    }
+  }
+  return copySecurityDescriptorSecurityLayer(dest_id, src_id);
 }
 /*!
  * \}
