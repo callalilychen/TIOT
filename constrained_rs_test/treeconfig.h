@@ -1,11 +1,11 @@
-/*_
- * treeconfig.h - Configuration for an resource server
+/*
+ * treeconfig.h - Configuration for constrained resource server
  *
- * Copyright 2015 Wenwen Chen
- */
+*/
 /*!
  * \defgroup    config_rs Configuration for an resource server
- * \brief       All parties share the same data declaration, only the length of data are here to configure.
+ *    
+ * \brief All parties share the same data declaration, only the length of data are here to configure.
  *
  * \note         Perhaps too static!
  *
@@ -23,24 +23,22 @@
 /* Include files                                                             */
 /*****************************************************************************/
 #include "interface.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
-
+#include "simplelink.h"
+#include "board_ext.h"
 #include "printString.h"
 #include "scanString.h"
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
-/*!
- * \brief Macro for print function
- */
-#define PRINT(...) printf(__VA_ARGS__)
-#define SCAN(...) scanf(__VA_ARGS__)
-#define SSCAN(...) sscan(__VA_ARGS__)
+  
+  #define BUFSIZE 100
+
+#define PRINT(...) print(__VA_ARGS__)
 #define SPRINT(...) sprint(__VA_ARGS__)
+#define SCAN(...)  
+#define SSCAN(...) sscan(__VA_ARGS__)  
 //TODO
-#define SECURITY_LAYER_UPDATE_STATE
+//#define SECURITY_LAYER_UPDATE_STATE
 /*!
  * \brief Macro to indicate, whether an operation is successful
  */
@@ -81,19 +79,18 @@ extern "C" {
 #define ADMIN_RIGHT 0xff
 
 #define IP_TYPE IPv4
-#define IPv4 char* 
-#define HTONS htons
-#define HTONL htonl
-#define ASSIGN_IP(addr, ip) inet_aton(ip, &addr)
+#define IPv4 uint32_t 
+#define HTONS sl_Htons
+#define HTONL sl_Htonl
+#define ASSIGN_IP(addr, ip) addr = HTONL(ip)
 
-#define HTONS htons
-#define ADDR_FAMILY AF_INET
-#define ADDR_TYPE struct sockaddr_in
-#define ADDR_SEND_TYPE struct sockaddr
-#define ADDR_LEN_TYPE socklen_t
-#define SENDTO_FUNC sendto
-  
-#define ADDR_DESCRIPTORS_LEN 3 
+#define ADDR_FAMILY SL_AF_INET
+#define ADDR_TYPE SlSockAddrIn_t
+#define ADDR_SEND_TYPE SlSockAddr_t
+#define ADDR_LEN_TYPE SlSocklen_t
+#define SENDTO_FUNC(...) 
+
+#define ADDR_DESCRIPTORS_LEN 1 
 #define ADDR_PREDEF_LEN 1
 #define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN
 
@@ -106,7 +103,7 @@ extern "C" {
 #define HASH_FUNC sha_construction.func
 
 #define APPLICATION_SESSIONS_LEN 2
-#define MAX_APPLICATION_MESSAGE_SIZE 200  
+#define MAX_APPLICATION_MESSAGE_SIZE 50 
 
 #define MSG_APPLICATION_COUNT 9
 #define UI_APPLICATION_COUNT 0 
@@ -132,12 +129,12 @@ extern "C" {
  *        A state-vector contains multiple states
  *
  * */
-#define TREE_STATE_TABLE_LEN 0xff     /*!< Number of state vectors in the table (Number of table rows) */
+#define TREE_STATE_TABLE_LEN 0xf     /*!< Number of state vectors in the table (Number of table rows) */
 #define TREE_STATE_VECTOR_LEN 2  /*!< Number of states in each state vector (Number of table columns) */
 
 #define TREE_STATE_SIZE 2          /*!< Size of state in Bytes*/
 #define TREE_STATE_TYPE uint16_t   /*!< Type of each state */
-#define TREE_STATE_UPPER_BOUNDARY 0xff  /*!< All allowed states should be smaller than the STATE_UPPER_BOUNDARY */
+#define TREE_STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than the STATE_UPPER_BOUNDARY */
 
 
 /*!
@@ -150,13 +147,16 @@ extern "C" {
 
 #define LED_IS_ON 1
 #define LED_IS_OFF 0
-#define RED_LED_ON printf("RED LED is on!\n")
-#define RED_LED_OFF printf("RED LED if off!\n")
-#define RED_LED_STATUS LED_IS_ON
+#define RED_LED_ON turnLedOn(LED1)
+#define RED_LED_OFF turnLedOff(LED1)
+#define RED_LED_STATUS GetLEDStatus()&1
 
-#define GREEN_LED_ON printf("GREEN LED is on!\n")
-#define GREEN_LED_OFF printf("GREEN LED if off!\n")
-#define GREEN_LED_STATUS LED_IS_ON
+#define GREEN_LED_ON turnLedOn(LED2)
+#define GREEN_LED_OFF turnLedOff(LED2)
+#define GREEN_LED_STATUS GetLEDStatus()&2
+
+#define TEST_SIGNAL_HIGH signalHigh()
+#define TEST_SIGNAL_LOW signalLow()
 
 
 #ifdef  __cplusplus

@@ -267,6 +267,10 @@ static unsigned int testSendCMD(unsigned char *req, unsigned int req_size, unsig
     PRINT("%s Address descriptor %u does not exist or is not active\n", ERROR_MESSAGE, selected_addr_id);
   }else{
     if(secure_flag){
+      if(!isActiveSecurityDescriptor(selected_security_id)){
+        PRINT("%s Security descriptor %u does not exist or is not active\n", ERROR_MESSAGE, selected_security_id);
+        return 0;
+      }
       copySecurityDescriptor(PREDEF_TEST_SECURITY_DESCRIPTOR, selected_security_id);
       test.security_descriptor_id = PREDEF_TEST_SECURITY_DESCRIPTOR;
     }else{

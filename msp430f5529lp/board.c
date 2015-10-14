@@ -36,6 +36,7 @@
 
 #include "simplelink.h"
 #include "board.h"
+#include "treeconfig.h"
 
 #define XT1_XT2_PORT_SEL            P5SEL
 #define XT1_ENABLE                  (BIT4 + BIT5)
@@ -725,6 +726,7 @@ void IntSpiGPIOHandler(void)
         }
 
 #endif
+        //PRINT("*");
         break;
 
       case P2IV_P2IFG1:

@@ -268,8 +268,8 @@ unsigned int handleEditPermission(unsigned char* req, unsigned int req_size, app
     TREE_STATE_TYPE secret_index = getSecretIndex(descriptor_id);
     TREE_STATE_TYPE perm_index = getExpectedState(secret_index,0);
     incExpectedState(secret_index, 0, 0);
-    setPermIndex(p_session->security_descriptor_id, perm_index);
-    setPerm(p_session->security_descriptor_id, (RIGHT_TYPE)perm);
+    setPermIndex(descriptor_id, perm_index);
+    setPerm(descriptor_id, (RIGHT_TYPE)perm);
     printSecurityDescriptorHeader();
     printSecurityDescriptor(descriptor_id);
   } else{

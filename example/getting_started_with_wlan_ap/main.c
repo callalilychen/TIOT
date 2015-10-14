@@ -428,7 +428,7 @@ int main(int argc, char** argv)
     }
 
     CLI_Write((_u8 *)" Device started as Access Point\n\r");
-
+while(1){
     /* Wait */
     CLI_Write((_u8 *)" Waiting for clients to connect...!\n\r");
     while((!IS_IP_LEASED(g_Status)) || (!IS_STA_CONNECTED(g_Status))) { _SlNonOsMainLoopTask(); }
@@ -459,6 +459,7 @@ int main(int argc, char** argv)
     }
 
     CLI_Write((_u8 *)" Device and the station are successfully connected \n\r");
+}
     return SUCCESS;
 }
 

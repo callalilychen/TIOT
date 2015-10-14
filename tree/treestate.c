@@ -21,12 +21,15 @@ int incExpectedState(unsigned int state_row, unsigned int state_col, unsigned in
     return FAIL;
   }
   for(int i =  state_col; i>=0; i--){
-    if(expected_states[state_row][i]+1 < TREE_STATE_UPPER_BOUNDARY){
+    if(expected_states[state_row][i] < TREE_STATE_UPPER_BOUNDARY){
       /*!
        * If the to increased state +1 is still in upper boundary
        */
       expected_states[state_row][i]++;
-      PRINT("%s New state: ", INFO_MESSAGE);
+      for(int j = state_col+1; j<TREE_STATE_VECTOR_LEN; j++){
+        expected_states[state_row][j] = 0;
+      }
+      PRINT("%s New state: %x\t", INFO_MESSAGE, state_row);
       for(int j = 0; j < TREE_STATE_VECTOR_LEN; j++){
         PRINT("%x\t", expected_states[state_row][j]);
       }

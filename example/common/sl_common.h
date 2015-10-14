@@ -85,7 +85,9 @@ extern "C" {
 /* Configuration of the device when it comes up in AP mode */
 #define SSID_AP_MODE       "CC3100"       /* SSID of the CC3100 in AP mode */
 #define PASSWORD_AP_MODE   ""                  /* Password of CC3100 AP */
+//#define PASSWORD_AP_MODE   "testtesttesttest"                  /* Password of CC3100 AP */
 #define SEC_TYPE_AP_MODE   SL_SEC_TYPE_OPEN    /* Can take SL_SEC_TYPE_WEP or
+//#define SEC_TYPE_AP_MODE   SL_SEC_TYPE_WPA_WPA2    /* Can take SL_SEC_TYPE_WEP or
                                                 * SL_SEC_TYPE_WPA as well */
 
 /*

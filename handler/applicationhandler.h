@@ -104,6 +104,8 @@ extern "C" {
 #endif
 #endif
           if(!hasRight){
+            //p_session -> security_descriptor_id = NO_DESCRIPTOR;
+            deactiveSecurityDescriptor(p_session -> security_descriptor_id);
             memcpy(p_session->message, "[ERROR] No Right!", 17);
             p_session->message[17] = '\0';
             p_session->message_size = strlen((const char*)(p_session->message));

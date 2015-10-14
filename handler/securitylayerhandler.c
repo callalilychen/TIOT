@@ -109,19 +109,27 @@ unsigned int handleSecurityLayer(unsigned char *msg, unsigned int * p_msg_size, 
   unsigned int forceUpdate = (getExpectedState(secret_index, 0) != perm_index);
   //TODO Work around to let AS not update state, perhaps replace with method to wait a message with the same key
 #ifdef SECURITY_LAYER_UPDATE_STATE
+    PRINT("%s Update state!\n", INFO_MESSAGE);
   if(SUCC == updateExpectedStateVector(secret_index, indexes, 1)){
 #endif
     // TODO use key identifier to search the same key
+    TEST_SIGNAL_HIGH;
     tree_node * p_curr_key = getKeyNode(secret_index, perm_code, perm_code_size, indexes[1], forceUpdate);
+    TEST_SIGNAL_LOW;
     if(verifyMAC(p_curr_key, msg+*p_header_size, p_msg_size, implementation->MACsize)){
+      TEST_SIGNAL_HIGH;
       // TODO optimization, use descriptor_id security as last tree node
       copyTreeNode(&(tmpDescriptorSecurity.key), p_curr_key);
+    //TODO no signal
+      TEST_SIGNAL_LOW;
       if(SUCC == updateSecurityDescriptor(descriptor_id, &tmpDescriptorSecurity, DESCRIPTOR_SECURITY_SIZE)){
+        TEST_SIGNAL_HIGH;
         return descriptor_id;
       } else{
       PRINT("[ERROR] Failed to update security descriptor_id!\n"); 
       }
     }else{
+      TEST_SIGNAL_HIGH;
   PRINT("=======Verify MAC %u=========\n", descriptor_id);
   printBlock("key", p_curr_key->block, p_curr_key->size);
   printBlock("msg", msg+*p_header_size, *p_msg_size);

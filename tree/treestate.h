@@ -149,6 +149,7 @@ extern "C" {
    * \note                      The length of states must be equal to TREE_STATE_VECTOR_LEN 
    */
   inline int __attribute__((always_inline))setStateVector(unsigned int states_index, TREE_STATE_TYPE * p_state_vector)
+    //TODO 
   {
     if(states_index >= TREE_STATE_TABLE_LEN || p_state_vector== NULL){
       return FAIL;

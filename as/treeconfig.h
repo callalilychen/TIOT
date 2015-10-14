@@ -139,7 +139,7 @@ extern "C" {
 
 #define TREE_STATE_SIZE 2          /*!< Size of state in Bytes*/
 #define TREE_STATE_TYPE uint16_t   /*!< Type of each state */
-#define TREE_STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than the TREE_STATE_UPPER_BOUNDARY */
+#define TREE_STATE_UPPER_BOUNDARY 0xff  /*!< All allowed states should be smaller than the TREE_STATE_UPPER_BOUNDARY */
 
 
 /*!
