@@ -9,12 +9,12 @@
 void ports_init(void);
 
 inline void __attribute__((always_inline))signalHigh(void){
-  P2OUT |= BIT3;
+  P8OUT |= BIT1;
   turnLedOn(LED1);
 }
 
 inline void __attribute__((always_inline))signalLow(void){
-  P2OUT &= ~BIT3;
+  P8OUT &= ~BIT1;
   turnLedOff(LED1);
 }
 

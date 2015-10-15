@@ -150,6 +150,7 @@ extern "C" {
 
 #define LED_IS_ON 1
 #define LED_IS_OFF 0
+
 #define RED_LED_ON printf("RED LED is on!\n")
 #define RED_LED_OFF printf("RED LED if off!\n")
 #define RED_LED_STATUS LED_IS_ON
@@ -157,6 +158,10 @@ extern "C" {
 #define GREEN_LED_ON printf("GREEN LED is on!\n")
 #define GREEN_LED_OFF printf("GREEN LED if off!\n")
 #define GREEN_LED_STATUS LED_IS_ON
+
+#define TEST_SIGNAL_HIGH printf("HIGH!\n")
+#define TEST_SIGNAL_LOW printf("LOW!\n")
+
 
 
 #ifdef  __cplusplus

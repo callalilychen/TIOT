@@ -24,7 +24,7 @@
 /*****************************************************************************/
 #include "interface.h"
 #include "simplelink.h"
-#include "board.h"
+#include "board_ext.h"
 #include "printString.h"
 #include "scanString.h"
 #ifdef  __cplusplus
@@ -152,6 +152,8 @@ extern "C" {
 #define GREEN_LED_OFF turnLedOff(LED2)
 #define GREEN_LED_STATUS GetLEDStatus()&2
 
+#define TEST_SIGNAL_HIGH signalHigh()
+#define TEST_SIGNAL_LOW signalLow()
 
 #ifdef  __cplusplus
 }
