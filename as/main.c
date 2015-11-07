@@ -13,7 +13,7 @@
 
 #define PORT 9002
 #define RS_PORT 5001  
-#define CONSTRAINED_RS_IP "192.168.1.38"
+#define CONSTRAINED_RS_IP "192.168.1.1"
 #define RS_IP "127.0.0.1"
 
 static pthread_mutex_t lock;

@@ -45,8 +45,7 @@ _i16 Buf_Read(void)
 {
   _u16 AddrSize = sizeof(SlSockAddr_t);
   Buf_Flush(1);
-  _i16 Status = 0;
-  sl_RecvFrom(udp_socket_fd, recvBuf, BUF_SIZE, 0, &diUdpSockAddr, (SlSocklen_t*)&AddrSize);
+  _i16 Status = sl_RecvFrom(udp_socket_fd, recvBuf, BUF_SIZE, 0, &diUdpSockAddr, (SlSocklen_t*)&AddrSize);
   if(Status > 0){
     handleUdpPackage(recvBuf, Status, (ADDR_TYPE *)(&diUdpSockAddr));
     sendUdpPackage(sendBuf, BUF_SIZE);

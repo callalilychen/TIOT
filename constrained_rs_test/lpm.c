@@ -38,7 +38,7 @@ void setupLPM(uint16_t v)
 __attribute__((interrupt(TIMER0_A1_VECTOR)))
 void isr_TA3 (void)
 {
-  __bic_SR_register_on_exit(rs_value);
+  __bic_SR_register(rs_value);
   //TA0CCTL0 &= ~CCIE; // Disable interrupt
   TA0CTL &= ~ TAIE;
   #ifdef LOG 
