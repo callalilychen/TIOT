@@ -1,11 +1,11 @@
-/*_
- * treeconfig.h - Configuration for an resource server
+/*
+ * treeconfig.h - Configuration for constrained resource server
  *
- * Copyright 2015 Wenwen Chen
- */
+*/
 /*!
  * \defgroup    config_rs Configuration for an resource server
- * \brief       All parties share the same data declaration, only the length of data are here to configure.
+ *    
+ * \brief All parties share the same data declaration, only the length of data are here to configure.
  *
  * \note         Perhaps too static!
  *
@@ -22,23 +22,32 @@
 /*****************************************************************************/
 /* Include files                                                             */
 /*****************************************************************************/
+#define MSP
+#ifdef MSP
+#include "cli_uart.h"
+#include "board.h"
+#include "board_ext.h"
+#endif
 #include "interface.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
-
+//#include "simplelink.h"
 #include "printString.h"
 #include "scanString.h"
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
-/*!
- * \brief Macro for print function
- */
-#define PRINT(...) printf(__VA_ARGS__)
-#define SCAN(...) scanf(__VA_ARGS__)
-#define SSCAN(...) sscan(__VA_ARGS__)
+#ifdef MSP
+#define DEBUG(...) print(__VA_ARGS__)
+#define PRINT(...) print(__VA_ARGS__)
 #define SPRINT(...) sprint(__VA_ARGS__)
+#define SCAN(...)  
+#define SSCAN(...) sscan(__VA_ARGS__)  
+#else
+#define DEBUG(...) printf(__VA_ARGS__)
+#define PRINT(...) printf(__VA_ARGS__)
+#define SPRINT(...) sprintf(__VA_ARGS__)
+#define SCAN(...)  scanf(__VA_ARGS__)
+#define SSCAN(...) sscanf(__VA_ARGS__)  
+#endif
 //TODO
 #define SECURITY_LAYER_UPDATE_STATE
 /*!
@@ -57,7 +66,6 @@ extern "C" {
  * \brief Macro to indicate infomations 
  */
 #define INFO 2
-
 
 #define RIOT_FILE_RELATIVE "[TEST]"
 #define DEBUG_FUNC "[TEST]"
@@ -83,38 +91,37 @@ extern "C" {
 #define NO_RIGHT 0x0
 #define ADMIN_RIGHT 0xff
 
-#define IP_TYPE IPv4
-#define IPv4 char* 
-#define HTONS htons
-#define HTONL htonl
-#define ASSIGN_IP(addr, ip) inet_aton(ip, &addr)
-
-#define HTONS htons
-#define ADDR_FAMILY AF_INET
-#define ADDR_TYPE struct sockaddr_in
-#define ADDR_SEND_TYPE struct sockaddr
-#define ADDR_LEN_TYPE socklen_t
-#define SENDTO_FUNC sendto
-  
-#define ADDR_DESCRIPTORS_LEN 3 
-#define ADDR_PREDEF_LEN 1
-#define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN
-
-#define SECURITY_DESCRIPTORS_LEN 1
-#define SECURITY_PREDEF_LEN 0 
-//#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
-#define SECURITY_LAYER_IMPLEMENTATIONS_LEN 1
-
-#define NODE_SIZE HASH_SIZE
-#define HASH_FUNC sha_construction.func
-
-#define APPLICATION_SESSIONS_LEN 2
-#define MAX_APPLICATION_MESSAGE_SIZE 200  
-
-#define MSG_APPLICATION_COUNT 9
-#define UI_APPLICATION_COUNT 0 
-#define MAX_APPLICATION_NAME_SIZE 5
-#define MAX_APPLICATION_USAGE_SIZE 0
+//#define IP_TYPE IPv4
+//#define IPv4 uint32_t 
+//#define HTONS sl_Htons
+//#define HTONL sl_Htonl
+//#define ASSIGN_IP(addr, ip) addr = HTONL(ip)
+//
+//#define ADDR_FAMILY SL_AF_INET
+//#define ADDR_TYPE SlSockAddrIn_t
+//#define ADDR_SEND_TYPE SlSockAddr_t
+//#define ADDR_LEN_TYPE SlSocklen_t
+//#define SENDTO_FUNC sl_SendTo
+//
+//#define ADDR_DESCRIPTORS_LEN 1 
+//#define ADDR_PREDEF_LEN 1
+//#define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN
+//
+//#define SECURITY_DESCRIPTORS_LEN 1
+//#define SECURITY_PREDEF_LEN 0 
+////#define PREDEF_NO_SECURITY_DESCRIPTOR SECURITY_DESCRIPTORS_LEN
+//#define SECURITY_LAYER_IMPLEMENTATIONS_LEN 1
+//
+//#define NODE_SIZE HASH_SIZE
+//#define HASH_FUNC sha_construction.func
+//
+//#define APPLICATION_SESSIONS_LEN 2
+//#define MAX_APPLICATION_MESSAGE_SIZE 50 
+//
+//#define MSG_APPLICATION_COUNT 9
+//#define UI_APPLICATION_COUNT 0 
+//#define MAX_APPLICATION_NAME_SIZE 5
+//#define MAX_APPLICATION_USAGE_SIZE 0
 
 /*!
  * \brief Configuration of tree
@@ -135,12 +142,12 @@ extern "C" {
  *        A state-vector contains multiple states
  *
  * */
-#define TREE_STATE_TABLE_LEN 0xff     /*!< Number of state vectors in the table (Number of table rows) */
+#define TREE_STATE_TABLE_LEN 0xf     /*!< Number of state vectors in the table (Number of table rows) */
 #define TREE_STATE_VECTOR_LEN 2  /*!< Number of states in each state vector (Number of table columns) */
 
 #define TREE_STATE_SIZE 2          /*!< Size of state in Bytes*/
 #define TREE_STATE_TYPE uint16_t   /*!< Type of each state */
-#define TREE_STATE_UPPER_BOUNDARY 0xff  /*!< All allowed states should be smaller than the STATE_UPPER_BOUNDARY */
+#define TREE_STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than the STATE_UPPER_BOUNDARY */
 
 
 /*!
@@ -153,19 +160,16 @@ extern "C" {
 
 #define LED_IS_ON 1
 #define LED_IS_OFF 0
+#define RED_LED_ON turnLedOn(LED1)
+#define RED_LED_OFF turnLedOff(LED1)
+#define RED_LED_STATUS GetLEDStatus()&1
 
-#define RED_LED_ON printf("RED LED is on!\n")
-#define RED_LED_OFF printf("RED LED if off!\n")
-#define RED_LED_STATUS LED_IS_ON
+#define GREEN_LED_ON turnLedOn(LED2)
+#define GREEN_LED_OFF turnLedOff(LED2)
+#define GREEN_LED_STATUS GetLEDStatus()&2
 
-#define GREEN_LED_ON printf("GREEN LED is on!\n")
-#define GREEN_LED_OFF printf("GREEN LED if off!\n")
-#define GREEN_LED_STATUS LED_IS_ON
-
-#define TEST_SIGNAL_HIGH printf("HIGH!\n")
-#define TEST_SIGNAL_LOW printf("LOW!\n")
-
-
+#define TEST_SIGNAL_HIGH signalHigh()
+#define TEST_SIGNAL_LOW signalLow()
 
 #ifdef  __cplusplus
 }

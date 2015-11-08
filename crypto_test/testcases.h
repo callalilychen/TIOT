@@ -1,39 +1,42 @@
 #ifndef TESTCASES_H
 #define TESTCASES_H
 #include <stddef.h>
-#include "board.h"
+//#include "board.h"
+#include <string.h>
+#include "treeconfig.h"
+
+//#define uECC_SUPPORTS_secp160r1 1
+//#define uECC_SUPPORTS_secp192r1 1
+//#define uECC_SUPPORTS_secp224r1 0
+//#define uECC_SUPPORTS_secp256r1 0
+//#define uECC_SUPPORTS_secp256k1 0
 
 #define BUTTONACTION 1000
+#define LED
 
 #define SIGNAL
 //#define SHA256
 //#define AES
-#define DES
-//#define TESTLED
+//#define DES
 //#define ECC
 #define TESTLPM
 
+#ifdef TESTLPM
+#include "lpm.h"
+#endif
+
 void setup(void);
 void tests(void);
-inline void testSingle(void);
+void testSingle(void);
 void printError(char * str);
 uint8_t getValidASCII(uint8_t i);
 int equal(uint8_t *, uint8_t *, int size);
 
 #ifdef SIGNAL
-inline void setupSignal(void);
-inline void startSignal(void);
-inline void testSignalHigh(void);
-inline void testSignalLow(void);
-#endif
-
-#ifdef TESTLED
-#ifndef LED
-#define LED
-#endif
-int testLED1(uint16_t);
-int testLED4(uint16_t);
-int testleds(uint16_t state);
+void setupSignal(void);
+void startSignal(void);
+void testSignalHigh(void);
+void testSignalLow(void);
 #endif
 
 #ifdef TESTBUTTOM
@@ -42,39 +45,34 @@ void testButton1(void);
 void testButton2(void);
 #endif
 
-#ifdef TESTLPM
-void setupLPM(void);
-void testLPM(uint16_t);
+#ifdef ECC
+void setupECC(void);
+void updateECC(int newValue);
+int testECC(int);
 #endif
 
-#ifdef ECC
-inline void setupECC(void);
-inline void updateECC(int newValue);
-inline int testECC(int);
-inline void printECC(void);
+#ifdef CHACHA20
+int testChaCha20(int);
 #endif
 
 #ifdef SHA
-inline void setupSHA256(void);
-inline void printSHA256(void);
 int testSHA256(int);
 #endif
 
 #ifdef AES
-inline void testAES(int);
-inline int setupAES(void);
-inline void updateAES(int);
-inline int testEncAES(void);
-inline int testDecAES(void);
-inline void printAES(void);
+void testAES(int);
+int setupAES(void);
+void updateAES(int);
+int testEncAES(void);
+int testDecAES(void);
 #endif
 
 #ifdef DES
 void test3DES(int);
-inline int setup3DES(void);
-inline void update3DES(int);
-inline int testEnc3DES(void);
-inline int testDec3DES(void);
-inline void print3DES(void);
+int setup3DES(void);
+void update3DES(int);
+int testEnc3DES(void);
+int testDec3DES(void);
 #endif
 #endif
+uint8_t getValidASCII(uint8_t i);

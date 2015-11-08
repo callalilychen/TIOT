@@ -1,8 +1,5 @@
-#include "stdint.h"
-#include "printString.h"
-#include "board.h"
-#include "button.h"
-
+#include <stdint.h>
+#include "treeconfig.h"
 extern volatile uint16_t wdt_counter;
 
 void initWDT(uint16_t);

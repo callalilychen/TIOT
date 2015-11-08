@@ -9,11 +9,11 @@
 
 int hmac_test(void)
 {
-  const char* secret = "test";
+  const char* secret = "testtesttesttesttesttesttest[7!!";
   unsigned char key[sha_construction.size*3];
   unsigned char key2[sha_construction.size*3];
-  sha_construction.func((unsigned char*)secret, 4, key);
-  SHA256((unsigned char*)secret, 4, key2);
+  sha_construction.func((unsigned char*)secret, 32, key);
+  SHA256((unsigned char*)secret, 32, key2);
   printBlock("key", key, sha_construction.size);
   printBlock("key2", key2,sha_construction.size);
 

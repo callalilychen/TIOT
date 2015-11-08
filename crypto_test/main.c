@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdint.h>
-
-#include "board.h"
-
+#include "treeconfig.h"
+#ifdef MSP
+#include "cli_uart.h"
+#endif
 
 #define TEST
 
@@ -12,36 +13,37 @@
 
 
 int main(void) {
-  board_init();
-
+#ifdef MSP
+  ports_init();
+  /* Stop WDT and initialize the system-clock of the MCU */
+  stopWDT();
+  initClk();
+  CLI_Configure();
 #ifdef LED
-  setupLED();
-  startSignal();
-
-  led1on();
+  initLEDs();
+  turnLedOn(LED1);
   __delay_cycles(500000);
-  led1off();
+  turnLedOff(LED1);
   __delay_cycles(500000);
-  led4on();
+  turnLedOn(LED1);
   __delay_cycles(500000);
-  led4off();
+  turnLedOff(LED1);
   __delay_cycles(500000);
 #endif
-
-  setup();
-
+#endif
+//initWDT(WDT_ADLY_250);
+//  setup();
+//LPM3;
 #ifdef TEST
 #ifdef TESTLPM
-  testLPM(LPM3_bits + GIE);
-#else
+  setupLPM(LPM3_bits + GIE);
+#endif
 	while(1){
-#ifdef TESTLMP
-   __bis_SR_register(LPM3_bits + GIE); // Enter LPM3
-#else
     tests();
+#ifdef TESTLPM
+   enterLPM();
 #endif
 	}
-#endif
 #endif
 	
 	return 0;

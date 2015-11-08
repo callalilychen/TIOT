@@ -1,5 +1,5 @@
 #include "testcases.h"
-#include "crypto/3des.h"
+#include "3des.h"
 
 cipher_context_t context;
 uint8_t enc_state, dec_state;
@@ -9,11 +9,11 @@ uint8_t cblock_3des[THREEDES_BLOCK_SIZE+1] = "testtest";
 uint8_t rpblock_3des[THREEDES_BLOCK_SIZE+1] = "test  !!";
 
 
-inline int setup3DES(void){
-  tripledes_init(&context,THREEDES_BLOCK_SIZE, THREEDES_BLOCK_SIZE, key);
+int setup3DES(void){
+  tripledes_init(&context,key, THREEDES_BLOCK_SIZE);
 }
 
-inline void print3DES(void){
+void print3DES(void){
 #ifdef DEBUG
   if(enc_state){
     print("3DES ENC DONE\n\r"); 
@@ -40,20 +40,20 @@ inline void print3DES(void){
   }
 #endif
 }
-inline void update3DES(int i){
+void update3DES(int i){
   enc_state = 0;
   dec_state = 0;
   pblock_3des[4] = getValidASCII((uint8_t)(i>>8));
   pblock_3des[5] = getValidASCII((uint8_t)i);
 }
 
-inline int testEnc3DES(void){
+int testEnc3DES(void){
 #ifdef SIGNAL
-  testSignalHigh();
+  signalHigh();
 #endif
   enc_state = tripledes_encrypt(&context, pblock_3des, cblock_3des);
 #ifdef SIGNAL
-  testSignalLow();
+  signalLow();
 #ifdef TESTLPM
   __delay_cycles(32);
 #else
@@ -65,13 +65,13 @@ inline int testEnc3DES(void){
   print3DES();
   return enc_state;
 }
-inline int testDec3DES(void){
+int testDec3DES(void){
 #ifdef SIGNAL
-  testSignalHigh();
+  signalHigh();
 #endif
   dec_state = tripledes_decrypt(&context, cblock_3des, rpblock_3des);
 #ifdef SIGNAL
-  testSignalLow();
+  signalLow();
 #ifndef TESTLPM
   __delay_cycles(1600);
   __delay_cycles(1600);

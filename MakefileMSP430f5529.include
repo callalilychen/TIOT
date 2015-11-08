@@ -1,6 +1,11 @@
 PROJECT ?= main
 PORT ?= /dev/ttyACM1
 
+PROJECT_SRC += $(wildcard ../msp430f5529lp/*.c)
+PROJECT_SRC += $(wildcard ../simplelink/source/*.c)
+C_FLAGS			+= -I../msp430f5529lp
+C_FLAGS			+= -I../simplelink/include
+
 # Project settings
 MCU = msp430f5529
 HOME_PATH = /home/wenwen

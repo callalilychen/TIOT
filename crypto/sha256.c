@@ -43,7 +43,7 @@
 
 #include <string.h>
 
-#include "sha256.h"
+#include "crypto/sha256.h"
 //#include "board.h"
 
 #ifdef __BIG_ENDIAN__
@@ -63,8 +63,7 @@ static void be32enc_vect(void *dst_, const void *src_, size_t len)
 {
     uint32_t *dst = dst_;
     const uint32_t *src = src_;
-    size_t i;
-    for (i = 0; i < len / 4; i++) {
+    for (size_t i = 0; i < len / 4; i++) {
         dst[i] = __builtin_bswap32(src[i]);
     }
 }
@@ -117,8 +116,7 @@ static void sha256_transform(uint32_t *state, const unsigned char block[64])
 
     /* 1. Prepare message schedule W. */
     be32dec_vect(W, block, 64);
-    int i;
-    for (i = 16; i < 64; i++) {
+    for (int i = 16; i < 64; i++) {
         W[i] = s1(W[i - 2]) + W[i - 7] + s0(W[i - 15]) + W[i - 16];
     }
 
@@ -126,7 +124,7 @@ static void sha256_transform(uint32_t *state, const unsigned char block[64])
     memcpy(S, state, 32);
 
     /* 3. Mix. */
-    for (i = 0; i < 64; ++i) {
+    for (int i = 0; i < 64; ++i) {
         uint32_t e = S[(68 - i) % 8], f = S[(69 - i) % 8];
         uint32_t g = S[(70 - i) % 8], h = S[(71 - i) % 8];
         uint32_t t0 = h + S1(e) + Ch(e, f, g) + W[i] + K[i];
@@ -140,7 +138,7 @@ static void sha256_transform(uint32_t *state, const unsigned char block[64])
     }
 
     /* 4. Mix local working variables into global state */
-    for (i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) {
         state[i] += S[i];
     }
 }

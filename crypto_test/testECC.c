@@ -25,31 +25,25 @@ int fake_rng(uint8_t *dest, unsigned size)
 
 inline void setupECC()
 {
-#ifdef DEBUG
-  print("Start ECC, Curve %d\n\r", uECC_curve());
-  print("Start ECC, Wordsize %d\n\r", getWordSize());
-  print("Start ECC, UECC Bytes %d\n\r", uECC_BYTES);
-#endif
+  DEBUG("Start ECC, Curve %d\n\r", uECC_curve());
+//  DEBUG("Start ECC, Wordsize %d\n\r", uECC_WORD_SIZE);
+  DEBUG("Start ECC, UECC Bytes %d\n\r", uECC_BYTES);
   uECC_set_rng(&fake_rng);
   int failed = uECC_make_key(public, private);
-#ifdef INFO
   if (!failed){
-    print("uECC_make_key() failed\n\r");
+    DEBUG("uECC_make_key() failed\n\r");
   }
-#endif
 
-#ifdef INFO
   int i;
-  print("Public key:\n\r");
+  DEBUG("Public key:\n\r");
   for(i=0; i<uECC_BYTES * 2; i++){
-    print("%x",public[i]);
+    DEBUG("%x",public[i]);
   }
-  print("\n\rPrivate key:\n\r");
+  DEBUG("\n\rPrivate key:\n\r");
   for(i=0; i<uECC_BYTES; i++){
-    print("%x",private[i]);
+    DEBUG("%x",private[i]);
   }
-  print("\n\r");
-#endif
+  DEBUG("\n\r");
   memcpy(hash, public, uECC_BYTES);
 }
 
@@ -63,40 +57,38 @@ inline void updateECC(int newValue)
 }
 
 inline void printECC(void){
-#ifdef INFO 
     int i=0;
   if(sign_state){
-    print("Sign ");
+    DEBUG("Sign ");
     for(i=0; i<uECC_BYTES; i++){
-    print("%x",hash[i]);
+    DEBUG("%x",hash[i]);
   }
 
-    print(" success:\n\r");
+    DEBUG(" success:\n\r");
     for (i=0;i<uECC_BYTES*2; i++){
-      print("%x", sig[i]);  
+      DEBUG("%x", sig[i]);  
     }
-    print("\n\r");
+    DEBUG("\n\r");
     sign_state = 0;
   }else{
     if(verify_state){
-      print("Verify success\n\r");
+      DEBUG("Verify success\n\r");
       
     }else{
-      print("uECC failed\n\r");
+      DEBUG("uECC failed\n\r");
     }
   }
-#endif
 }
 
 inline int testECC(int newValue)
 {
   updateECC(newValue);
 #ifdef SIGNAL
-  testSignalHigh();
+  signalHigh();
 #endif
   sign_state = uECC_sign(private, hash, sig);
 #ifdef SIGNAL
-  testSignalLow();
+  signalLow();
 #ifdef TESTLPM
   __delay_cycles(1600);
 #else
@@ -106,11 +98,11 @@ inline int testECC(int newValue)
 #endif
   printECC();
 #ifdef SIGNAL
-  testSignalHigh();
+  signalHigh();
 #endif
   verify_state = uECC_verify(public, hash, sig);
 #ifdef SIGNAL
-  testSignalLow();
+  signalLow();
 #ifndef TESTLPM
   __delay_cycles(8000000ul);
   __delay_cycles(8000000ul);

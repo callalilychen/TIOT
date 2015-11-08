@@ -44,14 +44,12 @@
 #define _SHA256_H_
 
 #include <inttypes.h>
-#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define SHA256_DIGEST_LENGTH 32
-#define SHA256_BLOCK_LENGTH 32
 
 /**
  * @brief Context for ciper operatins based on sha256

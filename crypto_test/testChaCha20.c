@@ -15,7 +15,7 @@ inline static void printSHA256(void){
   DEBUG("\n\r");
 }
 
-int testSHA256(int newValue){
+int testChaCha20(int newValue){
   block[0] = getValidASCII((uint8_t)(newValue>>8));
   block[1] = getValidASCII((uint8_t)newValue);
 #ifdef SIGNAL

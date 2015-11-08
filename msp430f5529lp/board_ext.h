@@ -18,4 +18,8 @@ inline void __attribute__((always_inline))signalLow(void){
   turnLedOff(LED1);
 }
 
+inline void __attribute__((always_inline))signalToggle(void){
+  P8OUT ^= BIT1;
+  toggleLed(LED1);
+}
 #endif /* __BOARD_EXT_H__ */

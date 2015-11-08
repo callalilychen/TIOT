@@ -7,8 +7,8 @@
 #include "tree.h" 
 #include "hmac.h"
 #include "applicationexample.h"
-#include "securitylayer.h" 
-#include "applicationlayer.h" 
+#include "securitylayerhandler.h" 
+#include "applicationlayerhandler.h" 
 
 
 static inline void receivedUdpPackageTEST(unsigned char* udp_payload, unsigned int udp_payload_size){
@@ -26,16 +26,16 @@ static inline unsigned int sendUdpPackageTEST(unsigned char* send_buf, unsigned 
   unsigned char *buf = send_buf;
   unsigned int application_session = NO_SESSION;
   unsigned int security_descriptor = NO_SESSION;
-  while(NULL!=(application_layer_msg = generateApplicationLayer(&application_session, & application_layer_msg_size, &security_descriptor))){
-    buf_size = 0;
-    buf = send_buf;
-    buf_size = generateSecurityLayerHeader(security_descriptor, buf, max_send_buf);
-    memcpy(buf+buf_size, application_layer_msg, application_layer_msg_size);
-    buf_size +=generateSecurityLayerMAC(security_descriptor, buf+buf_size, application_layer_msg_size, max_send_buf-buf_size);
-    buf_size +=application_layer_msg_size;
-    clearApplicationSession(application_session); 
-    deactiveSecurityDescriptor(security_descriptor); 
-  } 
+//  while(NULL!=(application_layer_msg = generateApplicationLayer(&application_session, & application_layer_msg_size, &security_descriptor))){
+//    buf_size = 0;
+//    buf = send_buf;
+//    buf_size = generateSecurityLayerHeader(security_descriptor, buf, max_send_buf);
+//    memcpy(buf+buf_size, application_layer_msg, application_layer_msg_size);
+//    buf_size +=generateSecurityLayerMAC(security_descriptor, buf+buf_size, application_layer_msg_size, max_send_buf-buf_size);
+//    buf_size +=application_layer_msg_size;
+//    clearApplicationSession(application_session); 
+//    deactiveSecurityDescriptor(security_descriptor); 
+//  } 
   return buf_size;
 }
 
