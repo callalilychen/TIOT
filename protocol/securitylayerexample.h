@@ -17,11 +17,11 @@
         0               1               2               3               Byte
         0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 bit
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+   
-        |Typ|PCT| TL  |C|       Permission Code (Type 0)                |
-        |       0       | Security Index|   Perm Index  |   Permission  |
+        |Typ|PCT| TL  |C|                    Permission Code (Type 0)                
+        |       0       |     PCT       | Security Index|   Perm Index   
         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+     
-        | Key Set index |                                               /
-        +-+-+-+-+-+-+-+-+                                               \
+           Permission   | Key Set index |                               /
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               \
         \                                                               /
         /                           Payload*                            \
         \                                                               /
@@ -65,6 +65,7 @@ extern "C" {
 
 #pragma pack(1)
   typedef struct permCodeExample{
+    uint8_t permcode_type;
     uint8_t secret_index;
     uint8_t perm_index;
     uint8_t perm;/*!<Right informations*/

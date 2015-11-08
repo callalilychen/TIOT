@@ -32,8 +32,7 @@ int main(void) {
 #endif
 #endif
 //initWDT(WDT_ADLY_250);
-//  setup();
-//LPM3;
+  setup();
 #ifdef TEST
 #ifdef TESTLPM
   setupLPM(LPM3_bits + GIE);

@@ -36,7 +36,7 @@
 extern "C" {
 #endif
 #ifdef MSP
-#define DEBUG(...) print(__VA_ARGS__)
+#define DEBUG(...) 
 #define PRINT(...) print(__VA_ARGS__)
 #define SPRINT(...) sprint(__VA_ARGS__)
 #define SCAN(...)  

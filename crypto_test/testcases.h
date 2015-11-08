@@ -1,7 +1,6 @@
 #ifndef TESTCASES_H
 #define TESTCASES_H
 #include <stddef.h>
-//#include "board.h"
 #include <string.h>
 #include "treeconfig.h"
 
@@ -15,10 +14,11 @@
 #define LED
 
 #define SIGNAL
-//#define SHA256
-//#define AES
-//#define DES
-//#define ECC
+#define CHACHA20
+#define SHA256
+#define AES
+#define DES
+#define ECC
 #define TESTLPM
 
 #ifdef TESTLPM
@@ -47,7 +47,6 @@ void testButton2(void);
 
 #ifdef ECC
 void setupECC(void);
-void updateECC(int newValue);
 int testECC(int);
 #endif
 
@@ -62,17 +61,11 @@ int testSHA256(int);
 #ifdef AES
 void testAES(int);
 int setupAES(void);
-void updateAES(int);
-int testEncAES(void);
-int testDecAES(void);
 #endif
 
 #ifdef DES
 void test3DES(int);
 int setup3DES(void);
-void update3DES(int);
-int testEnc3DES(void);
-int testDec3DES(void);
 #endif
 #endif
 uint8_t getValidASCII(uint8_t i);

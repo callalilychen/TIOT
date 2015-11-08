@@ -12,6 +12,9 @@ void setup(void){
   setupButton();
   cases++;
 #endif
+#ifdef CHACHA20 
+  cases++;
+#endif
 #ifdef SHA256 
   cases++;
 #endif
@@ -27,19 +30,17 @@ void setup(void){
   setup3DES();
   cases++;
 #endif
-#ifdef DEBUG
-  print("Start: %d\n\r", cases);
-#endif
+  DEBUG("Start: %d\n\r", cases);
 }
 
 //inline void testSingle(void){
 //#ifdef LOG 
-//  print("TestSinle\n\r");
+//  DEBUG("TestSinle\n\r");
 //#endif
 //#ifdef DEBUG
-//  print("cases: %x\n\r", cases);
-//  print("counter: %x\n\r", counter);
-//  print("param: %x\n\r", param);
+//  DEBUG("cases: %x\n\r", cases);
+//  DEBUG("counter: %x\n\r", counter);
+//  DEBUG("param: %x\n\r", param);
 //#endif
 //  if(param >= 0xff){
 //    param = 0;
@@ -114,17 +115,19 @@ void setup(void){
 //#endif
 //  }
 //#ifdef DEBUG
-//  print("Loop\n\r");
+//  DEBUG("Loop\n\r");
 //#endif
 //
 //}
 
 void tests(void){
   DEBUG("TEST\n");
+#ifdef CHACHA20 
+    testChaCha20(counter);
+#endif
 #ifdef SHA256
     testSHA256(counter);
 #endif
-
 #ifdef AES
     testAES(counter);
 #endif
@@ -146,7 +149,7 @@ void tests(void){
   __delay_cycles(500000);
 #endif
 #ifdef DEBUG
-  print("Loop\n\r");
+  DEBUG("Loop\n\r");
 #endif
   counter++;
 
