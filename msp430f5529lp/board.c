@@ -572,14 +572,11 @@ unsigned char GetLEDStatus()
 {
   unsigned char status = 0;
 
-  DEBUG("P1OUT: %d\n", P1OUT);
-  DEBUG("P4OUT: %d\n", P4OUT);
   if(P1OUT & BIT0)
     status |= (1 << 0);
   if(P4OUT & BIT7)
     status |= (1 << 1);
 
-  DEBUG("Status: %d\n", status);
   return status;
 }
 

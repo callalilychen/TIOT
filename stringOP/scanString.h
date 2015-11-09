@@ -7,13 +7,6 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#ifdef MSP
-#define SCAN(...)  
-#define SSCAN(...) sscan(__VA_ARGS__)  
-#else
-#define SCAN(...)  scanf(__VA_ARGS__)
-#define SSCAN(...) sscanf(__VA_ARGS__)  
-#endif
   int sscan(const char *str, const char *fmt, ...);
 
 #ifdef  __cplusplus

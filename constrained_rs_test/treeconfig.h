@@ -36,6 +36,19 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
+#ifdef MSP
+#define DEBUG(...) print(__VA_ARGS__)
+#define PRINT(...) print(__VA_ARGS__)
+#define SPRINT(...) sprint(__VA_ARGS__)
+#define SCAN(...)  
+#define SSCAN(...) sscan(__VA_ARGS__)  
+#else
+#define DEBUG(...) printf(__VA_ARGS__)
+#define PRINT(...) printf(__VA_ARGS__)
+#define SPRINT(...) sprintf(__VA_ARGS__)
+#define SCAN(...)  scanf(__VA_ARGS___
+#define SSCAN(...) sscanf(__VA_ARGS__)  
+#endif
     
   #define BUFSIZE 100
 
