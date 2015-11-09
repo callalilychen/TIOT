@@ -9,6 +9,7 @@ extern "C" {
 #ifdef MSP
 #define DEBUG(...) 
 #define PRINT(...) 
+#define  printf(...) 
 #define SPRINT(...) sprint(__VA_ARGS__)
 #else
 #define DEBUG(...) printf(__VA_ARGS__)
