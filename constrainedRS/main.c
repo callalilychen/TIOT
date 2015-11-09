@@ -1,7 +1,6 @@
 #include <stdint.h>
 
 
-#include "simplelink.h"
 #include "sl_common.h"
 #include "button.h"
 #include "wdt.h"

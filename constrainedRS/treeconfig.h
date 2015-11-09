@@ -22,18 +22,20 @@
 /*****************************************************************************/
 /* Include files                                                             */
 /*****************************************************************************/
-#include "interface.h"
-#include "simplelink.h"
+#define MSP
+#ifdef MSP
+#include "cli_uart.h"
+#include "board.h"
 #include "board_ext.h"
+#include "simplelink.h"
+#endif
+#include "interface.h"
 #include "printString.h"
 #include "scanString.h"
+#include "tmp.h"
 #ifdef  __cplusplus
 extern "C" {
 #endif
-#define PRINT(...) print(__VA_ARGS__)
-#define SPRINT(...) sprint(__VA_ARGS__)
-#define SCAN(...)  
-#define SSCAN(...) sscan(__VA_ARGS__)  
 //TODO
 #define SECURITY_LAYER_UPDATE_STATE
 /*!
