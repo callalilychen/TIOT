@@ -74,58 +74,10 @@ extern "C" {
    * \return Application response message size
    */
 #if(UI_APPLICATION_COUNT>0)
-  inline unsigned int __attribute__((always_inline))handleApplication(unsigned char* req, unsigned int req_size, unsigned int session_id, int application_type){
-    application ** applications; 
-    int applications_len = 0;
-    switch(application_type){
-      case msg_application:
-        applications = (application **)msg_applications;
-        applications_len = MSG_APPLICATION_COUNT;
-        break;
-      case ui_application:
-        applications = (application **)ui_applications;
-        applications_len = UI_APPLICATION_COUNT;
-        break;
-      default:
-        return 0;
-    }
+   unsigned int handleApplication(unsigned char* req, unsigned int req_size, unsigned int session_id, int application_type);
 #else
-    inline unsigned int __attribute__((always_inline))handleApplication(unsigned char* req, unsigned int req_size, unsigned int session_id){
+     unsigned int handleApplication(unsigned char* req, unsigned int req_size, unsigned int session_id);
 #endif
-      for(int i = 0; i < applications_len; i++){
-        if(req_size >= applications[i]->name_size && memcmp(applications[i]->name, req, applications[i]->name_size)==0){
-          application_session *p_session = getApplicationSession(session_id);
-          unsigned int hasRight = checkRight(getPerm(p_session -> security_descriptor_id), applications[i]->required_right);
-#if(UI_APPLICATION_COUNT>0)
-#ifdef ADMIN_PASSWORD_HASH 
-          if(!hasRight && application_type == ui_application){
-            hasRight = (ADMIN_RIGHT == askForAdminRight());
-          }
-#endif
-#endif
-          if(!hasRight){
-            //p_session -> security_descriptor_id = NO_DESCRIPTOR;
-            deactiveSecurityDescriptor(p_session -> security_descriptor_id);
-            memcpy(p_session->message, "[ERROR] No Right!", 17);
-            p_session->message[17] = '\0';
-            p_session->message_size = strlen((const char*)(p_session->message));
-            PRINT("%s\n", p_session->message);
-          } else if ((p_session->message_size = applications[i]->func(req+applications[i]->name_size, req_size-applications[i]->name_size, p_session))>0){
-#if(UI_APPLICATION_COUNT>0)
-            if(application_type == ui_application){
-              i+= MSG_APPLICATION_COUNT;
-            }
-#endif
-          }else{
-            clearApplicationSession(session_id);
-            return 0;
-          }
-          updateApplicationSession_Application(session_id, i);
-          return p_session->message_size;
-        } 
-      }
-      return 0;
-    }
 
     /*! 
      * \brief Write application header to the given buf, according to given type 
