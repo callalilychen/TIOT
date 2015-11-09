@@ -60,20 +60,16 @@ int main(int argc, char** argv)
   while(1){
     // Test code  
     for(int i = 3; i < 4; i++){
-#ifdef SIGNAL
       TEST_SIGNAL_HIGH;
-#endif
-      __delay_cycles(50000uL);
-#ifdef SIGNAL
+      __delay_cycles(12500uL);
       TEST_SIGNAL_LOW; 
-#endif
       DEBUG(">>>>>>>>>>TEST %d<<<<<<<<<<\n", i);
       TEST_SIGNAL_HIGH;
       handleUdpPackage(udp_payloads[i], udp_payloads_size[i], p_addr);
       sendUdpPackage(send_buf, BUFSIZE);
       TEST_SIGNAL_LOW;
     }
-    enterLPM(); 
+    enterLPM();
   }
 
   return 0;
