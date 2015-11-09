@@ -74,7 +74,6 @@ extern int udp_socket_fd;
   //}
   //
   inline  void __attribute__((always_inline))handleUdpPackage(unsigned char* udp_payload, unsigned int udp_payload_size, ADDR_TYPE *p_addr){
-    TEST_SIGNAL_LOW;
     unsigned int header_size = 0;
     udp_payload[udp_payload_size] = '\0';
     printBlock("received message", udp_payload, udp_payload_size);
