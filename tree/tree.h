@@ -41,12 +41,12 @@ extern "C" {
    *
    * \param   p_nodes  Pointer to the nodes
    * \param   p_edges  Pointer to the edges
-   * \param   len      Length of the tree path, which is equal to the number of nodes or number of edges - 1
+   * \param   depth    The depth of the last tree node in the path
    * \param   flag     Whether update nodes, if the nodes is not empty (node.size != 0)
    *
    * \return           Pointer to the last node or NULL, if p_nodes is NULL, the first node of p_nodes is empty or p_edges is NULL 
    */
-  inline tree_node *  __attribute__((always_inline))fillNodes(tree_node * p_nodes, tree_edge *p_edges, unsigned int len, unsigned int flag){
+  inline tree_node *  __attribute__((always_inline))fillNodes(tree_node * p_nodes, tree_edge *p_edges, unsigned int depth){
     if(p_nodes == NULL || p_edges == NULL){
       return NULL;
     }
@@ -57,10 +57,9 @@ extern "C" {
       return NULL;
     }
     int i = 0;
-    for(; i<len-1; i++){
-      if(flag || p_nodes[i+1].size == 0){
-        p_edges[i].func(p_nodes+i, p_edges+i, p_nodes+i+1);
-      }
+    for(; i<depth; i++){
+      p_edges[i].func(p_nodes+i, p_edges+i, p_nodes+i+1);
+      PRINT("Caculate edge:\n");
     }
     return p_nodes+i;
   }

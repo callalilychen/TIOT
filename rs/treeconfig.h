@@ -28,17 +28,10 @@
 
 #include "printString.h"
 #include "scanString.h"
-
+#include "tmp.h"
 #ifdef  __cplusplus
 extern "C" {
 #endif
-/*!
- * \brief Macro for print function
- */
-#define PRINT(...) printf(__VA_ARGS__)
-#define SCAN(...) scanf(__VA_ARGS__)
-#define SSCAN(...) sscan(__VA_ARGS__)
-#define SPRINT(...) sprint(__VA_ARGS__)
 //TODO
 #define SECURITY_LAYER_UPDATE_STATE
 /*!

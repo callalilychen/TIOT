@@ -42,7 +42,7 @@
  */
 
 #include <string.h>
-
+#include "treeconfig.h"
 #include "crypto/sha256.h"
 //#include "board.h"
 
@@ -252,10 +252,11 @@ unsigned char *sha256(const unsigned char *d, size_t n, unsigned char *md)
     if (md == NULL) {
         md = m;
     }
-
+    TEST_SIGNAL_LOW;
     sha256_init(&c);
     sha256_update(&c, d, n);
     sha256_final(md, &c);
+    TEST_SIGNAL_HIGH;
 
     return md;
 }

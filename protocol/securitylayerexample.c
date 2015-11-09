@@ -16,6 +16,7 @@
 #include "securitylayerexample.h"
 #include <string.h>
 
+const uint8_t PERMCODE_TYPE = 0x10;
 static securityHeaderExample currHeaders[SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN] = {0};
 
 unsigned int parseHeaderExample(unsigned int security_descriptor, unsigned char * msg, unsigned int *p_msg_size){
@@ -31,6 +32,8 @@ unsigned int generateHeaderExample(unsigned int security_descriptor, unsigned ch
   if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN || msg_size < SECURITY_LAYER_HEADER_LEN_EXAMPLE){
     return 0;
   }
+  // FIXME not static
+  currHeaders[security_descriptor].perm_code.permcode_type=PERMCODE_TYPE;
   memcpy(msg, currHeaders+security_descriptor, SECURITY_LAYER_HEADER_LEN_EXAMPLE);
   return SECURITY_LAYER_HEADER_LEN_EXAMPLE;
 }

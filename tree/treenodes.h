@@ -73,21 +73,20 @@ extern "C" {
    * \brief Set value to a cached tree node
    *
    * \param   index  The index of the to be set cached node in cached_nodes
-   * \param   value  The new cached root value
-   * \param   size   Size of the value in byte 
+   * \param   p_node The new cached node
    *
    * \return         Nonce
    */
-  inline void __attribute__((always_inline))setCachedNode(unsigned int index, unsigned char * value, unsigned int size)
+  inline void __attribute__((always_inline))setCachedNode(unsigned int index, tree_node * p_node)
   {
     if(index < CACHED_NODES_LEN)
     {
-      if(size > NODE_SIZE){
-        sha_construction.func(value, size, cached_nodes[index].block);
+      if(p_node ->size > NODE_SIZE){
+        sha_construction.func(p_node->block, p_node->size, cached_nodes[index].block);
         cached_nodes[index].size = sha_construction.size;
       } else {
-        memcpy(cached_nodes[index].block, value, size);
-        cached_nodes[index].size = size;
+        memcpy(cached_nodes[index].block, p_node->block, p_node->size);
+        cached_nodes[index].size = p_node->size;
       }
     }
   }
@@ -162,15 +161,15 @@ extern "C" {
     if(depth > TREE_HEIGTH){
       return NULL;
     }
-    int i = 0;
+    int i = 1;
     if(index < CACHED_NODES_LEN && cached_nodes[index].size>0){
-      memcpy(path_nodes, cached_nodes + index, sizeof(tree_node));
+      memcpy(path_nodes+1, cached_nodes + index, sizeof(tree_node));
       i++;
     }
-    for(; i<= depth; i++){
+    for(; i-1<= depth; i++){
       path_nodes[i].size = 0;
     }
-    return path_nodes;  
+    return path_nodes+1;  
   }
   
   /*!

@@ -7,8 +7,8 @@ void setupLPM(uint16_t v)
   //TA0CTL = TASSEL_2 | ID_3 | MC_1 | TACLR | TAIE | TAIFG; // Set the timer A to SMCLK, /8, up mode
   TA0CTL = TASSEL_1 | ID_3 | MC_1 | TACLR; // Set the timer A to ACLK, /8, up mode
   //TA0CTL |= TAIE; // Enable TA interrupt, which interrupt by timer == 0
-  //TA0CCR0 = 41*5; // 10ms *5
-  TA0CCR0 = 0x1000 * 0xf; //1s *2
+  TA0CCR0 = 41*10; // 10ms *5
+  //TA0CCR0 = 0x1000 * 0xf; //1s *2
   uint16_t timer = TA0R;
 
   //TA0CCTL0 = CAP;

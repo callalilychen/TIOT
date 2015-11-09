@@ -22,21 +22,23 @@
 /*****************************************************************************/
 /* Include files                                                             */
 /*****************************************************************************/
-#include "interface.h"
-#include "simplelink.h"
+#define MSP
+#ifdef MSP
+#include "cli_uart.h"
+#include "board.h"
 #include "board_ext.h"
+#include "simplelink.h"
+#endif
+#include "interface.h"
 #include "printString.h"
 #include "scanString.h"
+#include "tmp.h"
 #ifdef  __cplusplus
 extern "C" {
 #endif
-  
+    
   #define BUFSIZE 100
 
-#define PRINT(...) print(__VA_ARGS__)
-#define SPRINT(...) sprint(__VA_ARGS__)
-#define SCAN(...)  
-#define SSCAN(...) sscan(__VA_ARGS__)  
 //TODO
 //#define SECURITY_LAYER_UPDATE_STATE
 /*!
@@ -153,10 +155,10 @@ extern "C" {
 
 #define GREEN_LED_ON turnLedOn(LED2)
 #define GREEN_LED_OFF turnLedOff(LED2)
-#define GREEN_LED_STATUS GetLEDStatus()&2
+#define GREEN_LED_STATUS (GetLEDStatus()>>1)
 
-#define TEST_SIGNAL_HIGH signalHigh()
-#define TEST_SIGNAL_LOW signalLow()
+#define TEST_SIGNAL_HIGH  DEBUG("HIGH!\n");signalHigh()
+#define TEST_SIGNAL_LOW DEBUG("LOW!\n");signalLow()
 
 
 #ifdef  __cplusplus

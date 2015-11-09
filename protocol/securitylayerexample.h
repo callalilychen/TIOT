@@ -59,10 +59,10 @@ extern "C" {
 #endif
 
 #define SECURITY_LAYER_TYPE_EXAMPLE 0
-#define SECURITY_LAYER_HEADER_LEN_EXAMPLE 5
-#define SECURITY_LAYER_PERMCODE_LEN_EXAMPLE 3
+#define SECURITY_LAYER_HEADER_LEN_EXAMPLE 6
+#define SECURITY_LAYER_PERMCODE_LEN_EXAMPLE 4
 #define MAC_LEN_EXAMPLE 20
-
+const uint8_t PERMCODE_TYPE;
 #pragma pack(1)
   typedef struct permCodeExample{
     uint8_t permcode_type;

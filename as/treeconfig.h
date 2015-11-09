@@ -28,6 +28,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "tmp.h"
 #ifdef  __cplusplus
 extern "C" {
 #endif

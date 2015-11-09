@@ -67,9 +67,22 @@ static inline tree_node * getKeyNode(TREE_STATE_TYPE secret_index, unsigned char
   edges[1].params_size = TREE_STATE_SIZE;
 
   if(flag){
-    return fillNodes(getPathFromRoot(2), edges, 3, flag);
+    return fillNodes(getPathFromRoot(2), edges, 2);
   }else{
-    return fillNodes(getPathFromRootThenCachedNodes(2, secret_index), edges, 3, flag);
+    tree_node * p_nodes = getPathFromCachedNodes(1, secret_index);
+      printBlock("b1",p_nodes->block, p_nodes->size);
+
+    if(NULL== (p_nodes = fillNodes(p_nodes, edges+1, 1))){
+      p_nodes = getPathFromRoot(2);
+      fillNodes(p_nodes, edges, 2);
+      setCachedNode(secret_index, p_nodes+1);
+      printBlock("b1",p_nodes->block, p_nodes->size);
+      printBlock("b2",(p_nodes+1)->block, (p_nodes+1)->size);
+      printBlock("b3",(p_nodes+2)->block, (p_nodes+2)->size);
+      return p_nodes+2;
+    }
+    printBlock("b2",(p_nodes)->block, (p_nodes)->size);
+    return p_nodes;
   }
 }
 
@@ -77,8 +90,9 @@ static inline tree_node * getKeyNode(TREE_STATE_TYPE secret_index, unsigned char
 static inline int verifyMAC(tree_node * key, unsigned char * msg, unsigned int *p_msg_size, unsigned int mac_size){
   unsigned int size = 0;
   *p_msg_size -= mac_size;
+  //TEST_SIGNAL_LOW;
   hmac(&sha_construction, key->block, key->size, msg, *p_msg_size, tmpMAC, &size);
-
+  //TEST_SIGNAL_HIGH;
   return 0==memcmp(tmpMAC, msg+*p_msg_size, (unsigned int)mac_size);
 }
 
@@ -107,35 +121,33 @@ unsigned int handleSecurityLayer(unsigned char *msg, unsigned int * p_msg_size, 
   TREE_STATE_TYPE secret_index = implementation->getSecretIndex(descriptor_id);
   TREE_STATE_TYPE indexes [2] = {perm_index,  implementation->getKeyIndex(descriptor_id)};
   unsigned int forceUpdate = (getExpectedState(secret_index, 0) != perm_index);
+  PRINT("Force = %u!\n", forceUpdate);
   //TODO Work around to let AS not update state, perhaps replace with method to wait a message with the same key
+  //TODO update, when valid message
 #ifdef SECURITY_LAYER_UPDATE_STATE
     PRINT("%s Update state!\n", INFO_MESSAGE);
   if(SUCC == updateExpectedStateVector(secret_index, indexes, 1)){
 #endif
     // TODO use key identifier to search the same key
-    TEST_SIGNAL_HIGH;
+  //TEST_SIGNAL_LOW;
     tree_node * p_curr_key = getKeyNode(secret_index, perm_code, perm_code_size, indexes[1], forceUpdate);
-    TEST_SIGNAL_LOW;
+    //TEST_SIGNAL_HIGH;
     if(verifyMAC(p_curr_key, msg+*p_header_size, p_msg_size, implementation->MACsize)){
-      TEST_SIGNAL_HIGH;
       // TODO optimization, use descriptor_id security as last tree node
       copyTreeNode(&(tmpDescriptorSecurity.key), p_curr_key);
     //TODO no signal
-      TEST_SIGNAL_LOW;
       if(SUCC == updateSecurityDescriptor(descriptor_id, &tmpDescriptorSecurity, DESCRIPTOR_SECURITY_SIZE)){
-        TEST_SIGNAL_HIGH;
         return descriptor_id;
       } else{
       PRINT("[ERROR] Failed to update security descriptor_id!\n"); 
       }
     }else{
-      TEST_SIGNAL_HIGH;
-  PRINT("=======Verify MAC %u=========\n", descriptor_id);
-  printBlock("key", p_curr_key->block, p_curr_key->size);
-  printBlock("msg", msg+*p_header_size, *p_msg_size);
-  printBlock("getMac", msg+*p_msg_size, implementation->MACsize);
-  //printBlock("sollMac", tmpMAC, size);
-  PRINT("============================\n");
+      PRINT("=======Verify MAC %u=========\n", descriptor_id);
+      printBlock("key", p_curr_key->block, p_curr_key->size);
+      printBlock("msg", msg+*p_header_size, *p_msg_size);
+      printBlock("getMac", msg+*p_msg_size, implementation->MACsize);
+      printBlock("sollMac", tmpMAC, implementation->MACsize);
+      PRINT("============================\n");
       PRINT("[ERROR] Failed to verify MAC!\n"); 
     }
 #ifdef SECURITY_LAYER_UPDATE_STATE

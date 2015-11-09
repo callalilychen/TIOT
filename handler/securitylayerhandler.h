@@ -84,17 +84,17 @@ extern "C" {
     if(NULL == currKeyNode){
       return 0;
     }
-    TEST_SIGNAL_LOW;
+    //TEST_SIGNAL_LOW;
 
     hmac(&sha_construction, currKeyNode->block, currKeyNode->size, payload, payload_size, tmpMAC, &mac_size);
-  PRINT("=======Generate MAC %u========\n", security_descriptor_id);
-  printBlock("key", currKeyNode->block, currKeyNode->size);
-  printBlock("msg", payload, payload_size);
-  printBlock("Mac", tmpMAC, mac_size);
-  PRINT("============================\n");
+//  PRINT("=======Generate MAC %u========\n", security_descriptor_id);
+//  printBlock("key", currKeyNode->block, currKeyNode->size);
+//  printBlock("msg", payload, payload_size);
+//  printBlock("Mac", tmpMAC, mac_size);
+//  PRINT("============================\n");
     mac_size = implementations[currType]->MACsize;
     memcpy(payload+payload_size, tmpMAC, mac_size);
-    TEST_SIGNAL_HIGH;
+    //TEST_SIGNAL_HIGH;
     return mac_size;
   }
 
