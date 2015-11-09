@@ -10,7 +10,7 @@ C_FLAGS			+= -I../simplelink/include
 MCU = msp430f5529
 HOME_PATH = /home/wenwen
 TI_PATH = $(HOME_PATH)/ti
-MSP_PATH = $(TI_PATH)/gcc3.4.5.1
+MSP_PATH = $(TI_PATH)/gcc2
 TOOL_PATH = $(MSP_PATH)/bin
 GCC_LIBRARY_PATH = $(MSP_PATH)/include
 GCC_INCLUDE_PATH = $(GCC_LIBRARY_PATH)
@@ -20,6 +20,7 @@ GCC_LIBMSP_PATH = $(TI_PATH)/MSPDebugStack_OS_Package
 CC = $(TOOL_PATH)/msp430-elf-gcc
 CPP = $(TOOL_PATH)/msp430-elf-c++
 OBJCOPY = $(TOOL_PATH)/msp430-elf-objcopy
+OBJDUMP = $(TOOL_PATH)/msp430-elf-objdump
 PROGRAMMER = LD_LIBRARY_PATH=$(GCC_LIBMSP_PATH) mspdebug tilib
 SIZE = $(TOOL_PATH)/msp430-elf-size
 TERMPROG = picocom
@@ -31,7 +32,7 @@ DEBUGSERVER =  LD_LIBRARY_PATH=$(GCC_LIBMSP_PATH) mspdebug tilib
 # -ffunction-sections -fdata-sections are needed to place
 #  functions in separate sections, to be able to remove
 #  unneeded functions during linking
-C_FLAGS += -mmcu=$(MCU) $(INCLUDE_FLAGS) -Os -g
+C_FLAGS += -mmcu=$(MCU) $(INCLUDE_FLAGS) -Os
 C_FLAGS += -ffunction-sections -fdata-sections
 C_FLAGS += -I$(GCC_INCLUDE_PATH)
 #----------------------------------------------------------
@@ -69,6 +70,10 @@ upload:
 # analyze compiled program size:
 size:
 	$(SIZE) $(TARGET).elf
+
+dump:
+	$(OBJDUMP) -s $(TARGET).elf
+
 
 term: 
 	$(TERMPROG) $(TERM_FLAGS)
