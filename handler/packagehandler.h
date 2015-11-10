@@ -45,7 +45,9 @@ extern int udp_socket_fd;
           
           printIPv4("to ",HTONL((((ADDR_TYPE*)p_addr)->sin_addr).s_addr));
           PRINT(":%u\n", HTONS(((ADDR_TYPE*)p_addr)->sin_port));
+        TEST_SIGNAL_LOW;
           SENDTO_FUNC(udp_socket_fd, send_buf, send_buf_size, 0, p_addr, (ADDR_LEN_TYPE)ADDR_SIZE);
+        TEST_SIGNAL_HIGH;
         }else{
           send_buf[send_buf_size] = 0;
           PRINT("%s %s\n", INFO_MESSAGE, (const char*)application_message);

@@ -143,13 +143,13 @@ _i32 retVal = configureSimpleLinkToDefaultState();
         LOOP_FOREVER();
 
     /* Wait */
-    while(!IS_PING_DONE(g_Status)) { _SlNonOsMainLoopTask(); }
-
-    if (0 == g_PingPacketsRecv)
-    {
-        CLI_Write((_u8 *)" A STATION couldn't connect to the device \n\r");
-        ASSERT_ON_ERROR(LAN_CONNECTION_FAILED);
-    }
+//    while(!IS_PING_DONE(g_Status)) { _SlNonOsMainLoopTask(); }
+//
+//    if (0 == g_PingPacketsRecv)
+//    {
+//        CLI_Write((_u8 *)" A STATION couldn't connect to the device \n\r");
+//        ASSERT_ON_ERROR(LAN_CONNECTION_FAILED);
+//    }
 
     CLI_Write((_u8 *)" Device and the station are successfully connected \n\r");
     return SUCCESS;

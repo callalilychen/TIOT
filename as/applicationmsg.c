@@ -87,13 +87,13 @@ unsigned int handlePermReq(unsigned char* req, unsigned int req_size, applicatio
       memcpy(p_session->message, "permcode:", 9);  
       p_session->message_size = 9+generatePermCode(p_session->security_descriptor_id, p_session->message+9, MAX_APPLICATION_MESSAGE_SIZE-9);
       /* Calculate Secret */
-      unsigned int level = 2;
-      tree_edge * edges = getEdges(level - 1);
+      unsigned int depth = 2;
+      tree_edge * edges = getEdges(depth - 1);
       edges[0].func = edgeFunc;
       edges[0].params = getPermCode(p_session->security_descriptor_id, &(edges[0].params_size));
       tree_node * p_key_node = NULL;
 
-      p_key_node = fillNodes(getPathFromRoot(level), edges, level, 1);
+      p_key_node = fillNodes(getPathFromRoot(depth), edges, depth);
       p_session->message[(p_session->message_size)++] = ':';
       memcpy(p_session->message+p_session->message_size, &(p_key_node->block) , p_key_node->size);  
       p_session->message_size += p_key_node->size;

@@ -37,8 +37,8 @@
 extern "C" {
 #endif
 #ifdef MSP
-#define DEBUG(...) print(__VA_ARGS__)
-#define PRINT(...) print(__VA_ARGS__)
+#define DEBUG(...)  
+#define PRINT(...) 
 #define SPRINT(...) sprint(__VA_ARGS__)
 #define SCAN(...)  
 #define SSCAN(...) sscan(__VA_ARGS__)  
@@ -105,7 +105,7 @@ extern "C" {
 #define ADDR_LEN_TYPE SlSocklen_t
 #define SENDTO_FUNC(...) 
 
-#define ADDR_DESCRIPTORS_LEN 1 
+#define ADDR_DESCRIPTORS_LEN 3 
 #define ADDR_PREDEF_LEN 1
 #define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN
 

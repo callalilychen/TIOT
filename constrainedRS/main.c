@@ -38,6 +38,7 @@ int main(int argc, char** argv)
 {
   /* Stop WDT and initialize the system-clock of the MCU */
   stopWDT();
+  ports_init();
   initClk();
   CLI_Configure();
   print("LOS1\n\r");
@@ -51,6 +52,7 @@ int main(int argc, char** argv)
   retVal = initializeConnectionVariables();
   ASSERT_ON_ERROR(retVal);
   retVal = startAP();
+  //startWlanStion();
   ASSERT_ON_ERROR(retVal);
 
   _u8 macAddressVal[SL_MAC_ADDR_LEN];
@@ -94,17 +96,22 @@ int main(int argc, char** argv)
   /* Init predef addr of AS */
   updateAddrDescriptor(PREDEF_AS_ADDR, AS_PORT, AS_IP);
 
-  initWDT(WDT_ADLY_16);
+ // initWDT(WDT_ADLY_16);
   setupButton(15, 50);
   _u16 AddrSize = sizeof(SlSockAddrIn_t);
 
   while(1){
-    Buf_Read();
 
-    if(P1IN&BIT1 + P2IN&BIT1){
-      RED_LED_ON;
-    }else{
+    Buf_Read();
+    if(P2IN&BIT1){
       RED_LED_OFF;
+    }else{
+      RED_LED_ON;
+    }
+    if(P1IN&BIT1){
+      GREEN_LED_OFF;
+    }else{
+      GREEN_LED_ON;
     }
   }
 

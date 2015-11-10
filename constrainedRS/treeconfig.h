@@ -37,8 +37,8 @@
 extern "C" {
 #endif
 #ifdef MSP
-#define DEBUG(...) print(__VA_ARGS__)
-#define PRINT(...) print(__VA_ARGS__)
+#define DEBUG(...) 
+#define PRINT(...) 
 #define SPRINT(...) sprint(__VA_ARGS__)
 #define SCAN(...)  
 #define SSCAN(...) sscan(__VA_ARGS__)  
@@ -159,16 +159,19 @@ extern "C" {
 
 #define LED_IS_ON 1
 #define LED_IS_OFF 0
+
 #define RED_LED_ON turnLedOn(LED1)
 #define RED_LED_OFF turnLedOff(LED1)
 #define RED_LED_STATUS GetLEDStatus()&1
 
 #define GREEN_LED_ON turnLedOn(LED2)
 #define GREEN_LED_OFF turnLedOff(LED2)
-#define GREEN_LED_STATUS GetLEDStatus()&2
+#define GREEN_LED_STATUS (GetLEDStatus()>>1)
 
-#define TEST_SIGNAL_HIGH signalHigh()
-#define TEST_SIGNAL_LOW signalLow()
+#define TEST_SIGNAL_HIGH  DEBUG("HIGH!\n");signalHigh()
+#define TEST_SIGNAL_LOW DEBUG("LOW!\n");signalLow()
+
+
 
 #ifdef  __cplusplus
 }

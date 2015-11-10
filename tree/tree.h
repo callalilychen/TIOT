@@ -60,6 +60,9 @@ extern "C" {
     for(; i<depth; i++){
       p_edges[i].func(p_nodes+i, p_edges+i, p_nodes+i+1);
       PRINT("Caculate edge:\n");
+      printBlock("parent node", p_nodes[i].block, p_nodes[i].size );
+      printBlock("edge paramter", p_edges[i].params, p_edges[i].params_size );
+      printBlock("child node", p_nodes[i+1].block, p_nodes[i+1].size );
     }
     return p_nodes+i;
   }

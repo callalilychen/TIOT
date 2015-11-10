@@ -20,7 +20,7 @@
 #include "addr_descriptor.h"
 #include "tree.h"
 unsigned int selected_addr_id = 0;
-unsigned int selected_security_id = 0;
+unsigned int selected_security_id = PREDEF_TEST_SECURITY_DESCRIPTOR;
 
 /*!
  * \brief Handle send message cmd to the currently chosen address
@@ -120,7 +120,7 @@ unsigned int handleSecureSend(unsigned char* req, unsigned int req_size, applica
   edges[1].params_size = TREE_STATE_SIZE;
   tree_node * p_key_node = NULL;
 
-  p_key_node = fillNodes(getPathFromRoot(depth), edges, depth+1, 1);
+  p_key_node = fillNodes(getPathFromRoot(depth), edges, depth);
   printBlock("Key", p_key_node->block, p_key_node->size);
 
   if(SUCC!=updateSecurityWithKey(p_session->security_descriptor_id, p_key_node)){
@@ -131,7 +131,18 @@ unsigned int handleSecureSend(unsigned char* req, unsigned int req_size, applica
   return p_session->message_size;
 }
 
-test_setting test = {0};
+test_setting test = {
+    .status = TEST_IDLE,
+    .send_counter = 0,
+    .recv_counter = 0,
+    .interval.tv_sec = 0,
+    .interval.tv_nsec = 500*1000000L,
+    .times = 0,
+    .buf ={0},
+    .buf_size = {0},
+    .addr_descriptor_id = 0, 
+    .security_descriptor_id = 0
+  };
 
 
 /*!
@@ -156,12 +167,12 @@ const application msgapplication = {
 };
 
 unsigned int handleMsg(unsigned char* req, unsigned int req_size, application_session * p_session){
+  pthread_mutex_lock(&(test.lock));
   if(TEST_RUNNING==test.status && p_session->addr_descriptor_id == test.addr_descriptor_id){
     PRINT("%s Test %u is received\n", INFO_MESSAGE, test.recv_counter);
-    pthread_mutex_lock(&(test.lock));
     test.recv_counter++;
-    pthread_mutex_unlock(&(test.lock));
   }
+  pthread_mutex_unlock(&(test.lock));
   req[req_size] = '\0';
   PRINT("[%s (%u)\n", req, req_size);
   return 0;
@@ -219,7 +230,7 @@ void* testsend(void *nothing){
       edges[1].params_size = TREE_STATE_SIZE;
       tree_node * p_key_node = NULL;
 
-      p_key_node = fillNodes(getPathFromRoot(depth), edges, depth+1, 1);
+      p_key_node = fillNodes(getPathFromRoot(depth), edges, depth);
       printBlock("Key", p_key_node->block, p_key_node->size);
 
       updatePredefSecurityWithKey(test.security_descriptor_id, p_key_node);
@@ -239,9 +250,9 @@ void* testsend(void *nothing){
       nanosleep(&(test.interval), NULL);
     }
   }
-  float quoto = test.recv_counter/test.send_counter;
+  float quoto = (float)(test.send_counter-test.recv_counter)/(float)test.send_counter;
   PRINT("=====TEST RESULT=====\n");
-  PRINT("%s Send %u packages, receive %u packages. %.1f%% package loss!\n", INFO_MESSAGE, test.recv_counter,test.send_counter, 100*(1-quoto));
+  PRINT("%s Send %u packages, receive %u packages. %.1f%% package loss!\n", INFO_MESSAGE, test.send_counter, test.recv_counter, 100*quoto);
   PRINT("=====================\n");
   test.status = TEST_IDLE;
   pthread_mutex_unlock(&(test.lock));

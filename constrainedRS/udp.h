@@ -1,6 +1,7 @@
 #ifndef __UDP_H__
 #define __UDP_H__
 #include "simplelink.h"
+#include "socket.h"
 #include "sl_common.h"
 #include "interface.h"
 #include "packagehandler.h"

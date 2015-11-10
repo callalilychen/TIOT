@@ -13,6 +13,7 @@
 
 #define PORT 9002
 #define RS_PORT 5001  
+//#define CONSTRAINED_RS_IP "192.168.1.38"
 #define CONSTRAINED_RS_IP "192.168.1.1"
 #define RS_IP "127.0.0.1"
 
@@ -82,6 +83,9 @@ int main(int argc, char** argv)
   /* Init predef addr of RS */
   updateAddrWithIpAndPort(0, CONSTRAINED_RS_IP, RS_PORT);
   updatePredefAddrWithIpAndPort(PREDEF_RS_ADDR, RS_IP, RS_PORT);
+
+  updatePredefSecurityWithProtocolType(PREDEF_TEST_SECURITY_DESCRIPTOR,0);
+  setPerm(PREDEF_TEST_SECURITY_DESCRIPTOR, 3);
 
   pthread_mutex_init (&lock, NULL);
   /* UDP Thread to handle received UDP messages */

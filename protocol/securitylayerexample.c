@@ -42,6 +42,8 @@ unsigned int generatePermCodeExample(unsigned int security_descriptor, unsigned 
   if(security_descriptor>=SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN || msg_size < SECURITY_LAYER_PERMCODE_LEN_EXAMPLE){
     return 0;
   }
+  // FIXME not static
+  currHeaders[security_descriptor].perm_code.permcode_type=PERMCODE_TYPE;
   memcpy(msg, &(currHeaders[security_descriptor].perm_code), SECURITY_LAYER_PERMCODE_LEN_EXAMPLE);
   return SECURITY_LAYER_PERMCODE_LEN_EXAMPLE;
 }
@@ -60,7 +62,9 @@ void * getPermCodeExample(unsigned int security_descriptor, unsigned int * size)
     return NULL;
   }
   if(size != NULL)
-  *size = sizeof(permCodeExample);
+    *size = sizeof(permCodeExample);
+  // FIXME not static
+  currHeaders[security_descriptor].perm_code.permcode_type=PERMCODE_TYPE;
   return &(currHeaders[security_descriptor].perm_code);
 }
 

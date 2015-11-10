@@ -93,7 +93,7 @@ unsigned int handleAddSec(unsigned char* req, unsigned int req_size, application
       incExpectedState(secret_index, 0, 0);
       setBit(secret_index);
       setSecretIndex(descriptor_id, secret_index);
-      setPermIndex(descriptor_id, perm_index);
+      setPermIndex(descriptor_id, getExpectedState(secret_index,0));
       setPerm(descriptor_id, perm);
       setKeyIndex(descriptor_id, 0);
       PRINT("New Security descriptor:\n");
@@ -268,7 +268,7 @@ unsigned int handleEditPermission(unsigned char* req, unsigned int req_size, app
     TREE_STATE_TYPE secret_index = getSecretIndex(descriptor_id);
     TREE_STATE_TYPE perm_index = getExpectedState(secret_index,0);
     incExpectedState(secret_index, 0, 0);
-    setPermIndex(descriptor_id, perm_index);
+    setPermIndex(descriptor_id, getExpectedState(secret_index,0));
     setPerm(descriptor_id, (RIGHT_TYPE)perm);
     printSecurityDescriptorHeader();
     printSecurityDescriptor(descriptor_id);
