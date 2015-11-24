@@ -2,14 +2,14 @@
 #include "3des.h"
 
 cipher_context_t context;
-uint8_t key[THREEDES_BLOCK_SIZE];
+uint8_t deskey[24+1]="abcdefghijklmnopqrsnuwyx";
 uint8_t pblock_3des[THREEDES_BLOCK_SIZE+1] = "  !test!";
 uint8_t cblock_3des[THREEDES_BLOCK_SIZE+1] = "testtest";
 uint8_t rpblock_3des[THREEDES_BLOCK_SIZE+1] = "  !test!";
 
 
 int setup3DES(void){
-  tripledes_init(&context,key, THREEDES_BLOCK_SIZE);
+  tripledes_init(&context,deskey, 24);
 }
 
 static inline void print3DES(void){
