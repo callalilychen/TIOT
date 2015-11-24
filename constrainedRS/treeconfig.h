@@ -95,12 +95,17 @@ extern "C" {
 #define HTONS sl_Htons
 #define HTONL sl_Htonl
 #define ASSIGN_IP(addr, ip) addr = HTONL(ip)
-
 #define ADDR_FAMILY SL_AF_INET
 #define ADDR_TYPE SlSockAddrIn_t
 #define ADDR_SEND_TYPE SlSockAddr_t
 #define ADDR_LEN_TYPE SlSocklen_t
 #define SENDTO_FUNC sl_SendTo
+
+#define ADDR_FAMILY SL_AF_INET
+#define ADDR_TYPE SlSockAddrIn_t
+#define ADDR_SEND_TYPE SlSockAddr_t
+#define ADDR_LEN_TYPE SlSocklen_t
+#define SENDTO_FUNC(...)
 
 #define ADDR_DESCRIPTORS_LEN 1 
 #define ADDR_PREDEF_LEN 1
@@ -123,30 +128,28 @@ extern "C" {
 #define MAX_APPLICATION_USAGE_SIZE 0
 
 /*!
- * \brief Configuration of tree
+ * \brief Configuration of the secret tree
  *
- *        0. level -> root
- *        1. level -> secrets
- *        2. level -> key 
- *
+ *        0. Level -> Server Secret 
+ *        1. Level -> Client Secrets
+ *        2. Level -> Keys 
  * */
 #define TREE_HEIGTH 2
-#define CACHED_NODES_LEN ADDR_DESCRIPTORS_LEN
+#define CACHED_NODES_LEN 5
 
 /*!
- * \brief Configuration of state manangement
+ * \brief Configuration of secret tree state 
  *
- *        States are managed in a table
- *        Each row in the table represents a state-vector
- *        A state-vector contains multiple states
- *
+ *        States are managed in a table.
+ *        Rows in the table are called state-vectors.
+ *        A state-vector contains multiple indices.
  * */
-#define TREE_STATE_TABLE_LEN 0xf     /*!< Number of state vectors in the table (Number of table rows) */
-#define TREE_STATE_VECTOR_LEN 2  /*!< Number of states in each state vector (Number of table columns) */
-
-#define TREE_STATE_SIZE 2          /*!< Size of state in Bytes*/
+#define TREE_STATE_SIZE 2         /*!< Size of state in Bytes*/
 #define TREE_STATE_TYPE uint16_t   /*!< Type of each state */
-#define TREE_STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than the STATE_UPPER_BOUNDARY */
+#define TREE_STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than or equal to the STATE_UPPER_BOUNDARY */
+#define TREE_STATE_TABLE_LEN 100     /*!< Number of the table rows (The maximum number of simultaneously authorized clients) */
+#define TREE_STATE_VECTOR_LEN TREE_HEIGTH  /*!< Number of states in each state vector (Number of table columns) */
+
 
 
 /*!

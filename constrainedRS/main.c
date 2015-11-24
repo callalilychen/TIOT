@@ -90,9 +90,9 @@ int main(int argc, char** argv)
   resetApplicationSession();
 
   // TODO config root 
+  initTreeNodes();
   const char root[5] = "test";
   setRoot((unsigned char *)root, 4);
-
   /* Init predef addr of AS */
   updateAddrDescriptor(PREDEF_AS_ADDR, AS_PORT, AS_IP);
 
