@@ -16,10 +16,10 @@
 #include "treenodes.h"
 
 #if(CACHED_NODES_LEN>0)
-tree_node cached_nodes[CACHED_NODES_LEN] = {0};
+tree_node cached_nodes[CACHED_NODES_LEN];
 #endif
 
-tree_node path_nodes[TREE_HEIGTH+1] = {0};
+tree_node path_nodes[TREE_HEIGTH+1];
 
 /*!
  * @}

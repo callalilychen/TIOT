@@ -48,6 +48,21 @@ extern "C" {
 #endif
   
   /*!
+   * \brief Initialize reserved tree node storage, set all node size to 0.
+   *
+   * \return         Nonce
+   */
+  inline void __attribute__((always_inline))initTreeNodes()
+  {
+    for(int i = 0; i < TREE_HEIGTH+1; i++){
+      path_nodes[i].size = 0;
+    }
+    for(int i = 0; i < CACHED_NODES_LEN; i++){
+      cached_nodes[i].size = 0;
+    }
+  }
+
+  /*!
    * \brief Set value to the tree root
    *
    *        Tree root is the first node of path_nodes
