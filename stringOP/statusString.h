@@ -1,0 +1,14 @@
+#define SUCC_MESSAGE "[SUCC]"
+#define SUCC_MESSAGE_SIZE 6
+
+#define DONE_MESSAGE "[OK]"
+#define DONE_MESSAGE_SIZE 4
+
+#define ERROR_MESSAGE "[ERR]"
+#define ERROR_MESSAGE_SIZE 5
+
+#define USAGE_MESSAGE "[USAGE]"
+#define USAGE_MESSAGE_SIZE 7
+
+#define INFO_MESSAGE "[INFO]"
+#define INFO_MESSAGE_SIZE 6
