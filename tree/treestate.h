@@ -149,11 +149,11 @@ extern "C" {
    * \note                      The length of states must be equal to TREE_STATE_VECTOR_LEN 
    */
   inline int __attribute__((always_inline))setStateVector(unsigned int states_index, TREE_STATE_TYPE * p_state_vector)
-    //TODO 
   {
     if(states_index >= TREE_STATE_TABLE_LEN || p_state_vector== NULL){
       return FAIL;
     }
+    printBlock("Current State",expected_states[states_index], TREE_STATE_VECTOR_LEN);
     for(int i = 0; i < TREE_STATE_VECTOR_LEN; i++){
       if(SUCC != validState(p_state_vector[i], expected_states[states_index][i])){
         return FAIL;
@@ -227,6 +227,7 @@ extern "C" {
   inline int __attribute__((always_inline))updateExpectedStateVector(unsigned int state_index, TREE_STATE_TYPE * p_state_vector, unsigned int inc_pre_state)
   {
     if(SUCC == setStateVector(state_index, p_state_vector)){
+      DEBUG("Inc expected state now!\n");
       return incExpectedState(state_index, TREE_STATE_VECTOR_LEN-1, inc_pre_state);
     }
     return FAIL;

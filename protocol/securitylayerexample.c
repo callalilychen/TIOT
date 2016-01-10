@@ -16,7 +16,7 @@
 #include "securitylayerexample.h"
 #include <string.h>
 
-const uint8_t PERMCODE_TYPE = 0x10;
+const uint8_t PERMCODE_TYPE = 0x40;
 static securityHeaderExample currHeaders[SECURITY_DESCRIPTORS_LEN+SECURITY_PREDEF_LEN] = {0};
 
 unsigned int parseHeaderExample(unsigned int security_descriptor, unsigned char * msg, unsigned int *p_msg_size){

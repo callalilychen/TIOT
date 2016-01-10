@@ -32,7 +32,7 @@ const application redledonapplication = {
   .name = "rlon",
   .name_size = 4,
 #if(MAX_APPLICATION_USAGE_SIZE>0)
-  .usage = "\t\tTurn on red led, required right 7",
+  .usage = "\t\tTurn on red LED",
 #endif
   .required_right = 7,
   .func = handleRedLEDon
@@ -61,7 +61,7 @@ const application redledoffapplication = {
   .name = "rloff",
   .name_size = 5,
 #if(MAX_APPLICATION_USAGE_SIZE>0)
-  .usage = "\t\tTurn off red led, required right 3",
+  .usage = "\t\tTurn off red LED",
 #endif
   .required_right = 3,
   .func = handleRedLEDoff
@@ -71,7 +71,7 @@ unsigned int handleRedLEDoff(unsigned char* req, unsigned int req_size, applicat
     return 0;
   }
   RED_LED_OFF;
-  return generateApplicationStatusResponse(&redledoffapplication, p_session, SUCC, NULL, 0);
+  return generateApplicationStatusResponse(&redledoffapplication, p_session, DONE, NULL, 0);
 }
 
 /*!
@@ -88,7 +88,7 @@ const application redledapplication = {
   .name = "rls",
   .name_size = 3,
 #if(MAX_APPLICATION_USAGE_SIZE>0)
-  .usage = "\t\tRed led status, required right 1",
+  .usage = "\t\tRed LED status",
 #endif
   .required_right = 1,
   .func = handleRedLED
@@ -100,11 +100,11 @@ unsigned int handleRedLED(unsigned char* req, unsigned int req_size, application
   }
   char * status_string;
   if(LED_IS_OFF == RED_LED_STATUS){
-    status_string = " is off";
+    status_string = "OFF";
   }else{
-    status_string = " is on";
+    status_string = "ON";
   }
-  return generateApplicationStatusResponse(&redledapplication, p_session, SUCC, (unsigned char *)status_string, strlen(status_string));
+  return generateApplicationStatusResponse(&redledapplication, p_session, INFO, (unsigned char *)status_string, strlen(status_string));
 }
 
 

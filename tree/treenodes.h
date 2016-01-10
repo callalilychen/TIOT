@@ -105,6 +105,19 @@ extern "C" {
       }
     }
   }
+  /*!
+   * \brief Clear a cached tree node
+   *
+   * \param   index  The index of the to be set cached node in cached_nodes
+   *
+   * \return         Nonce
+   */
+  inline void __attribute__((always_inline))clearCachedNode(unsigned int index)
+  {
+    if(index < CACHED_NODES_LEN)
+    { cached_nodes[index].size = 0;
+    }
+  }
 #endif
 
   /*!

@@ -87,11 +87,11 @@ extern "C" {
     TEST_SIGNAL_LOW;
 
     hmac(&sha_construction, currKeyNode->block, currKeyNode->size, payload, payload_size, tmpMAC, &mac_size);
-//  PRINT("=======Generate MAC %u========\n", security_descriptor_id);
-//  printBlock("key", currKeyNode->block, currKeyNode->size);
-//  printBlock("msg", payload, payload_size);
-//  printBlock("Mac", tmpMAC, mac_size);
-//  PRINT("============================\n");
+    DEBUG("=======Generate MAC %u========\n", security_descriptor_id);
+    debugBlock("key", currKeyNode->block, currKeyNode->size);
+    debugBlock("msg", payload, payload_size);
+    debugBlock("Mac", tmpMAC, mac_size);
+    DEBUG("============================\n");
     mac_size = implementations[currType]->MACsize;
     memcpy(payload+payload_size, tmpMAC, mac_size);
     TEST_SIGNAL_HIGH;
@@ -188,11 +188,11 @@ extern "C" {
     return NULL;
   }
   inline void __attribute__((always_inline))printSecurityDescriptorSecurityLayerHeader(){
-    PRINT("Security Index\tPermission Index\tPermission\tKey Index");
+    PRINT("Client Secret Index\tPermission Index\tPermission\tKey Index");
   }
   
   inline void __attribute__((always_inline)) printSecurityDescriptorSecurityLayer(unsigned int id){
-    PRINT("%u\t\t%u\t\t\t%u\t\t%u", 
+    PRINT("%u\t\t\t%u\t\t\t%u\t\t%u", 
         getSecretIndex(id),
         getPermIndex(id),
         getPerm(id),

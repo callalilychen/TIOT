@@ -63,6 +63,8 @@ inline uint8_t * (__attribute__((always_inline))optimizedXOR)(uint8_t * a, uint8
 
 void printIPv4(char* name, uint32_t ip);
 void printBlock(char* name, unsigned char* block, size_t block_len);
+void debugIPv4(char* name, uint32_t ip);
+void debugBlock(char* name, unsigned char* block, size_t block_len);
 
 #ifdef  __cplusplus
 }

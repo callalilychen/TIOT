@@ -26,6 +26,7 @@ extern "C" {
    * \brief Application defination of revocation
    */
   extern const application rsrevapplication;
+  extern const application rsrevapplication2;
   
 #ifdef  __cplusplus
 }

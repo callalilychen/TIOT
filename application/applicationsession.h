@@ -120,6 +120,20 @@ extern "C" {
   }
 
   /*!
+   * \brief Get the response message size of the application session of the given id 
+   *
+   * \param session_id    The given session id
+   *
+   * \return              Size of response message
+   */
+  inline unsigned int __attribute__((always_inline))getApplicationMessageSize(unsigned int session_id){
+    if(session_id < APPLICATION_SESSIONS_LEN){
+      return application_sessions[session_id].message_size;
+    }
+    return 0;
+  }
+
+  /*!
    * \brief Get a pointer to the application session of the given id 
    *
    * \param session_id    The given session id

@@ -29,11 +29,6 @@ int incExpectedState(unsigned int state_row, unsigned int state_col, unsigned in
       for(int j = state_col+1; j<TREE_STATE_VECTOR_LEN; j++){
         expected_states[state_row][j] = 0;
       }
-      PRINT("%s New state: %x\t", INFO_MESSAGE, state_row);
-      for(int j = 0; j < TREE_STATE_VECTOR_LEN; j++){
-        PRINT("%x\t", expected_states[state_row][j]);
-      }
-      PRINT("\n");
       return SUCC;
     }else if(!inc_pre_state){
       /*!

@@ -67,7 +67,7 @@ extern "C" {
    * \return the bit index
    */
   inline unsigned int __attribute__((always_inline))getFirstNotSetBit(void){
-    PRINT("BIT_MAP_SIZE is %d\n", BIT_MAP_SIZE);
+    DEBUG("BIT_MAP_SIZE is %d\n", BIT_MAP_SIZE);
     for(int i =0; i < BIT_MAP_SIZE; i++){
       if(bitmap[i]!=0xff){
         for(int ii=0; ii<8; ii++){

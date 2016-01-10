@@ -10,7 +10,11 @@
 #include <arpa/inet.h>
 
 #include "packagehandler.h"
-
+#define TEST_RTT
+#ifdef TEST_RTT
+#include <time.h>
+struct timespec sendtime;
+#endif
 #define PORT 9002
 #define RS_PORT 5001  
 //#define CONSTRAINED_RS_IP "192.168.1.38"
@@ -18,7 +22,6 @@
 #define RS_IP "127.0.0.1"
 
 static pthread_mutex_t lock;
-
 unsigned char main_buf[BUFSIZE+1] = {0};
 
 socklen_t addrlen = sizeof(ADDR_TYPE);
@@ -30,6 +33,16 @@ static void * recvUdpThread(void* nothing){
     int recvlen = recvfrom(udp_socket_fd, buf, BUFSIZE, 0, (struct sockaddr *)&si_remote, &addrlen);
     if(recvlen > 0 ){
       pthread_mutex_lock(&lock);
+#ifdef TEST_RTT
+    time_t currtime = time(0);
+    struct tm * timeinfo;
+
+    timeinfo = localtime ( &currtime );
+    DEBUG ( "Current local time and date is %s", asctime (timeinfo));
+    struct timespec recvtime;
+    clock_gettime(CLOCK_REALTIME, &recvtime);
+    PRINT ( ">>> Latency is: %f ms\n", (double)(recvtime.tv_sec-sendtime.tv_sec)*1000+(double)(recvtime.tv_nsec-sendtime.tv_nsec)/1000000.0);
+#endif
       handleUdpPackage((unsigned char*)buf, recvlen, (ADDR_TYPE *)&si_remote);
       sendUdpPackage( main_buf, BUFSIZE);
 
@@ -45,9 +58,17 @@ static void * cmdThread(void* nothing){
 
   while(1){
     SCAN("%s",str);
-    PRINT("%s (%lu)\n",str, strlen(str));
+    DEBUG("%s (%lu)\n",str, strlen(str));
     pthread_mutex_lock(&lock);
     handleCmdPackage((unsigned char *)str, strlen(str));
+#ifdef TEST_RTT
+   time_t currtime = time(0);
+    struct tm * timeinfo;
+
+    timeinfo = localtime ( &currtime );
+    DEBUG ( "Current local time and date is %s", asctime (timeinfo) );
+    clock_gettime(CLOCK_REALTIME, &sendtime);
+#endif
     sendUdpPackage(main_buf, BUFSIZE);
     pthread_mutex_unlock(&lock);
   }
@@ -84,8 +105,18 @@ int main(int argc, char** argv)
   updateAddrWithIpAndPort(0, CONSTRAINED_RS_IP, RS_PORT);
   updatePredefAddrWithIpAndPort(PREDEF_RS_ADDR, RS_IP, RS_PORT);
 
+  updateSecurityWithProtocolType(0,0);
+  updateSecurityWithProtocolType(1,0);
+  updateSecurityWithProtocolType(2,0);
   updatePredefSecurityWithProtocolType(PREDEF_TEST_SECURITY_DESCRIPTOR,0);
-  setPerm(PREDEF_TEST_SECURITY_DESCRIPTOR, 3);
+  setPerm(0, 0);
+  setSecretIndex(0,1);
+  setPerm(1, 3);
+  setSecretIndex(1,2);
+  setPerm(2, 7);
+  setSecretIndex(2,3);
+  setPerm(PREDEF_TEST_SECURITY_DESCRIPTOR, 0xff);
+  setSecretIndex(PREDEF_TEST_SECURITY_DESCRIPTOR,4);
 
   pthread_mutex_init (&lock, NULL);
   /* UDP Thread to handle received UDP messages */

@@ -22,6 +22,7 @@
 
 #include "treeedges.h"
 #include "treenodes.h"
+#include "utils.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -59,10 +60,10 @@ extern "C" {
     int i = 0;
     for(; i<depth; i++){
       p_edges[i].func(p_nodes+i, p_edges+i, p_nodes+i+1);
-      PRINT("Caculate edge:\n");
-      printBlock("parent node", p_nodes[i].block, p_nodes[i].size );
-      printBlock("edge paramter", p_edges[i].params, p_edges[i].params_size );
-      printBlock("child node", p_nodes[i+1].block, p_nodes[i+1].size );
+      DEBUG("Caculate edge:\n");
+      debugBlock("parent node", p_nodes[i].block, p_nodes[i].size );
+      debugBlock("edge paramter", p_edges[i].params, p_edges[i].params_size );
+      debugBlock("child node", p_nodes[i+1].block, p_nodes[i+1].size );
     }
     return p_nodes+i;
   }

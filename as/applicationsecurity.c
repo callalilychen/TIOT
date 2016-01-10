@@ -63,7 +63,7 @@ unsigned int handleLsSecurity(unsigned char* req, unsigned int req_size, applica
  */
 unsigned int handleAddSec(unsigned char* req, unsigned int req_size, application_session * p_session);
 const application addsecapplication = {
-  .name = "sadd:",
+  .name = "padd:",
   .name_size = 5,
   .usage = "%u:%u\t<type>:<perm>\tAdd a new permission",
   .required_right = NO_RIGHT,
@@ -128,7 +128,7 @@ const application editprotocoltypeapplication = {
 unsigned int handleEditSecurityLayerProtocolType(unsigned char* req, unsigned int req_size, application_session * p_session){
   // XXX This application is only for ui, therefore, output is directly printed on the standard output via PRINT.
   unsigned int descriptor_id;
-  uint8_t type;
+  unsigned int type;
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &type)==2){
     if(descriptor_id==test.security_descriptor_id){
       pthread_mutex_lock(&(test.lock));
@@ -174,14 +174,14 @@ unsigned int handleEditSecretIndex(unsigned char* req, unsigned int req_size, ap
 const application editsecretindexapplication = {
   .name = "sedit:",
   .name_size = 6,
-  .usage = "%u:%u\t<id>:<index>\tEdit the security index of a security descriptor",
+  .usage = "%u:%u\t<id>:<index>\tEdit the Client Secret Index of a security descriptor",
   .required_right = NO_RIGHT,
   .func = handleEditSecretIndex
 };
 unsigned int handleEditSecretIndex(unsigned char* req, unsigned int req_size, application_session * p_session){
   // XXX This application is only for ui, therefore, output is directly printed on the standard output via PRINT.
   unsigned int descriptor_id;
-  TREE_STATE_TYPE secret_index;
+  unsigned int secret_index;
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &secret_index)==2){
     if(descriptor_id==test.security_descriptor_id){
       pthread_mutex_lock(&(test.lock));
@@ -209,7 +209,9 @@ unsigned int handleEditSecretIndex(unsigned char* req, unsigned int req_size, ap
       if(SUCC == clearBit(old_secret_index) && SUCC == setBit(secret_index)){
         TREE_STATE_TYPE perm_index = getExpectedState(secret_index,0);
         incExpectedState(secret_index, 0, 0);
-        setPermIndex(p_session->security_descriptor_id, perm_index);
+        setSecretIndex(descriptor_id, secret_index);
+        setBit(secret_index);
+        setPermIndex(descriptor_id, perm_index);
         printSecurityDescriptorHeader();
         printSecurityDescriptor(descriptor_id);
       }
@@ -241,8 +243,8 @@ const application editpermapplication = {
 };
 unsigned int handleEditPermission(unsigned char* req, unsigned int req_size, application_session * p_session){
   // XXX This application is only for ui, therefore, output is directly printed on the standard output via PRINT.
-  unsigned int descriptor_id;
-  RIGHT_TYPE perm;
+  int descriptor_id;
+  int perm;
   if(SSCAN((const char*)req, "%u:%u", &descriptor_id, &perm)==2){
     if(descriptor_id==test.security_descriptor_id){
       pthread_mutex_lock(&(test.lock));
@@ -261,16 +263,21 @@ unsigned int handleEditPermission(unsigned char* req, unsigned int req_size, app
       if(ADMIN_RIGHT == askForAdminRight()){
         PRINT("%s Update Security as admin:\n", SUCC_MESSAGE);
       }else{
-        PRINT("%s No right to change predefined security descriptor!:\n", ERROR_MESSAGE);
+        PRINT("%s No right to change predefined security descriptor!: %d\n", ERROR_MESSAGE,descriptor_id);
         return 0;
       }
     }
+    activeSecurityDescriptor(descriptor_id);
+
     TREE_STATE_TYPE secret_index = getSecretIndex(descriptor_id);
     TREE_STATE_TYPE perm_index = getExpectedState(secret_index,0);
     incExpectedState(secret_index, 0, 0);
     setPermIndex(descriptor_id, getExpectedState(secret_index,0));
     setPerm(descriptor_id, (RIGHT_TYPE)perm);
+    selected_security_id = descriptor_id;
+    PRINT("  ");
     printSecurityDescriptorHeader();
+    PRINT("* ");
     printSecurityDescriptor(descriptor_id);
   } else{
     PRINT("%s %s%s\n", USAGE_MESSAGE, editpermapplication.name, editpermapplication.usage);
@@ -355,8 +362,11 @@ unsigned int handleSelectSecurity(unsigned char* req, unsigned int req_size, app
   if(SSCAN((const char*)req, "%u", &id)==1){
     if(id < ADDR_DESCRIPTORS_LEN + ADDR_PREDEF_LEN){
       selected_security_id = id;
-      PRINT("%s Select security descriptor:\n", SUCC_MESSAGE);
-      printSecurityDescriptor(id);
+      PRINT("%s Selected:\n", SUCC_MESSAGE);
+    PRINT("  ");
+    printSecurityDescriptorHeader();
+    PRINT("* ");
+    printSecurityDescriptor(id);
     }else{
       PRINT("%s Descriptor id %u is out of range!:\n", ERROR_MESSAGE, id);
     }

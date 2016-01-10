@@ -21,8 +21,7 @@
 
 const application *msg_applications[MSG_APPLICATION_COUNT] = {
   &exampleapplication, 
-  &ackapplication, 
-  &rsrevapplication,
+  &rsrevapplication2,
   &redledonapplication,
   &redledoffapplication,
   &redledapplication,

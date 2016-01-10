@@ -32,7 +32,7 @@ const application greenledonapplication = {
   .name = "glon",
   .name_size = 4,
 #if(MAX_APPLICATION_USAGE_SIZE>0)
-  .usage = "\t\tTurn on green led",
+  .usage = "\t\tTurn on green LED",
 #endif
   .required_right = 0,
   .func = handleGreenLEDon
@@ -42,7 +42,7 @@ unsigned int handleGreenLEDon(unsigned char* req, unsigned int req_size, applica
     return 0;
   }
   GREEN_LED_ON;
-  return generateApplicationStatusResponse(&greenledonapplication, p_session, SUCC, NULL, 0);
+  return generateApplicationStatusResponse(&greenledonapplication, p_session, DONE, NULL, 0);
   
 }
 
@@ -61,7 +61,7 @@ const application greenledoffapplication = {
   .name = "gloff",
   .name_size = 5,
 #if(MAX_APPLICATION_USAGE_SIZE>0)
-  .usage = "\t\tTurn off green led",
+  .usage = "\t\tTurn off green LED",
 #endif
   .required_right = 0,
   .func = handleGreenLEDoff
@@ -71,7 +71,7 @@ unsigned int handleGreenLEDoff(unsigned char* req, unsigned int req_size, applic
     return 0;
   }
   GREEN_LED_OFF;
-  return generateApplicationStatusResponse(&greenledoffapplication, p_session, SUCC, NULL, 0);
+  return generateApplicationStatusResponse(&greenledoffapplication, p_session, DONE, NULL, 0);
 }
 
 /*!
@@ -88,7 +88,7 @@ const application greenledapplication = {
   .name = "gls",
   .name_size = 3,
 #if(MAX_APPLICATION_USAGE_SIZE>0)
-  .usage = "\t\tGreen led status",
+  .usage = "\t\tGreen LED status",
 #endif
   .required_right = 0,
   .func = handleGreenLED
@@ -100,11 +100,11 @@ unsigned int handleGreenLED(unsigned char* req, unsigned int req_size, applicati
   }
   char * status_string;
   if(LED_IS_OFF == GREEN_LED_STATUS){
-    status_string = " is off";
+    status_string = "OFF";
   }else{
-    status_string = " is on";
+    status_string = "ON";
   }
-  return generateApplicationStatusResponse(&greenledapplication, p_session, SUCC, (unsigned char *)status_string, strlen(status_string));
+  return generateApplicationStatusResponse(&greenledapplication, p_session, INFO, (unsigned char *)status_string, strlen(status_string));
 }
 
 

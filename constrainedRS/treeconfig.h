@@ -31,6 +31,7 @@
 #endif
 #include "interface.h"
 #include "printString.h"
+#include "statusString.h"
 #include "scanString.h"
 #include "tmp.h"
 #ifdef  __cplusplus
@@ -38,12 +39,14 @@ extern "C" {
 #endif
 #ifdef MSP
 #define DEBUG(...) 
-#define PRINT(...) 
+#define VPRINT(...)
+#define PRINT(...)  print(__VA_ARGS__)
 #define SPRINT(...) sprint(__VA_ARGS__)
 #define SCAN(...)  
 #define SSCAN(...) sscan(__VA_ARGS__)  
 #else
 #define DEBUG(...) printf(__VA_ARGS__)
+#define VPRINT(...) printf(__VA_ARGS__)
 #define PRINT(...) printf(__VA_ARGS__)
 #define SPRINT(...) sprintf(__VA_ARGS__)
 #define SCAN(...)  scanf(__VA_ARGS___
@@ -69,20 +72,6 @@ extern "C" {
 #define INFO 2
 
 
-#define SUCC_MESSAGE "[SUCCESS]"
-#define SUCC_MESSAGE_SIZE 9
-
-#define DONE_MESSAGE "[DONE]"
-#define DONE_MESSAGE_SIZE 6
-
-#define ERROR_MESSAGE "[ERROR]"
-#define ERROR_MESSAGE_SIZE 7
-
-#define USAGE_MESSAGE "[USAGE]"
-#define USAGE_MESSAGE_SIZE 7
-
-#define INFO_MESSAGE "[INFO]"
-#define INFO_MESSAGE_SIZE 6
 #define RIGHT_TYPE uint8_t
 /*!
  * \brief Macro for when no right is required 
@@ -101,12 +90,6 @@ extern "C" {
 #define ADDR_LEN_TYPE SlSocklen_t
 #define SENDTO_FUNC sl_SendTo
 
-#define ADDR_FAMILY SL_AF_INET
-#define ADDR_TYPE SlSockAddrIn_t
-#define ADDR_SEND_TYPE SlSockAddr_t
-#define ADDR_LEN_TYPE SlSocklen_t
-#define SENDTO_FUNC(...)
-
 #define ADDR_DESCRIPTORS_LEN 1 
 #define ADDR_PREDEF_LEN 1
 #define PREDEF_AS_ADDR ADDR_DESCRIPTORS_LEN
@@ -122,7 +105,7 @@ extern "C" {
 #define APPLICATION_SESSIONS_LEN 2
 #define MAX_APPLICATION_MESSAGE_SIZE 50 
 
-#define MSG_APPLICATION_COUNT 9
+#define MSG_APPLICATION_COUNT 8
 #define UI_APPLICATION_COUNT 0 
 #define MAX_APPLICATION_NAME_SIZE 5
 #define MAX_APPLICATION_USAGE_SIZE 0
@@ -144,9 +127,9 @@ extern "C" {
  *        Rows in the table are called state-vectors.
  *        A state-vector contains multiple indices.
  * */
-#define TREE_STATE_SIZE 2         /*!< Size of state in Bytes*/
-#define TREE_STATE_TYPE uint16_t   /*!< Type of each state */
-#define TREE_STATE_UPPER_BOUNDARY 0xffff  /*!< All allowed states should be smaller than or equal to the STATE_UPPER_BOUNDARY */
+#define TREE_STATE_SIZE 1         /*!< Size of state in Bytes*/
+#define TREE_STATE_TYPE uint8_t   /*!< Type of each state */
+#define TREE_STATE_UPPER_BOUNDARY 0xff  /*!< All allowed states should be smaller than or equal to the STATE_UPPER_BOUNDARY */
 #define TREE_STATE_TABLE_LEN 100     /*!< Number of the table rows (The maximum number of simultaneously authorized clients) */
 #define TREE_STATE_VECTOR_LEN TREE_HEIGTH  /*!< Number of states in each state vector (Number of table columns) */
 
@@ -165,14 +148,14 @@ extern "C" {
 
 #define RED_LED_ON turnLedOn(LED1)
 #define RED_LED_OFF turnLedOff(LED1)
-#define RED_LED_STATUS GetLEDStatus()&1
+#define RED_LED_STATUS (GetLEDStatus()&1)
 
 #define GREEN_LED_ON turnLedOn(LED2)
 #define GREEN_LED_OFF turnLedOff(LED2)
-#define GREEN_LED_STATUS (GetLEDStatus()>>1)
+#define GREEN_LED_STATUS (((GetLEDStatus()>>1))&1)
 
-#define TEST_SIGNAL_HIGH  DEBUG("HIGH!\n");signalHigh()
-#define TEST_SIGNAL_LOW DEBUG("LOW!\n");signalLow()
+#define TEST_SIGNAL_HIGH
+#define TEST_SIGNAL_LOW
 
 
 

@@ -1,4 +1,5 @@
 #include "hmac.h"
+#include "treeconfig.h"
 
 #define IPAD_SINGLE 0x36
 #define OPAD_SINGLE 0x5c

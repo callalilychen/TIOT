@@ -30,7 +30,7 @@
  * \return         0 
  */
 unsigned int handleUIHelp(unsigned char* req, unsigned int req_size, application_session * p_session){
-  PRINT("%s %u user interface applications:\n", USAGE_MESSAGE, UI_APPLICATION_COUNT);
+  PRINT("%s %u user interface commands:\n", USAGE_MESSAGE, UI_APPLICATION_COUNT);
   for(int i = 0; i < UI_APPLICATION_COUNT; i++){
     PRINT("\t%s%s\n", ui_applications[i]->name, ui_applications[i]->usage);
   } 
@@ -57,7 +57,7 @@ const application uihelpapplication = {
  * \return         0 
  */
 unsigned int handleMsgHelp(unsigned char* req, unsigned int req_size, application_session * p_session){
-  PRINT("%s %u message applications:\n", USAGE_MESSAGE, MSG_APPLICATION_COUNT);
+  PRINT("%s %u message commands:\n", USAGE_MESSAGE, MSG_APPLICATION_COUNT);
   for(int i = 0; i < MSG_APPLICATION_COUNT; i++){
     PRINT("\t%s%s\n", msg_applications[i]->name, msg_applications[i]->usage);
   } 
@@ -78,8 +78,7 @@ const application msghelpapplication = {
  */
 const static application *rs_msg_applications[RS_MSG_APPLICATION_COUNT] = {
   &exampleapplication, 
-  &ackapplication, 
-  &rsrevapplication,
+  &rsrevapplication2,
   &redledonapplication,
   &redledoffapplication,
   &redledapplication,
@@ -100,9 +99,9 @@ const static application *rs_msg_applications[RS_MSG_APPLICATION_COUNT] = {
  * \return         0 
  */
 unsigned int handleRSHelp(unsigned char* req, unsigned int req_size, application_session * p_session){
-  PRINT("%s %u resource server message applications:\n", USAGE_MESSAGE, RS_MSG_APPLICATION_COUNT);
+  PRINT("%s %u commands for accesing Resource Servers:\n", USAGE_MESSAGE, RS_MSG_APPLICATION_COUNT);
   for(int i = 0; i < RS_MSG_APPLICATION_COUNT; i++){
-    PRINT("\t%s%s\n", rs_msg_applications[i]->name, rs_msg_applications[i]->usage);
+    PRINT("\t%s%s. Required permissions: 0x%x\n", rs_msg_applications[i]->name, rs_msg_applications[i]->usage, rs_msg_applications[i]->required_right);
   } 
   return 0;
 }

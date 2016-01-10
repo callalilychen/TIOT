@@ -42,6 +42,9 @@ unsigned int handleRSRevocation(unsigned char* req, unsigned int req_size, appli
   }
   unsigned int secret_index;
   if(SSCAN((const char*)req, "%u", &secret_index)==1){
+  incExpectedState(secret_index, 0,0);
+  //TODO make cache smart
+  clearCachedNode(secret_index);
     p_session->message_size = generateApplicationHeader(p_session->message, MAX_APPLICATION_MESSAGE_SIZE-req_size - rsrevapplication.name_size,invalidStateVector(secret_index));
     if(p_session->message_size > 0){
       memcpy(p_session->message + p_session->message_size, req-rsrevapplication.name_size, req_size+rsrevapplication.name_size);
@@ -52,6 +55,33 @@ unsigned int handleRSRevocation(unsigned char* req, unsigned int req_size, appli
 }
 
 
+unsigned int handleRSRevocation2(unsigned char* req, unsigned int req_size, application_session * p_session);
+const application rsrevapplication2 = {
+  .name = "rev",
+  .name_size = 3,
+#if(MAX_APPLICATION_USAGE_SIZE>0)
+  .usage = "\t\tRevoke the current secret",
+#endif
+  .required_right = ADMIN_RIGHT,
+  .func = handleRSRevocation2
+};
+/*!
+ * \brief Handle revocation message
+ *
+ * \param req      Rest of request message after application name
+ * \param req_size Size of this message
+ * \param p_session pointer to the corresponding application session
+ *
+ * \return Response message size
+ */
+unsigned int handleRSRevocation2(unsigned char* req, unsigned int req_size, application_session * p_session){
+  unsigned int secret_index = getSecretIndex(p_session->security_descriptor_id);
+  incExpectedState(secret_index, 0,0);
+  //TODO make cache smart
+  clearCachedNode(secret_index);
+
+  return generateApplicationStatusResponse(&rsrevapplication2, p_session, DONE, NULL, 0);
+}
 
 /*!
  * \}

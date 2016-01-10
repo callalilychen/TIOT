@@ -67,16 +67,16 @@ static inline tree_node * getKeyNode(TREE_STATE_TYPE secret_index, unsigned char
   edges[1].params = (unsigned char *)(&key_index);
   edges[1].params_size = TREE_STATE_SIZE;
   tree_node * p_res;
-  if(flag){
-    p_res = fillNodes(getPathFromRoot(2), edges, 2);
-  }else{
+  if(!flag){
     p_res = fillNodes(getPathFromCachedNodes(1, secret_index), edges+1, 1);
-    if(NULL== p_res){
-      tree_node * p_nodes = getPathFromRoot(2);
-      p_res = fillNodes(p_nodes, edges, 2);
-      setCachedNode(secret_index, p_nodes+1);
+    if(NULL!= p_res){
+      TEST_SIGNAL_HIGH;
+      return p_res;
     }
   }
+    tree_node * p_nodes = getPathFromRoot(2);
+    p_res = fillNodes(p_nodes, edges, 2);
+    setCachedNode(secret_index, p_nodes+1);
   TEST_SIGNAL_HIGH;
   return p_res;
 }
@@ -117,32 +117,36 @@ unsigned int handleSecurityLayer(unsigned char *msg, unsigned int * p_msg_size, 
   TREE_STATE_TYPE secret_index = implementation->getSecretIndex(descriptor_id);
   TREE_STATE_TYPE indexes [2] = {perm_index,  implementation->getKeyIndex(descriptor_id)};
   unsigned int forceUpdate = (getExpectedState(secret_index, 0) != perm_index);
-  PRINT("Force = %u!\n", forceUpdate);
+  DEBUG("Force = %u!\n", forceUpdate);
   //TODO Work around to let AS not update state, perhaps replace with method to wait a message with the same key
   //TODO update, when valid message
 #ifdef SECURITY_LAYER_UPDATE_STATE
-    PRINT("%s Update state!\n", INFO_MESSAGE);
+    DEBUG("%s Update state %u: %x|%x\n", INFO_MESSAGE, secret_index, indexes[0], indexes[1]);
   if(SUCC == updateExpectedStateVector(secret_index, indexes, 1)){
+#else
+    forceUpdate = 1;
 #endif
+    DEBUG("Generate Key:\n");
     // TODO use key identifier to search the same key
     tree_node * p_curr_key = getKeyNode(secret_index, perm_code, perm_code_size, indexes[1], forceUpdate);
+    DEBUG("Verify MAC:\n MAC size is %u \n" , implementation->MACsize);
     if(verifyMAC(p_curr_key, msg+*p_header_size, p_msg_size, implementation->MACsize)){
       // TODO optimization, use descriptor_id security as last tree node
       copyTreeNode(&(tmpDescriptorSecurity.key), p_curr_key);
-    //TODO no signal
+    DEBUG("Update key for descriptor:\n");
       if(SUCC == updateSecurityDescriptor(descriptor_id, &tmpDescriptorSecurity, DESCRIPTOR_SECURITY_SIZE)){
         return descriptor_id;
       } else{
       PRINT("[ERROR] Failed to update security descriptor_id!\n"); 
       }
     }else{
-      PRINT("=======Verify MAC %u=========\n", descriptor_id);
-      printBlock("key", p_curr_key->block, p_curr_key->size);
-      printBlock("msg", msg+*p_header_size, *p_msg_size);
-      printBlock("getMac", msg+*p_msg_size, implementation->MACsize);
-      printBlock("sollMac", tmpMAC, implementation->MACsize);
-      PRINT("============================\n");
-      PRINT("[ERROR] Failed to verify MAC!\n"); 
+      DEBUG("=======Verify MAC %u=========\n", descriptor_id);
+      debugBlock("key", p_curr_key->block, p_curr_key->size);
+      debugBlock("msg", msg+*p_header_size, *p_msg_size);
+      debugBlock("getMac", msg+*p_msg_size, implementation->MACsize);
+      debugBlock("sollMac", tmpMAC, implementation->MACsize);
+      DEBUG("============================\n");
+      DEBUG("[ERROR] Failed to verify MAC!\n"); 
     }
 #ifdef SECURITY_LAYER_UPDATE_STATE
   }else{

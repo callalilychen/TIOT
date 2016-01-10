@@ -20,7 +20,7 @@
 #include "addr_descriptor.h"
 #include "tree.h"
 unsigned int selected_addr_id = 0;
-unsigned int selected_security_id = PREDEF_TEST_SECURITY_DESCRIPTOR;
+unsigned int selected_security_id = 0;
 
 /*!
  * \brief Handle send message cmd to the currently chosen address
@@ -121,7 +121,7 @@ unsigned int handleSecureSend(unsigned char* req, unsigned int req_size, applica
   tree_node * p_key_node = NULL;
 
   p_key_node = fillNodes(getPathFromRoot(depth), edges, depth);
-  printBlock("Key", p_key_node->block, p_key_node->size);
+  debugBlock("Key", p_key_node->block, p_key_node->size);
 
   if(SUCC!=updateSecurityWithKey(p_session->security_descriptor_id, p_key_node)){
     updatePredefSecurityWithKey(p_session->security_descriptor_id, p_key_node);
@@ -174,7 +174,8 @@ unsigned int handleMsg(unsigned char* req, unsigned int req_size, application_se
   }
   pthread_mutex_unlock(&(test.lock));
   req[req_size] = '\0';
-  PRINT("[%s (%u)\n", req, req_size);
+  PRINT("[%s\n", req);
+  DEBUG("Size: %u\n", req_size);
   return 0;
 }
  /*!
@@ -231,7 +232,7 @@ void* testsend(void *nothing){
       tree_node * p_key_node = NULL;
 
       p_key_node = fillNodes(getPathFromRoot(depth), edges, depth);
-      printBlock("Key", p_key_node->block, p_key_node->size);
+      debugBlock("Key", p_key_node->block, p_key_node->size);
 
       updatePredefSecurityWithKey(test.security_descriptor_id, p_key_node);
       generateSecurityLayerHeader(test.security_descriptor_id, test.buf[buf_index], BUFSIZE);
@@ -290,7 +291,7 @@ static unsigned int testSendCMD(unsigned char *req, unsigned int req_size, unsig
     /*!
       * Separate req to different messages
       *
-      * \note sscanf((const char*)req, "%s,%s,%s,%s", test.buf[0]+header_size, test.buf[1]+header_size, test.buf[2]+header_size, test.buf[3]+header_size) does not work
+      * \note sscanf((const char*)req, "%s:%s:%s:%s", test.buf[0]+header_size, test.buf[1]+header_size, test.buf[2]+header_size, test.buf[3]+header_size) does not work
       */
     unsigned int header_size = getSecurityLayerHeaderSize(test.security_descriptor_id);
     unsigned int mac_size = getSecurityLayerMACSize(test.security_descriptor_id);
@@ -298,7 +299,7 @@ static unsigned int testSendCMD(unsigned char *req, unsigned int req_size, unsig
     unsigned int curr_buf_size = 0;
     unsigned int total_buf_size = 0;
     for(int i = 0; i < req_size; i++){
-      if(req[i] == ','){
+      if(req[i] == ':'){
         test.buf_size[curr_buf_index] = header_size+curr_buf_size+mac_size;
         total_buf_size += curr_buf_size;
         curr_buf_index ++;
@@ -353,7 +354,7 @@ unsigned int handleTestSend(unsigned char* req, unsigned int req_size, applicati
 const application testsendapplication = {
   .name = "ts:",
   .name_size = 3,
-  .usage = "%s[,%s,%s,%s]\t<message>,...\tPeriodically send the given messages to the selected address without security issues",
+  .usage = "%s[:%s:%s:%s]\t<message>,...\tPeriodically send the given messages to the selected address without security issues",
   .required_right = NO_RIGHT,
   .func = handleTestSend
 };
@@ -377,7 +378,7 @@ unsigned int handleTestSecureSend(unsigned char* req, unsigned int req_size, app
 const application testsecuresendapplication = {
   .name = "tss:",
   .name_size = 4,
-  .usage = "%s[,%s,%s,%s]\t<message>,...\tPeriodically send the given messages to the selected address with security issues",
+  .usage = "%s[:%s:%s:%s]\t<message>,...\tPeriodically send the given messages to the selected address with security issues",
   .required_right = NO_RIGHT,
   .func = handleTestSecureSend
 };

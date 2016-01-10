@@ -58,7 +58,7 @@ extern "C" {
    *
    * \param p_descriptor  The pointer to the descriptor
    *
-   * \return              The descriptor value
+   * \return              NULL
    */
   inline void (__attribute__((always_inline))activeDescriptor)(descriptor* p_descriptor){
     if(p_descriptor!=NULL){

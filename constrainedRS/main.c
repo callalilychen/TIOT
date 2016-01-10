@@ -103,16 +103,16 @@ int main(int argc, char** argv)
   while(1){
 
     Buf_Read();
-    if(P2IN&BIT1){
-      RED_LED_OFF;
-    }else{
-      RED_LED_ON;
-    }
-    if(P1IN&BIT1){
-      GREEN_LED_OFF;
-    }else{
-      GREEN_LED_ON;
-    }
+//    if(P2IN&BIT1){
+//      RED_LED_OFF;
+//    }else{
+//      RED_LED_ON;
+//    }
+//    if(P1IN&BIT1){
+//      GREEN_LED_OFF;
+//    }else{
+//      GREEN_LED_ON;
+//    }
   }
 
 

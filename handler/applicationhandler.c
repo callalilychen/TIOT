@@ -53,13 +53,14 @@ unsigned int generateApplicationHeader(unsigned char* buf, unsigned int max_buf_
 unsigned int generateApplicationStatusResponse(const application* p_application, application_session * p_session, int type, unsigned char * status, unsigned int status_size){
   p_session->message_size = generateApplicationHeader(p_session->message, MAX_APPLICATION_MESSAGE_SIZE - p_application->name_size - status_size,  type);
     if(p_session->message_size > 0){
-      memcpy(p_session->message + p_session->message_size, p_application->name, p_application->name_size);
-      p_session->message_size +=  p_application->name_size;
+      //memcpy(p_session->message + p_session->message_size, p_application->name, p_application->name_size);
+      //p_session->message_size +=  p_application->name_size;
       memcpy(p_session->message + p_session->message_size, status, status_size);
       p_session->message_size +=  status_size;
       p_session->message[p_session->message_size] = '\0';
   }
-  PRINT("Response (%u): %s\n", p_session->message_size, p_session->message);
+  VPRINT("Response (%u): %s\n", p_session->message_size, p_session->message);
+  PRINT("v ");
   return p_session->message_size;
 }
 
@@ -96,8 +97,8 @@ unsigned int generateApplicationStatusResponse(const application* p_application,
           if(!hasRight){
             //p_session -> security_descriptor_id = NO_DESCRIPTOR;
             deactiveSecurityDescriptor(p_session -> security_descriptor_id);
-            memcpy(p_session->message, "[ERROR] No Right!", 17);
-            p_session->message[17] = '\0';
+            memcpy(p_session->message, "[ERR] NOP", 9);
+            p_session->message[9] = '\0';
             p_session->message_size = strlen((const char*)(p_session->message));
             PRINT("%s\n", p_session->message);
           } else if ((p_session->message_size = applications[i]->func(req+applications[i]->name_size, req_size-applications[i]->name_size, p_session))>0){

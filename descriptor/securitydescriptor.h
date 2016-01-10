@@ -94,6 +94,18 @@ extern "C" {
   }  
 
   /*!
+   * \brief Active the security descriptor of the given id
+   *
+   *  \param id       Identifier of the security descriptor to be checked
+   *
+   *  \return         None
+   *
+   */
+  inline int __attribute__((always_inline)) activeSecurityDescriptor(unsigned int id){
+    if(id < SECURITY_DESCRIPTORS_LEN)
+      activeDescriptor(security_descriptors+id);
+  }
+  /*!
    * \brief Get key node for the given descriptor id
    *
    * \param id    Identifier of the required security storage

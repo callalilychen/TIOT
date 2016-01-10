@@ -23,36 +23,38 @@
 /* Include files                                                             */
 /*****************************************************************************/
 #include "interface.h"
+#include "statusString.h"
 #include "scanString.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "tmp.h"
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
+
+/*!
+ * \brief Macro for print function
+ */
 #ifdef MSP
 #define DEBUG(...) 
 #define PRINT(...) 
+#define WPRINT(...) 
 #define SPRINT(...) sprint(__VA_ARGS__)
 #define SCAN(...)  
 #define SSCAN(...) sscan(__VA_ARGS__)  
 #else
-#define DEBUG(...) printf(__VA_ARGS__)
+#define DEBUG(...)
 #define PRINT(...) printf(__VA_ARGS__)
+#define VPRINT(...) printf(__VA_ARGS__)
 #define SPRINT(...) sprintf(__VA_ARGS__)
-#define SCAN(...)  scanf(__VA_ARGS___
-#define SSCAN(...) sscanf(__VA_ARGS__)  
+#define SCAN(...)  scanf(__VA_ARGS__)
+#define SSCAN(...) sscan(__VA_ARGS__)  
 #endif
 #define BUFSIZE 512
-/*!
- * \brief Macro for print function
- */
-#define PRINT(...) printf(__VA_ARGS__)
-#define SCAN(...) scanf(__VA_ARGS__)
-#define SSCAN(...) sscan(__VA_ARGS__)
-#define SPRINT(...) sprintf(__VA_ARGS__)
+
 
 /*!
  * \brief Macro to indicate, whether an operation is successful 
@@ -70,23 +72,6 @@ extern "C" {
  * \brief Macro to indicate infomations 
  */
 #define INFO 2
-
-
-#define SUCC_MESSAGE "[SUCCESS]"
-#define SUCC_MESSAGE_SIZE 9
-
-#define DONE_MESSAGE "[DONE]"
-#define DONE_MESSAGE_SIZE 6
-
-#define ERROR_MESSAGE "[ERROR]"
-#define ERROR_MESSAGE_SIZE 7
-
-#define USAGE_MESSAGE "[USAGE]"
-#define USAGE_MESSAGE_SIZE 7
-
-#define INFO_MESSAGE "[INFO]"
-#define INFO_MESSAGE_SIZE 6
-
 
 #define RIGHT_TYPE uint8_t
 /*!
@@ -123,38 +108,34 @@ extern "C" {
 #define APPLICATION_SESSIONS_LEN 2
 #define MAX_APPLICATION_MESSAGE_SIZE 200  
 
-#define RS_MSG_APPLICATION_COUNT 9
+#define RS_MSG_APPLICATION_COUNT 8
 #define MSG_APPLICATION_COUNT 5
 #define UI_APPLICATION_COUNT 23
 #define MAX_APPLICATION_NAME_SIZE 20
 #define MAX_APPLICATION_USAGE_SIZE 200
 
 /*!
- * \brief Configuration of tree
+ * \brief Configuration of the secret tree
  *
- *        0. level -> root
- *        1. level -> secrets
- *        2. level -> key // FIXME AS can also behavior as C
- *
+ *        0. Level -> Server Secret 
+ *        1. Level -> Client Secrets
+ *        2. Level -> Keys 
  * */
 #define TREE_HEIGTH 2
-#define CACHED_NODES_LEN ADDR_DESCRIPTORS_LEN
+#define CACHED_NODES_LEN 5
 
 /*!
- * \brief Configuration of state manangement
+ * \brief Configuration of secret tree state 
  *
- *        States are managed in a table
- *        Each row in the table represents a state-vector
- *        A state-vector contains multiple states
- *
+ *        States are managed in a table.
+ *        Rows in the table are called state-vectors.
+ *        A state-vector contains multiple indices.
  * */
-#define TREE_STATE_TABLE_LEN 0xff     /*!< Number of state vectors in the table (Number of table rows) */
-#define TREE_STATE_VECTOR_LEN 2  /*!< Number of states in each state vector (Number of table columns) */
-
-#define TREE_STATE_SIZE 2          /*!< Size of state in Bytes*/
-#define TREE_STATE_TYPE uint16_t   /*!< Type of each state */
-#define TREE_STATE_UPPER_BOUNDARY 0xff  /*!< All allowed states should be smaller than the TREE_STATE_UPPER_BOUNDARY */
-
+#define TREE_STATE_SIZE 1         /*!< Size of state in Bytes*/
+#define TREE_STATE_TYPE uint8_t   /*!< Type of each state */
+#define TREE_STATE_UPPER_BOUNDARY 0xff  /*!< All allowed states should be smaller than or equal to the STATE_UPPER_BOUNDARY */
+#define TREE_STATE_TABLE_LEN 100     /*!< Number of the table rows (The maximum number of simultaneously authorized clients) */
+#define TREE_STATE_VECTOR_LEN TREE_HEIGTH  /*!< Number of states in each state vector (Number of table columns) */
 
 /*!
  * \brief Configuration of bit map
@@ -174,8 +155,8 @@ extern "C" {
 #define GREEN_LED_OFF printf("GREEN LED if off!\n")
 #define GREEN_LED_STATUS LED_IS_ON
 
-#define TEST_SIGNAL_HIGH printf("HIGH!\n")
-#define TEST_SIGNAL_LOW printf("LOW!\n")
+#define TEST_SIGNAL_HIGH
+#define TEST_SIGNAL_LOW
 
 #ifdef  __cplusplus
 }
